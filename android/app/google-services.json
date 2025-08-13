@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "389470171647",
+    "project_id": "webtnmfact",
+    "storage_bucket": "webtnmfact.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:389470171647:android:fa32951215edd9e322f7ca",
+        "android_client_info": {
+          "package_name": "com.example.tnm_fact"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDJXFFOWwtf1SMUBNqjVRqHXHbSMrMovg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

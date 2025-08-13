@@ -1,13 +1,19 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:tnm_fact/controller/home_page_controller.dart';
+import 'package:tnm_fact/firebase_options.dart';
 import 'package:tnm_fact/view/page/home_page.dart';
 
-void main() {
+void main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
-    WidgetsFlutterBinding.ensureInitialized();
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
