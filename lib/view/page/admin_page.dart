@@ -5,6 +5,8 @@ import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/view/page/create_page.dart';
 import 'package:tnm_fact/view/widget/app_admin_top_bar.dart';
+import 'package:tnm_fact/view/widget/app_post.dart';
+import 'package:tnm_fact/view/widget/app_post_title.dart';
 
 class AdminPage extends GetView<AdminController> {
   const AdminPage({super.key});
@@ -18,7 +20,10 @@ class AdminPage extends GetView<AdminController> {
           backgroundColor: AppColor.primary,
           actions: [
             IconButton(
-              icon: const Icon(Icons.add, color: Colors.white,),
+              icon: const Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
               onPressed: () {
                 Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
                 // 여기에 글 작성 로직 추가
@@ -33,7 +38,7 @@ class AdminPage extends GetView<AdminController> {
             children: [
               Obx(() {
                 return AppAdminTopBar(
-                  totalCount: 88,
+                  totalCount: controller.totalCount.value,
                   publishedCount: 87,
                   pendingCount: 1,
                   selectedIndex: controller.selectedIndex.value,
@@ -56,7 +61,26 @@ class AdminPage extends GetView<AdminController> {
                 );
               }),
               Container(),
-              Container()
+              SizedBox(height: 16.h),
+              AppPostTitle(),
+              Expanded(
+                child: Obx(() {
+                  return ListView.builder(
+                    itemCount: controller.postList.length,
+                    itemBuilder: (context, index) {
+                      print('게시글 수: ${controller.postList.length}');
+                      final post = controller.postList[index];
+                      return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.h),
+                          child: AppPost(
+                              title: post['title'] ?? '',
+                              author: post['author'] ?? '',
+                              category: post['category'] ?? '',
+                              createdAt: post['createdAt'] ?? ''));
+                    },
+                  );
+                }),
+              )
             ],
           ),
         ));

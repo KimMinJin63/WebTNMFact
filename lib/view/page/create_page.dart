@@ -1,70 +1,125 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:tnm_fact/controller/admin_controller.dart';
+import 'package:tnm_fact/controller/create_controller.dart';
+import 'package:tnm_fact/utils/app_color.dart';
+import 'package:tnm_fact/utils/app_text_style.dart';
+import 'package:tnm_fact/view/page/admin_page.dart';
 
-class CreatePage extends StatelessWidget {
+class CreatePage extends GetView<CreateController> {
   const CreatePage({super.key});
-  static const String route = '/create'; // 페이지 라우트 이름
+  static const String route = '/create';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-           Text('제목'),  
-            SizedBox(height: 8.h),
-            TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: '제목을 입력하세요',
+      appBar: AppBar(
+        title: Text('제목 없음 · 글'),
+        centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: () {
+              controller.createPost(
+                title: controller.titleController.text,
+                content: controller.contentController.text,
+                category: controller.selectedCategory.value,
+                author: '김병국'
+
+              );
+              Get.find<AdminController>().fetchPosts();
+              Get.toNamed(AdminPage.route); // 글 작성 후 관리자 페이지로 이동
+            },
+            child: Text(
+              '공개',
+              style: TextStyle(color: Colors.white),
+            ),
+          )
+        ],
+        backgroundColor: Colors.grey[900],
+      ),
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 왼쪽: 본문 입력 영역
+          Expanded(
+            flex: 3,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 32.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 제목
+                  TextField(
+                    controller: controller.titleController,
+                    style: AppTextStyle.koBold35(),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: '제목 추가',
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+
+                  // 본문
+                  Expanded(
+                    child: TextField(
+                      controller: controller.contentController,
+                      maxLines: null,
+                      expands: true,
+                      keyboardType: TextInputType.multiline,
+                      decoration: InputDecoration(
+                        hintText: '/을 입력하여 블록 선택',
+                        border: InputBorder.none,
+                      ),
+                      style: AppTextStyle.koRegular18()
+                          .copyWith(color: AppColor.black),
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 16.h),
-            Text('내용'),
-            SizedBox(height: 8.h),
-            TextField(
-              maxLines: 5,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: '내용을 입력하세요',
+          ),
+
+          // 오른쪽: 카테고리 사이드바
+          Container(
+            width: 200.w,
+            decoration: BoxDecoration(
+              border: Border(left: BorderSide(color: Colors.grey[300]!)),
+              color: Colors.grey[50],
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
+            child: Obx(
+              () => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('카테고리', style: TextStyle(fontWeight: FontWeight.bold)),
+                  SizedBox(height: 16.h),
+                  CheckboxListTile(
+                    title: Text('데일리 팩트'),
+                    value: controller.selectedCategory.value == '데일리 팩트',
+                    onChanged: (val) {
+                      controller.selectedCategory.value =
+                          val! ? '데일리 팩트' : ''; // 선택/해제
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  CheckboxListTile(
+                    title: Text('인사이트 팩트'),
+                    value: controller.selectedCategory.value == '인사이트 팩트',
+                    onChanged: (val) {
+                      controller.selectedCategory.value = val! ? '인사이트 팩트' : '';
+                    },
+                    controlAffinity: ListTileControlAffinity.leading,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 16.h),
-            Text('카테고리'),
-            DropdownButton<String>(
-              items: <String>['데일리팩트', '인사이트팩트']
-                  .map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (_) {},
-              hint: Text('카테고리를 선택하세요'),
-            ),
-            SizedBox(height: 16.h),
-            Text('태그'),
-            TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: '태그를 입력하세요 (쉼표로 구분)',
-              ),
-            ),
-            SizedBox(height: 16.h),
-            Text('이미지 업로드'),  
-            ElevatedButton(
-              onPressed: () {
-                // 글 작성 로직 추가
-                print('글 작성 버튼 클릭됨');
-              },
-              child: const Text('글 작성하기'),
-            ),
-          ],  
-        ),
-      )
+          ),
+        ],
+      ),
     );
   }
 }

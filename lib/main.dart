@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
+import 'package:tnm_fact/controller/create_controller.dart';
 import 'package:tnm_fact/controller/home_page_controller.dart';
 import 'package:tnm_fact/controller/login_controller.dart';
 import 'package:tnm_fact/firebase_options.dart';
@@ -10,12 +11,15 @@ import 'package:tnm_fact/utils/app_pages.dart';
 import 'package:tnm_fact/view/page/admin_page.dart';
 import 'package:tnm_fact/view/page/home_page.dart';
 import 'package:tnm_fact/view/page/login_page.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await initializeDateFormatting('ko_KR', null); // ✅ 로케일 설정 추가
   runApp(const MyApp());
 }
 
@@ -38,6 +42,7 @@ class MyApp extends StatelessWidget {
             Get.lazyPut(() => HomePageController(), fenix: true);
             Get.lazyPut(() => LoginController(), fenix: true);
             Get.lazyPut(() => AdminController(), fenix: true);
+            Get.lazyPut(() => CreateController(), fenix: true);
           }),
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
