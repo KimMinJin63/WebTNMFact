@@ -1,0 +1,64 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:tnm_fact/controller/admin_controller.dart';
+import 'package:tnm_fact/utils/app_color.dart';
+import 'package:tnm_fact/view/page/create_page.dart';
+import 'package:tnm_fact/view/widget/app_admin_top_bar.dart';
+
+class AdminPage extends GetView<AdminController> {
+  const AdminPage({super.key});
+  static const String route = '/admin';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('글'),
+          backgroundColor: AppColor.primary,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add, color: Colors.white,),
+              onPressed: () {
+                Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
+                // 여기에 글 작성 로직 추가
+                print('글 작성 버튼 클릭됨');
+              },
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            children: [
+              Obx(() {
+                return AppAdminTopBar(
+                  totalCount: 88,
+                  publishedCount: 87,
+                  pendingCount: 1,
+                  selectedIndex: controller.selectedIndex.value,
+                  searchController: controller.searchController,
+                  onSearch: (keyword) {
+                    print('검색: $keyword');
+                  },
+                  onTapAll: () {
+                    controller.selectTab(0);
+                    print('모두 탭 클릭');
+                  },
+                  onTapPublished: () {
+                    controller.selectTab(1);
+                    print('발행됨 클릭');
+                  },
+                  onTapPending: () {
+                    controller.selectTab(2);
+                    print('대기중 클릭');
+                  },
+                );
+              }),
+              Container(),
+              Container()
+            ],
+          ),
+        ));
+  }
+}

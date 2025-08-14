@@ -129,109 +129,83 @@ class HomePage extends GetView<HomePageController> {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 72.w),
               child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, crossAxisSpacing: 40.w, // 가로 간격
-                    mainAxisSpacing: 32.h,
-                    childAspectRatio: 0.7,
-                  ), // 세로 간격),
-
-                  itemBuilder: (context, index) {
-                    return LayoutBuilder(
-                      builder: (context, constraints) {
-                        final double whiteHeight = constraints.maxHeight;
-                        final double greyHeight = whiteHeight / 9 * 4.h;
-
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: AppColor.white,
-                            borderRadius: BorderRadius.circular(16.r),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColor.grey.withOpacity(0.2),
-                                blurRadius: 4.r,
-                                offset: Offset(0, 2.h),
+                itemCount: 12, // 원하시는 개수로 변경하세요
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 40.w,
+                  mainAxisSpacing: 32.h,
+                  childAspectRatio: 0.7,
+                ),
+                itemBuilder: (context, index) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.white,
+                      borderRadius: BorderRadius.circular(16.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColor.grey.withOpacity(0.2),
+                          blurRadius: 4.r,
+                          offset: Offset(0, 2.h),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                        padding: EdgeInsets.all(16.w),
+                        child: Column(
+                          children: [
+                            // 상단 이미지 영역
+                            AspectRatio(
+                              aspectRatio: 3 / 2,
+                              child: Container(
+                                width: double.infinity,
+                                color: AppColor.grey,
+                                child: Center(
+                                  child: Text('이미지 $index',
+                                      style: AppTextStyle.koRegular18()),
+                                ),
                               ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  height: greyHeight,
-                                  decoration: BoxDecoration(
-                                    color: AppColor.grey,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '이미지 $index',
-                                      style: AppTextStyle.koRegular18(),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  height: whiteHeight / 12.h,
-                                  alignment: Alignment.center,
-                                  color: AppColor.shadowGrey,
-                                  margin: EdgeInsets.only(top: 8.h),
-                                  child: Center(
-                                    child: Text(
-                                      '해시태그 $index',
-                                      style: AppTextStyle.koRegular18(),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  height: whiteHeight / 7.h,
-                                  alignment: Alignment.center,
-                                                                    color: AppColor.shadowGrey,
-                                  margin: EdgeInsets.only(top: 8.h),
-                                  child: Center(
-                                    child: Text(
-                                      '제목 $index',
-                                      style: AppTextStyle.koRegular18(),
-                                    ),
-                                  ),
-
-                                ),
-                                Container(
-                                  height: whiteHeight / 7.h,
-                                  alignment: Alignment.center,
-                                                                    color: AppColor.shadowGrey,
-                                  margin: EdgeInsets.only(top: 8.h),
-                                  child: Center(
-                                    child: Text(
-                                      '본문 $index',
-                                      style: AppTextStyle.koRegular18(),
-                                    ),
-                                  ),
-
-                                ),
-                                Container(
-                                  height: whiteHeight / 15.h,
-                                  alignment: Alignment.center,
-                                                                    color: AppColor.shadowGrey,
-                                  margin: EdgeInsets.only(top: 8.h),
-                                  child: Center(
-                                    child: Text(
-                                      '날짜 $index',
-                                      style: AppTextStyle.koRegular18(),
-                                    ),
-                                  ),
-
-                                ),
-                              ],
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  }),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  _buildFlexibleBox('해시태그 $index', flex: 2),
+                                  _buildFlexibleBox('제목 제목 제목 제목 제목 $index',
+                                      flex: 2),
+                                  _buildFlexibleBox(
+                                      '본문이 아주 길 수도 있고\n2줄도 될 수 있음 $index',
+                                      flex: 5),
+                                  _buildFlexibleBox('2025.08.14', flex: 1),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )),
+                  );
+                },
+              ),
             ),
-          ),
+          )
         ],
       ),
     );
   }
+}
+
+Widget _buildFlexibleBox(String text, {required int flex}) {
+  return Expanded(
+    flex: flex,
+    child: Container(
+      margin: EdgeInsets.only(top: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w),
+      alignment: Alignment.center,
+      color: AppColor.shadowGrey,
+      child: Text(
+        text,
+        style: AppTextStyle.koRegular18(),
+        textAlign: TextAlign.center,
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
+      ),
+    ),
+  );
 }

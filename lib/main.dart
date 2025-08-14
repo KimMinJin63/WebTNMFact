@@ -2,9 +2,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/controller/home_page_controller.dart';
+import 'package:tnm_fact/controller/login_controller.dart';
 import 'package:tnm_fact/firebase_options.dart';
+import 'package:tnm_fact/utils/app_pages.dart';
+import 'package:tnm_fact/view/page/admin_page.dart';
 import 'package:tnm_fact/view/page/home_page.dart';
+import 'package:tnm_fact/view/page/login_page.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -14,12 +19,11 @@ void main() async {
   runApp(const MyApp());
 }
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
-    @override
+  @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: const Size(1440, 900),
@@ -27,17 +31,22 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return GetMaterialApp(
-          title: 'Flutter Demo',
+          title: 'TNM FACT',
           debugShowCheckedModeBanner: false,
           useInheritedMediaQuery: true,
           initialBinding: BindingsBuilder(() {
             Get.lazyPut(() => HomePageController(), fenix: true);
+            Get.lazyPut(() => LoginController(), fenix: true);
+            Get.lazyPut(() => AdminController(), fenix: true);
           }),
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             useMaterial3: true,
           ),
-          home: const HomePage(), // ✅ 진입점 명시(가장 간단)
+          // home: const AdminPage(),
+          home: const LoginPage(),
+          getPages: AppPages.pages,
+          // home: const HomePage(),
           // initialRoute / getPages 조합을 쓰려면 아래처럼:
           // initialRoute: HomePage.route,
           // getPages: [
