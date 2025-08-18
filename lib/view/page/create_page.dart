@@ -19,23 +19,26 @@ class CreatePage extends GetView<CreateController> {
         title: Text('제목 없음 · 글'),
         centerTitle: true,
         actions: [
-          TextButton(
-            onPressed: () {
-              controller.createPost(
-                title: controller.titleController.text,
-                content: controller.contentController.text,
-                category: controller.selectedCategory.value,
-                author: '김병국'
-
-              );
-              Get.find<AdminController>().fetchPosts();
-              Get.toNamed(AdminPage.route); // 글 작성 후 관리자 페이지로 이동
-            },
-            child: Text(
-              '공개',
-              style: TextStyle(color: Colors.white),
+          // Obx(
+          //   () => 
+            TextButton(
+              onPressed: () {
+                controller.createPost(
+                    title: controller.titleController.text,
+                    content: controller.contentController.text,
+                    category: controller.selectedCategory.value,
+                    status: controller.selectedPublish.value,
+                    author: '김병국');
+                Get.find<AdminController>().fetchAllPosts();
+                Get.find<AdminController>().fetchAllPostCounts();
+                Get.offNamed(AdminPage.route); // 글 작성 후 관리자 페이지로 이동
+              },
+              child: Text(
+                '공개',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
-          )
+          // )
         ],
         backgroundColor: Colors.grey[900],
       ),
@@ -89,33 +92,75 @@ class CreatePage extends GetView<CreateController> {
               color: Colors.grey[50],
             ),
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
-            child: Obx(
-              () => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('카테고리', style: TextStyle(fontWeight: FontWeight.bold)),
-                  SizedBox(height: 16.h),
-                  CheckboxListTile(
-                    title: Text('데일리 팩트'),
-                    value: controller.selectedCategory.value == '데일리 팩트',
-                    onChanged: (val) {
-                      controller.selectedCategory.value =
-                          val! ? '데일리 팩트' : ''; // 선택/해제
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                    contentPadding: EdgeInsets.zero,
+            child: Column(
+              children: [
+                Obx(
+                  () => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('카테고리',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(height: 16.h),
+                      CheckboxListTile(
+                        title: Text('데일리 팩트'),
+                        value: controller.selectedCategory.value == '데일리 팩트',
+                        onChanged: (val) {
+                          controller.selectedCategory.value =
+                              val! ? '데일리 팩트' : ''; // 선택/해제
+                        },
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      CheckboxListTile(
+                        title: Text('인사이트 팩트'),
+                        value: controller.selectedCategory.value == '인사이트 팩트',
+                        onChanged: (val) {
+                          controller.selectedCategory.value =
+                              val! ? '인사이트 팩트' : '';
+                        },
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ],
                   ),
-                  CheckboxListTile(
-                    title: Text('인사이트 팩트'),
-                    value: controller.selectedCategory.value == '인사이트 팩트',
-                    onChanged: (val) {
-                      controller.selectedCategory.value = val! ? '인사이트 팩트' : '';
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                    contentPadding: EdgeInsets.zero,
+                ),
+                SizedBox(
+                  height: 18.h,
+                ),
+                Divider(),
+                SizedBox(
+                  height: 18.h,
+                ),
+                Obx(
+                  () => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('발행여부',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(height: 16.h),
+                      CheckboxListTile(
+                        title: Text('발행'),
+                        value: controller.selectedPublish.value == '발행',
+                        onChanged: (val) {
+                          controller.selectedPublish.value =
+                              val! ? '발행' : ''; // 선택/해제
+                        },
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      CheckboxListTile(
+                        title: Text('미발행'),
+                        value: controller.selectedPublish.value == '미발행',
+                        onChanged: (val) {
+                          controller.selectedPublish.value = val! ? '미발행' : '';
+                        },
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],

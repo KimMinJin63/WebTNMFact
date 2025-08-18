@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 
 class AppPost extends StatelessWidget {
@@ -8,11 +9,13 @@ class AppPost extends StatelessWidget {
       required this.title,
       required this.author,
       required this.category,
-      required this.createdAt});
+      required this.createdAt,
+      this.onTap});
   final String title;
   final String author;
   final String category;
   final String createdAt;
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +54,7 @@ class AppPost extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: () {
-                // 수정 페이지로 이동
-                // print('수정 클릭: ${post['id']}');
-              },
+              onPressed: onTap
             ),
             IconButton(
               icon: const Icon(Icons.delete),

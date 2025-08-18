@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/view/page/create_page.dart';
+import 'package:tnm_fact/view/page/edit_page.dart';
 import 'package:tnm_fact/view/widget/app_admin_top_bar.dart';
 import 'package:tnm_fact/view/widget/app_post.dart';
 import 'package:tnm_fact/view/widget/app_post_title.dart';
@@ -39,8 +40,8 @@ class AdminPage extends GetView<AdminController> {
               Obx(() {
                 return AppAdminTopBar(
                   totalCount: controller.totalCount.value,
-                  publishedCount: 87,
-                  pendingCount: 1,
+                  publishedCount: controller.publishedCount.value,
+                  pendingCount: controller.pendingCount.value,
                   selectedIndex: controller.selectedIndex.value,
                   searchController: controller.searchController,
                   onSearch: (keyword) {
@@ -76,7 +77,8 @@ class AdminPage extends GetView<AdminController> {
                               title: post['title'] ?? '',
                               author: post['author'] ?? '',
                               category: post['category'] ?? '',
-                              createdAt: post['createdAt'] ?? ''));
+                              createdAt: post['createdAt'] ?? '',
+                              onTap: () => Get.toNamed(EditPage.route, arguments: post)));
                     },
                   );
                 }),
