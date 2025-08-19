@@ -12,7 +12,7 @@ class AppTitleButton extends StatelessWidget {
     return TextButton(
         onPressed: onPressed,
         child: Text(title,
-            style: AppTextStyle.koBold18().copyWith(
+            style: AppTextStyle.koBold13().copyWith(
               color: color
             )));
     

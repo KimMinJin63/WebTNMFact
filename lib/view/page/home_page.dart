@@ -21,7 +21,7 @@ class HomePage extends GetView<HomePageController> {
           leading: Padding(
             padding: EdgeInsets.only(left: 16.w),
             child:
-                Center(child: Text('TNM FACT', style: AppTextStyle.koBold28())),
+                Center(child: Text('TNM FACT', style: AppTextStyle.koBold20())),
           ),
           title: Center(
             child: Row(
@@ -131,7 +131,7 @@ class HomePage extends GetView<HomePageController> {
               child: GridView.builder(
                 itemCount: 12, // 원하시는 개수로 변경하세요
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
+                  crossAxisCount: 4,
                   crossAxisSpacing: 40.w,
                   mainAxisSpacing: 32.h,
                   childAspectRatio: 0.7,
@@ -155,7 +155,7 @@ class HomePage extends GetView<HomePageController> {
                           children: [
                             // 상단 이미지 영역
                             AspectRatio(
-                              aspectRatio: 3 / 2,
+                              aspectRatio: 5 / 3,
                               child: Container(
                                 width: double.infinity,
                                 color: AppColor.grey,
@@ -168,12 +168,12 @@ class HomePage extends GetView<HomePageController> {
                             Expanded(
                               child: Column(
                                 children: [
-                                  _buildFlexibleBox('해시태그 $index', flex: 2),
+                                  _buildFlexibleBox('해시태그 $index', flex: 1),
                                   _buildFlexibleBox('제목 제목 제목 제목 제목 $index',
                                       flex: 2),
                                   _buildFlexibleBox(
                                       '본문이 아주 길 수도 있고\n2줄도 될 수 있음 $index',
-                                      flex: 5),
+                                      flex: 3),
                                   _buildFlexibleBox('2025.08.14', flex: 1),
                                 ],
                               ),

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
+import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/page/create_page.dart';
 import 'package:tnm_fact/view/page/edit_page.dart';
 import 'package:tnm_fact/view/widget/app_admin_top_bar.dart';
@@ -17,24 +18,59 @@ class AdminPage extends GetView<AdminController> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('어드민 페이지'),
-          backgroundColor: AppColor.primary,
+          elevation: 0,
+          title: Text(
+            '관리 페이지',
+            style: AppTextStyle.koBold28().copyWith(color: AppColor.black),
+          ),
+          backgroundColor: Colors.transparent,
           actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.add,
-                color: Colors.white,
+            Padding(
+              padding: EdgeInsets.only(right: 32.w),
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: TextButton(
+                  child: Text('기사 작성'),
+                  onPressed: () {
+                    Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
+                    // 여기에 글 작성 로직 추가
+                    print('글 작성 버튼 클릭됨');
+                  },
+                ),
               ),
-              onPressed: () {
-                Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
-                // 여기에 글 작성 로직 추가
-                print('글 작성 버튼 클릭됨');
-              },
             ),
+            // IconButton(
+            //   icon: const Icon(
+            //     Icons.add,
+            //     color: Colors.black,
+            //   ),
+            //   onPressed: () {
+            //     Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
+            //     // 여기에 글 작성 로직 추가
+            //     print('글 작성 버튼 클릭됨');
+            //   },
+            // ),
           ],
         ),
+        // appBar: AppBar(
+        //   title: const Text('어드민 페이지'),
+        //   backgroundColor: AppColor.primary,
+        //   actions: [
+        //     IconButton(
+        //       icon: const Icon(
+        //         Icons.add,
+        //         color: Colors.white,
+        //       ),
+        //       onPressed: () {
+        //         Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
+        //         // 여기에 글 작성 로직 추가
+        //         print('글 작성 버튼 클릭됨');
+        //       },
+        //     ),
+        //   ],
+        // ),
         body: Padding(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
           child: Column(
             children: [
               Obx(() {
@@ -94,9 +130,8 @@ class AdminPage extends GetView<AdminController> {
                   return ListView.builder(
                     itemCount: visibleList.length,
                     itemBuilder: (context, index) {
-                      
                       print('게시글 수: ${controller.postList.length}');
-                     final post = visibleList[index];
+                      final post = visibleList[index];
                       return Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.h),
                           child: AppPost(
