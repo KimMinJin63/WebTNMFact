@@ -10,62 +10,93 @@ class AppPost extends StatelessWidget {
       required this.author,
       required this.category,
       required this.createdAt,
-      this.onTap});
+      required this.status,
+      this.onTap,
+      this.onContentTap,
+      this.onDeleteTap
+      });
   final String title;
   final String author;
   final String category;
   final String createdAt;
+  final String status;
   final Function()? onTap;
+  final Function()? onContentTap;
+  final Function()? onDeleteTap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: TextStyle(fontSize: 16.sp),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        Expanded(
-          child: Text(
-            author,
-            style: TextStyle(fontSize: 16.sp),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        Expanded(
-          child: Text(
-            category,
-            style: TextStyle(fontSize: 16.sp),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        Expanded(
-          child: Text(
-            createdAt,
-            style: TextStyle(fontSize: 16.sp),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: onTap
+    return SizedBox(
+      width: double.infinity,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 15,
+            child: InkWell(
+              onTap: onContentTap,
+              child: Text(
+                title,
+                style: TextStyle(fontSize: 16.sp),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                // 삭제 처리
-                // print('삭제 클릭: ${post['id']}');
-              },
+          ),
+          Expanded(
+            flex: 8,
+            child: Text(
+              author,
+              style: TextStyle(fontSize: 16.sp),
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
-      ],
+          ),
+          Expanded(
+            flex: 10,
+            child: Text(
+              category,
+              style: TextStyle(fontSize: 16.sp),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Expanded(
+            flex: 14,
+            child: Text(
+              createdAt,
+              style: TextStyle(fontSize: 16.sp),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Expanded(
+            flex: 10,
+            child: Text(
+              status,
+              style: TextStyle(fontSize: 16.sp),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Expanded(
+            flex: 7,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                  icon: const Icon(Icons.edit),
+                  onPressed: onTap,
+                ),
+                SizedBox(width: 16.w),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                  icon: const Icon(Icons.delete),
+                  onPressed: onDeleteTap
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 }

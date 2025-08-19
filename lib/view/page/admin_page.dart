@@ -17,7 +17,7 @@ class AdminPage extends GetView<AdminController> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('글'),
+          title: const Text('어드민 페이지'),
           backgroundColor: AppColor.primary,
           actions: [
             IconButton(
@@ -44,9 +44,23 @@ class AdminPage extends GetView<AdminController> {
                   pendingCount: controller.pendingCount.value,
                   selectedIndex: controller.selectedIndex.value,
                   searchController: controller.searchController,
-                  onSearch: (keyword) {
-                    print('검색: $keyword');
+                  onTap: () {
+                    if (controller.searchController.text.isNotEmpty) {
+                      controller.findPost();
+                    }
+                    else {
+                      controller.fetchAllPosts();
+                    }
                   },
+                  onChanged: (value) {
+                    if (value.isEmpty) {
+                      controller.findPost();
+                    } 
+                  },
+                  // searchController: controller.searchController,
+                  // onSearch: (keyword) {
+                  //   print('검색: $keyword');
+                  // },
                   onTapAll: () {
                     controller.selectTab(0);
                     print('모두 탭 클릭');
@@ -77,8 +91,37 @@ class AdminPage extends GetView<AdminController> {
                               title: post['title'] ?? '',
                               author: post['author'] ?? '',
                               category: post['category'] ?? '',
-                              createdAt: post['createdAt'] ?? '',
-                              onTap: () => Get.toNamed(EditPage.route, arguments: post)));
+                              createdAt: post['updatedAt'] ?? post['createdAt'],
+                              status: post['status'] ?? '',
+                              onContentTap: () => Get.toNamed(EditPage.route, arguments: post),
+                              onDeleteTap: () {
+                                print('삭제 버튼 클릭됨: ${post['id']}');
+                                Get.dialog(
+                                  AlertDialog(
+                                    title: const Text('게시글 삭제'),
+                                    content: const Text('정말로 이 게시글을 삭제하시겠습니까?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Get.back(); // 다이얼로그 닫기
+                                        },
+                                        child: const Text('취소'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          controller.deletePost(post['id']);
+                                          controller.fetchAllPosts();
+                                          controller.fetchAllPostCounts();
+                                          Get.back(); // 다이얼로그 닫기
+                                        },
+                                        child: const Text('삭제'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              onTap: () => Get.toNamed(EditPage.route,
+                                  arguments: post)));
                     },
                   );
                 }),

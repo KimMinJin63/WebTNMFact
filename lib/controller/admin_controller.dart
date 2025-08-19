@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
@@ -17,6 +18,7 @@ class AdminController extends GetxController {
   RxInt totalCount = 0.obs;
   RxInt publishedCount = 0.obs;
   RxInt pendingCount = 0.obs;
+  RxList<Map<String, dynamic>> originalPostList = <Map<String, dynamic>>[].obs;
 
   @override
   void onInit() {
@@ -31,6 +33,45 @@ class AdminController extends GetxController {
     selectedIndex.value = index;
   }
 
+  Future findPost() async {
+    String searchQuery = searchController.text.trim().toLowerCase();
+
+    if (searchQuery.isEmpty) {
+      postList.value = originalPostList.toList(); // 전체 복원
+      return;
+    }
+
+    postList.value = originalPostList.where((post) {
+      return post['title']?.toString().toLowerCase().contains(searchQuery) ??
+          false;
+    }).toList();
+  }
+
+  Future deletePost(String docId) async {
+    try {
+      print('게시글 삭제 중... ID: $docId');
+      await firestore.collection('posts').doc(docId).delete();
+
+      Get.dialog(
+        AlertDialog(
+          title: const Text('삭제 완료'),
+          content: const Text('게시글이 성공적으로 삭제되었습니다.'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Get.back(); // 다이얼로그 닫기
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        ),
+        barrierDismissible: false,
+      );
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to delete post: $e');
+    }
+  }
+
   Future<void> fetchAllPosts({String? searchQuery}) async {
     try {
       final snapshot = await firestore
@@ -39,21 +80,33 @@ class AdminController extends GetxController {
           .get();
 
       postList.value = snapshot.docs.map((doc) {
-        final timestamp = doc['createdAt'] as Timestamp?;
-        final dateTime = timestamp?.toDate() ?? DateTime.now();
-        final formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR')
-            .format(dateTime); // 원하는 형식 지정
+        final createdTimestamp = doc['createdAt'] as Timestamp?;
+        final createdDate = createdTimestamp?.toDate() ?? DateTime.now();
+        final formattedCreated =
+            DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR').format(createdDate);
+
+        final updatedTimestamp = doc.data().containsKey('updatedAt')
+            ? doc['updatedAt'] as Timestamp?
+            : null;
+        final formattedUpdated = updatedTimestamp != null
+            ? DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR')
+                .format(updatedTimestamp.toDate())
+            : null;
+
         return {
           'id': doc.id,
           'title': doc['title'],
           'content': doc['content'],
           'category': doc['category'],
           'author': doc['author'],
-          'createdAt': formattedDate, // String으로 저장
-          // 'status': doc['status'] ?? 'pending', // 기본값 설정
+          'createdAt': formattedCreated,
+          'updatedAt': formattedUpdated,
+          'status': doc['status'], // 기본값 설정
           // 'imageUrl': doc['imageUrl'] ?? '', // 이미지 URL이 없을 경우
         };
       }).toList();
+
+      originalPostList.value = postList.toList();
 
       print('게시글 불러오기 성공');
       print('총 게시글 수: ${snapshot.docs.length}');
@@ -71,18 +124,29 @@ class AdminController extends GetxController {
           .get();
 
       notPostList.value = snapshot.docs.map((doc) {
-        final timestamp = doc['createdAt'] as Timestamp?;
-        final dateTime = timestamp?.toDate() ?? DateTime.now();
-        final formattedDate =
-            DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR').format(dateTime);
+        final createdTimestamp = doc['createdAt'] as Timestamp?;
+        final createdDate = createdTimestamp?.toDate() ?? DateTime.now();
+        final formattedCreated =
+            DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR').format(createdDate);
+
+        final updatedTimestamp = doc.data().containsKey('updatedAt')
+            ? doc['updatedAt'] as Timestamp?
+            : null;
+        final formattedUpdated = updatedTimestamp != null
+            ? DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR')
+                .format(updatedTimestamp.toDate())
+            : null;
+
         return {
           'id': doc.id,
           'title': doc['title'],
           'content': doc['content'],
           'category': doc['category'],
           'author': doc['author'],
-          'createdAt': formattedDate,
-          'status': doc['status'],
+          'createdAt': formattedCreated,
+          'updatedAt': formattedUpdated,
+          'status': doc['status'], // 기본값 설정
+          // 'imageUrl': doc['imageUrl'] ?? '', // 이미지 URL이 없을 경우
         };
       }).toList();
 
@@ -102,18 +166,28 @@ class AdminController extends GetxController {
           .get();
 
       donePostList.value = snapshot.docs.map((doc) {
-        final timestamp = doc['createdAt'] as Timestamp?;
-        final dateTime = timestamp?.toDate() ?? DateTime.now();
-        final formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR')
-            .format(dateTime); // 원하는 형식 지정
+        final createdTimestamp = doc['createdAt'] as Timestamp?;
+        final createdDate = createdTimestamp?.toDate() ?? DateTime.now();
+        final formattedCreated =
+            DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR').format(createdDate);
+
+        final updatedTimestamp = doc.data().containsKey('updatedAt')
+            ? doc['updatedAt'] as Timestamp?
+            : null;
+        final formattedUpdated = updatedTimestamp != null
+            ? DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR')
+                .format(updatedTimestamp.toDate())
+            : null;
+
         return {
           'id': doc.id,
           'title': doc['title'],
           'content': doc['content'],
           'category': doc['category'],
           'author': doc['author'],
-          'createdAt': formattedDate, // String으로 저장
-          // 'status': doc['status'] ?? 'pending', // 기본값 설정
+          'createdAt': formattedCreated,
+          'updatedAt': formattedUpdated,
+          'status': doc['status'], // 기본값 설정
           // 'imageUrl': doc['imageUrl'] ?? '', // 이미지 URL이 없을 경우
         };
       }).toList();
@@ -148,35 +222,4 @@ class AdminController extends GetxController {
       print('🔥 게시글 카운트 불러오기 실패: $e');
     }
   }
-
-Future<void> editPost({
-  required String title,
-  required String content,
-  required String category,
-  required String author,
-  required String status,
-  required String docId,
-}) async {
-  try {
-    Map<String, dynamic> updateData = {
-      'title': title,
-      'content': content,
-      'category': category,
-      'author': author,
-      'status': status,
-      'updatedAt': FieldValue.serverTimestamp(),
-    };
-
-    await FirebaseFirestore.instance
-        .collection('posts')
-        .doc(docId)
-        .update(updateData);
-
-    await fetchAllPosts(); // 또는 현재 탭에 맞는 함수
-
-    update(); // GetX 상태 갱신
-  } catch (e) {
-    print('🔥 게시글 수정 실패: $e');
-  }
-}
 }

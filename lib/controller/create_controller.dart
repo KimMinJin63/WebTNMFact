@@ -30,7 +30,21 @@ class CreateController extends GetxController {
       });
 
       final docId = docRef.id;
-      Get.snackbar('Success', 'Post created successfully');
+      Get.dialog(
+        AlertDialog(
+          title: const Text('게시글 작성 완료'),
+          content: const Text('게시글이 성공적으로 작성되었습니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back(); // 다이얼로그 닫기
+                Get.offAllNamed('/admin'); // 관리자 페이지로 이동
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        ),
+      );
     } catch (e) {
       Get.snackbar('Error', 'Failed to create post: $e');
     }

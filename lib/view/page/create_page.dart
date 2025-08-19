@@ -31,7 +31,7 @@ class CreatePage extends GetView<CreateController> {
                     author: '김병국');
                 Get.find<AdminController>().fetchAllPosts();
                 Get.find<AdminController>().fetchAllPostCounts();
-                Get.offNamed(AdminPage.route); // 글 작성 후 관리자 페이지로 이동
+                Get.offAllNamed(AdminPage.route); // 글 작성 후 관리자 페이지로 이동
               },
               child: Text(
                 '공개',

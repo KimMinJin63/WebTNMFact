@@ -8,6 +8,8 @@ class EditController extends GetxController {
   final AdminController adminController = Get.find<AdminController>();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
+  RxString selectedCategory = ''.obs;
+  RxString selectedPublish = ''.obs;
 
   @override
   void onInit() {
@@ -17,6 +19,8 @@ class EditController extends GetxController {
     if (post != null) {
       titleController.text = post['title'] ?? '';
       contentController.text = post['content'] ?? '';
+      selectedCategory.value = post['category'] ?? '';
+      selectedPublish.value = post['status'] ?? '';
     }
   }
 
