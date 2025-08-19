@@ -31,6 +31,10 @@ class AdminController extends GetxController {
 
   void selectTab(int index) {
     selectedIndex.value = index;
+    postList.refresh();
+    donePostList.refresh();
+    notPostList.refresh();
+    update();
   }
 
   Future findPost() async {

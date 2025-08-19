@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:tnm_fact/controller/admin_controller.dart';
+import 'package:tnm_fact/view/page/admin_page.dart';
 
 class CreateController extends GetxController {
   RxString selectedCategory = ''.obs;
   RxString selectedPublish = ''.obs;
   TextEditingController titleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
+  final AdminController adminController = Get.find<AdminController>();
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -30,21 +33,6 @@ class CreateController extends GetxController {
       });
 
       final docId = docRef.id;
-      Get.dialog(
-        AlertDialog(
-          title: const Text('게시글 작성 완료'),
-          content: const Text('게시글이 성공적으로 작성되었습니다.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Get.back(); // 다이얼로그 닫기
-                Get.offAllNamed('/admin'); // 관리자 페이지로 이동
-              },
-              child: const Text('확인'),
-            ),
-          ],
-        ),
-      );
     } catch (e) {
       Get.snackbar('Error', 'Failed to create post: $e');
     }

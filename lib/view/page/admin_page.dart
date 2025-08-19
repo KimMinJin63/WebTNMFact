@@ -47,15 +47,14 @@ class AdminPage extends GetView<AdminController> {
                   onTap: () {
                     if (controller.searchController.text.isNotEmpty) {
                       controller.findPost();
-                    }
-                    else {
+                    } else {
                       controller.fetchAllPosts();
                     }
                   },
                   onChanged: (value) {
                     if (value.isEmpty) {
                       controller.findPost();
-                    } 
+                    }
                   },
                   // searchController: controller.searchController,
                   // onSearch: (keyword) {
@@ -67,7 +66,6 @@ class AdminPage extends GetView<AdminController> {
                   },
                   onTapPublished: () {
                     controller.selectTab(1);
-                    print('발행됨 클릭');
                   },
                   onTapPending: () {
                     controller.selectTab(2);
@@ -80,11 +78,25 @@ class AdminPage extends GetView<AdminController> {
               AppPostTitle(),
               Expanded(
                 child: Obx(() {
+                  List<Map<String, dynamic>> visibleList;
+                  switch (controller.selectedIndex.value) {
+                    case 1:
+                      visibleList = controller.donePostList;
+                      break;
+                    case 2:
+                      visibleList = controller.notPostList;
+                      break;
+                    case 0:
+                    default:
+                      visibleList = controller.postList;
+                      break;
+                  }
                   return ListView.builder(
-                    itemCount: controller.postList.length,
+                    itemCount: visibleList.length,
                     itemBuilder: (context, index) {
+                      
                       print('게시글 수: ${controller.postList.length}');
-                      final post = controller.postList[index];
+                     final post = visibleList[index];
                       return Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.h),
                           child: AppPost(
@@ -93,7 +105,8 @@ class AdminPage extends GetView<AdminController> {
                               category: post['category'] ?? '',
                               createdAt: post['updatedAt'] ?? post['createdAt'],
                               status: post['status'] ?? '',
-                              onContentTap: () => Get.toNamed(EditPage.route, arguments: post),
+                              onContentTap: () =>
+                                  Get.toNamed(EditPage.route, arguments: post),
                               onDeleteTap: () {
                                 print('삭제 버튼 클릭됨: ${post['id']}');
                                 Get.dialog(

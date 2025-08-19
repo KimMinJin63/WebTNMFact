@@ -46,6 +46,11 @@ class EditPage extends GetView<EditController> {
               // final adminController = Get.find<AdminController>();
               adminController.fetchAllPosts();
               adminController.fetchAllPostCounts();
+              adminController.fetchDonePosts(); // ✅ 발행 글 갱신
+              adminController.fetchNotPosts();
+              adminController.selectTab(
+                controller.selectedPublish.value == '발행' ? 1 : 2,
+              );
 
               Get.offAllNamed(AdminPage.route); // 수정 완료 후 관리자 페이지로 이동
             },

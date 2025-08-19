@@ -20,24 +20,47 @@ class CreatePage extends GetView<CreateController> {
         centerTitle: true,
         actions: [
           // Obx(
-          //   () => 
-            TextButton(
-              onPressed: () {
-                controller.createPost(
-                    title: controller.titleController.text,
-                    content: controller.contentController.text,
-                    category: controller.selectedCategory.value,
-                    status: controller.selectedPublish.value,
-                    author: '김병국');
-                Get.find<AdminController>().fetchAllPosts();
-                Get.find<AdminController>().fetchAllPostCounts();
-                Get.offAllNamed(AdminPage.route); // 글 작성 후 관리자 페이지로 이동
-              },
-              child: Text(
-                '공개',
-                style: TextStyle(color: Colors.white),
-              ),
+          //   () =>
+          TextButton(
+            onPressed: () {
+              controller.createPost(
+                  title: controller.titleController.text,
+                  content: controller.contentController.text,
+                  category: controller.selectedCategory.value,
+                  status: controller.selectedPublish.value,
+                  author: '김병국');
+              Get.dialog(
+                AlertDialog(
+                  title: const Text('게시글 작성 완료'),
+                  content: const Text('게시글이 성공적으로 작성되었습니다.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Get.back(); // 다이얼로그 닫기
+                        final adminController = Get.find<AdminController>();
+                        adminController.fetchAllPosts();
+                        adminController.fetchAllPostCounts();
+                        adminController.fetchDonePosts(); // ✅ 발행 글 갱신
+                        adminController.fetchNotPosts();
+
+                        adminController.selectTab(
+                          controller.selectedPublish.value == '발행' ? 1 : 2,
+                        );
+                        adminController.selectedIndex.canUpdate;
+                        adminController.update();
+                        Get.offAllNamed(AdminPage.route); // 글 작성 후 관리자 페이지로 이동
+                      },
+                      child: const Text('확인'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            child: Text(
+              '공개',
+              style: TextStyle(color: Colors.white),
             ),
+          ),
           // )
         ],
         backgroundColor: Colors.grey[900],

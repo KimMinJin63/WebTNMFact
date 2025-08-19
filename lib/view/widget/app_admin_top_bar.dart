@@ -18,7 +18,6 @@ class AppAdminTopBar extends StatelessWidget {
   final Function()? onTap;
   final ValueChanged<String>? onChanged;
 
-  
   const AppAdminTopBar({
     super.key,
     required this.totalCount,
@@ -47,11 +46,14 @@ class AppAdminTopBar extends StatelessWidget {
           // 왼쪽 탭 필터 영역
           Row(
             children: [
-              _buildTab('모두', totalCount, onTapAll, 0),
+              Obx(() => _buildTab('모두', totalCount, onTapAll, 0,
+                  controller.selectedIndex.value)),
               _divider(),
-              _buildTab('발행됨', publishedCount, onTapPublished, 1),
+              Obx(() => _buildTab('발행됨', publishedCount, onTapPublished, 1,
+                  controller.selectedIndex.value)),
               _divider(),
-              _buildTab('대기중', pendingCount, onTapPending, 2),
+              Obx(() => _buildTab('대기중', pendingCount, onTapPending, 2,
+                  controller.selectedIndex.value)),
             ],
           ),
 
@@ -98,17 +100,18 @@ class AppAdminTopBar extends StatelessWidget {
     );
   }
 
-  Widget _buildTab(String label, int count, VoidCallback? onTap, int index) {
-    final controller = Get.find<AdminController>();
-    final isSelected = controller.selectedIndex == index;
+  Widget _buildTab(String label, int count, VoidCallback? onTap, int index,
+      int selectedIndex) {
+        print('Selected Index: $selectedIndex, Current Index: $index');
     return InkWell(
       onTap: onTap,
       child: Text(
         '$label ($count)',
         style: TextStyle(
           fontSize: 14,
-          color: isSelected ? AppColor.black : AppColor.primary, // 선택된 탭 색상
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: selectedIndex == index ? AppColor.black : AppColor.primary,
+          fontWeight:
+              selectedIndex == index ? FontWeight.bold : FontWeight.normal,
         ),
       ),
     );
