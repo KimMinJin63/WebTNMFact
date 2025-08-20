@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
@@ -100,7 +102,7 @@ class HomePage extends GetView<HomeController> {
                         controller.clearFocus();
                       },
                       icon:
-                          Icon(Icons.search, size: 22.sp, color: AppColor.grey),
+                          Icon(Icons.search, size: 20.sp, color: AppColor.grey),
                       splashRadius: 20, // 클릭 영역 조정
                     ),
                     hintText: "관심있는 교육 키워드를 검색하세요",
@@ -147,6 +149,16 @@ class HomePage extends GetView<HomeController> {
                     childAspectRatio: 0.7,
                   ),
                   itemBuilder: (context, index) {
+                    final timestamp = controller.postList[index]['updatedAt'] ??
+                        controller.postList[index]['createdAt'];
+
+                    String formattedDate = '';
+                    if (timestamp != null && timestamp is Timestamp) {
+                      final date = timestamp.toDate();
+                      formattedDate =
+                          DateFormat('yyyy-MM-dd HH:mm').format(date);
+                    }
+
                     print('지금 게시글 목록 ${controller.postList[index]['title']}');
                     return Container(
                       decoration: BoxDecoration(
@@ -237,7 +249,9 @@ class HomePage extends GetView<HomeController> {
                                         // flex: 3
                                       ),
                                       const Spacer(),
-                                      _buildFlexibleBox('2025.08.14',
+                                      _buildFlexibleBox('$formattedDate',
+                                          style: AppTextStyle.koRegular12()
+                                              .copyWith(color: AppColor.black),
                                           // flex: 1,
                                           maxLines: 1),
                                     ],
