@@ -39,36 +39,8 @@ class AdminPage extends GetView<AdminController> {
                 ),
               ),
             ),
-            // IconButton(
-            //   icon: const Icon(
-            //     Icons.add,
-            //     color: Colors.black,
-            //   ),
-            //   onPressed: () {
-            //     Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
-            //     // 여기에 글 작성 로직 추가
-            //     print('글 작성 버튼 클릭됨');
-            //   },
-            // ),
           ],
         ),
-        // appBar: AppBar(
-        //   title: const Text('어드민 페이지'),
-        //   backgroundColor: AppColor.primary,
-        //   actions: [
-        //     IconButton(
-        //       icon: const Icon(
-        //         Icons.add,
-        //         color: Colors.white,
-        //       ),
-        //       onPressed: () {
-        //         Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
-        //         // 여기에 글 작성 로직 추가
-        //         print('글 작성 버튼 클릭됨');
-        //       },
-        //     ),
-        //   ],
-        // ),
         body: Padding(
           padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
           child: Column(
@@ -81,21 +53,48 @@ class AdminPage extends GetView<AdminController> {
                   selectedIndex: controller.selectedIndex.value,
                   searchController: controller.searchController,
                   onTap: () {
-                    if (controller.searchController.text.isNotEmpty) {
-                      controller.findPost();
-                    } else {
-                      controller.fetchAllPosts();
+                    if (controller.selectedIndex == 0) {
+                      print('모두 탭 클릭');
+                      if (controller.searchController.text.isNotEmpty) {
+                        controller.findPost();
+                      } else {
+                        controller.fetchAllPosts();
+                      }
+                    } else if (controller.selectedIndex == 1) {
+                      print('발행됨 탭 클릭');
+                      if (controller.searchController.text.isNotEmpty) {
+                        controller.findPost();
+                      } else {
+                        controller.fetchDonePosts();
+                      }
+                    } else if (controller.selectedIndex == 2) {
+                      print('대기중 탭 클릭');
+                      if (controller.searchController.text.isNotEmpty) {
+                        controller.findPost();
+                      } else {
+                        controller.fetchNotPosts();
+                      }
                     }
                   },
                   onChanged: (value) {
                     if (value.isEmpty) {
-                      controller.findPost();
+                      // 원복
+                      if (controller.selectedIndex == 0) {
+                        print('모두 탭 원복');
+                        controller.postList.value =
+                            controller.originalPostList.toList();
+                      } else if (controller.selectedIndex == 1) {
+                        print('발행됨 탭 원복');
+                        controller.donePostList.value =
+                            controller.originalDonePostList.toList();
+                      } else {
+                        print('대기중 탭 원복');
+                        controller.notPostList.value =
+                            controller.originalNotPostList.toList();
+                      }
+                      return;
                     }
                   },
-                  // searchController: controller.searchController,
-                  // onSearch: (keyword) {
-                  //   print('검색: $keyword');
-                  // },
                   onTapAll: () {
                     controller.selectTab(0);
                     print('모두 탭 클릭');

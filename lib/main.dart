@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/controller/create_controller.dart';
 import 'package:tnm_fact/controller/edit_controller.dart';
-import 'package:tnm_fact/controller/home_page_controller.dart';
+import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/controller/login_controller.dart';
 import 'package:tnm_fact/firebase_options.dart';
 import 'package:tnm_fact/utils/app_pages.dart';
@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           useInheritedMediaQuery: true,
           initialBinding: BindingsBuilder(() {
-            Get.lazyPut(() => HomePageController(), fenix: true);
+            Get.lazyPut(() => HomeController(), fenix: true);
             Get.lazyPut(() => LoginController(), fenix: true);
             Get.lazyPut(() => AdminController(), fenix: true);
             Get.lazyPut(() => CreateController(), fenix: true);
@@ -50,8 +50,8 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             useMaterial3: true,
           ),
-          home: const HomePage(),
-          // home: const AdminPage(),
+          // home: const HomePage(),
+          home: const AdminPage(),
           // home: const LoginPage(),
           getPages: AppPages.pages,
           // home: const HomePage(),

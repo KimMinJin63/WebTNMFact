@@ -19,6 +19,11 @@ class AdminController extends GetxController {
   RxInt publishedCount = 0.obs;
   RxInt pendingCount = 0.obs;
   RxList<Map<String, dynamic>> originalPostList = <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> originalDonePostList =
+      <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> originalNotPostList =
+      <Map<String, dynamic>>[].obs;
+  RxBool isSearching = false.obs;
 
   @override
   void onInit() {
@@ -38,17 +43,30 @@ class AdminController extends GetxController {
   }
 
   Future findPost() async {
-    String searchQuery = searchController.text.trim().toLowerCase();
+    final searchQuery = searchController.text.trim().toLowerCase();
+    final tabIndex = selectedIndex.value;
 
-    if (searchQuery.isEmpty) {
-      postList.value = originalPostList.toList(); // 전체 복원
-      return;
+    isSearching.value = searchQuery.isNotEmpty; // ✅ 검색 상태 반영
+
+    if (tabIndex == 0) {
+      postList.value = originalPostList
+          .where((p) =>
+              p['title']?.toString().toLowerCase().contains(searchQuery) ??
+              false)
+          .toList();
+    } else if (tabIndex == 1) {
+      donePostList.value = originalDonePostList
+          .where((p) =>
+              p['title']?.toString().toLowerCase().contains(searchQuery) ??
+              false)
+          .toList();
+    } else {
+      notPostList.value = originalNotPostList
+          .where((p) =>
+              p['title']?.toString().toLowerCase().contains(searchQuery) ??
+              false)
+          .toList();
     }
-
-    postList.value = originalPostList.where((post) {
-      return post['title']?.toString().toLowerCase().contains(searchQuery) ??
-          false;
-    }).toList();
   }
 
   Future deletePost(String docId) async {
@@ -154,6 +172,8 @@ class AdminController extends GetxController {
         };
       }).toList();
 
+      originalNotPostList.value = notPostList.toList();
+
       print('📄 미발행 게시글 불러오기 성공');
       print('총 미발행 게시글 수: ${snapshot.docs.length}');
     } catch (e) {
@@ -195,6 +215,8 @@ class AdminController extends GetxController {
           // 'imageUrl': doc['imageUrl'] ?? '', // 이미지 URL이 없을 경우
         };
       }).toList();
+
+      originalDonePostList.value = donePostList.toList();
 
       print('게시글 불러오기 성공');
       print('총 게시글 수: ${snapshot.docs.length}');

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
-import 'package:tnm_fact/controller/home_page_controller.dart';
+import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/widget/app_title_button.dart';
 
-class HomePage extends GetView<HomePageController> {
+class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
   static const route = '/homepage';
 
@@ -69,7 +69,7 @@ class HomePage extends GetView<HomePageController> {
           ),
           actions: [
             Padding(
-              padding: EdgeInsets.only(right: 16.w, top: 8.h, bottom: 8.h),
+              padding: EdgeInsets.only(right: 16.w, top: 12.h, bottom: 12.h),
               child: Container(
                 decoration: BoxDecoration(
                   color: AppColor.white,
@@ -81,7 +81,7 @@ class HomePage extends GetView<HomePageController> {
                 alignment: Alignment.centerRight,
                 child: TextField(
                   focusNode: controller.searchFocusNode, // ✅ 연결
-                  style: AppTextStyle.koRegular18().copyWith(
+                  style: AppTextStyle.koRegular15().copyWith(
                     color: AppColor.grey,
                   ),
                   controller: controller.searchController,
@@ -104,7 +104,7 @@ class HomePage extends GetView<HomePageController> {
                       splashRadius: 20, // 클릭 영역 조정
                     ),
                     hintText: "관심있는 교육 키워드를 검색하세요",
-                    hintStyle: AppTextStyle.koRegular15().copyWith(
+                    hintStyle: AppTextStyle.koRegular14().copyWith(
                       color: AppColor.grey,
                     ),
                     border: InputBorder.none,
@@ -128,61 +128,128 @@ class HomePage extends GetView<HomePageController> {
           Expanded(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 72.w),
-              child: GridView.builder(
-                itemCount: 12, // 원하시는 개수로 변경하세요
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 40.w,
-                  mainAxisSpacing: 32.h,
-                  childAspectRatio: 0.7,
-                ),
-                itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: AppColor.white,
-                      borderRadius: BorderRadius.circular(16.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColor.grey.withOpacity(0.2),
-                          blurRadius: 4.r,
-                          offset: Offset(0, 2.h),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                        padding: EdgeInsets.all(16.w),
-                        child: Column(
-                          children: [
-                            // 상단 이미지 영역
-                            AspectRatio(
-                              aspectRatio: 5 / 3,
-                              child: Container(
-                                width: double.infinity,
-                                color: AppColor.grey,
-                                child: Center(
-                                  child: Text('이미지 $index',
-                                      style: AppTextStyle.koRegular18()),
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (controller.postList.isEmpty) {
+                  return Center(
+                    child:
+                        Text('게시글이 없습니다.', style: AppTextStyle.koRegular18()),
+                  );
+                }
+                return GridView.builder(
+                  itemCount: controller.postList.length, // 원하시는 개수로 변경하세요
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    crossAxisSpacing: 40.w,
+                    mainAxisSpacing: 32.h,
+                    childAspectRatio: 0.7,
+                  ),
+                  itemBuilder: (context, index) {
+                    print('지금 게시글 목록 ${controller.postList[index]['title']}');
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: AppColor.white,
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColor.grey.withOpacity(0.2),
+                            blurRadius: 4.r,
+                            offset: Offset(0, 2.h),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                          padding: EdgeInsets.all(16.w),
+                          child: Column(
+                            children: [
+                              // 상단 이미지 영역
+                              AspectRatio(
+                                aspectRatio: 5 / 3,
+                                child: Container(
+                                  width: double.infinity,
+                                  color: AppColor.grey,
+                                  child: Center(
+                                    child: Text('이미지 $index',
+                                        style: AppTextStyle.koRegular18()),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  _buildFlexibleBox('해시태그 $index', flex: 1),
-                                  _buildFlexibleBox('제목 제목 제목 제목 제목 $index',
-                                      flex: 2),
-                                  _buildFlexibleBox(
-                                      '본문이 아주 길 수도 있고\n2줄도 될 수 있음 $index',
-                                      flex: 3),
-                                  _buildFlexibleBox('2025.08.14', flex: 1),
-                                ],
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.only(top: 4.h),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.all(4.w),
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Container(
+                                            margin: EdgeInsets.only(top: 8.h),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8.w),
+                                            decoration: BoxDecoration(
+                                              color: controller.postList[index]
+                                                          ['category'] ==
+                                                      '데일리 팩트'
+                                                  ? AppColor.primary
+                                                      .withOpacity(0.1)
+                                                  : AppColor.yellow
+                                                      .withOpacity(0.2),
+                                              borderRadius:
+                                                  BorderRadius.circular(80.r),
+                                            ),
+                                            child: Padding(
+                                              padding: EdgeInsets.all(2.w),
+                                              child: Text(
+                                                '${controller.postList[index]['category']}',
+                                                style: AppTextStyle
+                                                        .koSemiBold14()
+                                                    .copyWith(
+                                                        color: controller.postList[
+                                                                        index][
+                                                                    'category'] ==
+                                                                '데일리 팩트'
+                                                            ? AppColor.primary
+                                                            : AppColor.yellow),
+                                                textAlign: TextAlign.left,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      _buildFlexibleBox(
+                                        '${controller.postList[index]['title']}',
+                                        style: AppTextStyle.koSemiBold18(),
+                                        maxLines: 2,
+                                        // flex: 2
+                                      ),
+                                      _buildFlexibleBox(
+                                        '${controller.postList[index]['content']}',
+                                        style:
+                                            AppTextStyle.koRegular14().copyWith(
+                                          color: AppColor.grey,
+                                        ),
+                                        maxLines: 3,
+                                        // flex: 3
+                                      ),
+                                      const Spacer(),
+                                      _buildFlexibleBox('2025.08.14',
+                                          // flex: 1,
+                                          maxLines: 1),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
-                        )),
-                  );
-                },
-              ),
+                            ],
+                          )),
+                    );
+                  },
+                );
+              }),
             ),
           )
         ],
@@ -191,19 +258,21 @@ class HomePage extends GetView<HomePageController> {
   }
 }
 
-Widget _buildFlexibleBox(String text, {required int flex}) {
-  return Expanded(
-    flex: flex,
-    child: Container(
-      margin: EdgeInsets.only(top: 8.h),
-      padding: EdgeInsets.symmetric(horizontal: 8.w),
-      alignment: Alignment.center,
-      color: AppColor.shadowGrey,
+Widget _buildFlexibleBox(
+  String text, {
+  // required int flex,
+  required int maxLines,
+  TextStyle? style, // ✅ 추가
+}) {
+  return Padding(
+    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+    child: Align(
+      alignment: Alignment.centerLeft,
       child: Text(
         text,
-        style: AppTextStyle.koRegular18(),
-        textAlign: TextAlign.center,
-        maxLines: 3,
+        style: style,
+        textAlign: TextAlign.left,
+        maxLines: maxLines,
         overflow: TextOverflow.ellipsis,
       ),
     ),
