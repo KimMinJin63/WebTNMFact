@@ -233,7 +233,7 @@ class HomePage extends GetView<HomeController> {
                                             AppTextStyle.koRegular14().copyWith(
                                           color: AppColor.grey,
                                         ),
-                                        maxLines: 3,
+                                        maxLines: 5,
                                         // flex: 3
                                       ),
                                       const Spacer(),

@@ -34,13 +34,19 @@ class AdminController extends GetxController {
     fetchDonePosts();
   }
 
-  void selectTab(int index) {
-    selectedIndex.value = index;
-    postList.refresh();
-    donePostList.refresh();
-    notPostList.refresh();
-    update();
+void selectTab(int index) {
+  selectedIndex.value = index;
+
+  final hasKeyword = searchController.text.trim().isNotEmpty;
+
+  if (hasKeyword) {
+    findPost();
+  } else {
+    if (index == 0)      fetchAllPosts();
+    else if (index == 1) fetchDonePosts();
+    else                 fetchNotPosts();
   }
+}
 
   Future findPost() async {
     final searchQuery = searchController.text.trim().toLowerCase();
