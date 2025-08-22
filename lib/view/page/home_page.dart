@@ -115,158 +115,183 @@ class HomePage extends GetView<HomeController> {
               ),
             ),
           ]),
-      body: Column(
-        children: [
-          // 여기에 본문 내용 추가
-          Center(
-            child: Padding(
-              padding: EdgeInsets.all(32.w),
-              child: Text(
-                '진실을 전달하는 미디어',
-                style: AppTextStyle.koBold35(),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 72.w),
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (controller.postList.isEmpty) {
-                  return Center(
-                    child:
-                        Text('게시글이 없습니다.', style: AppTextStyle.koRegular18()),
-                  );
-                }
-                return GridView.builder(
-                  itemCount: controller.postList.length, // 원하시는 개수로 변경하세요
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 40.w,
-                    mainAxisSpacing: 32.h,
-                    childAspectRatio: 0.7,
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: 24.h),
+          child: Column(
+            children: [
+              // 여기에 본문 내용 추가
+              Center(
+                child: Padding(
+                  padding: EdgeInsets.all(32.w),
+                  child: Text(
+                    '진실을 전달하는 미디어',
+                    style: AppTextStyle.koBold35(),
                   ),
-                  itemBuilder: (context, index) {
-                    final timestamp = controller.postList[index]['updatedAt'] ??
-                        controller.postList[index]['createdAt'];
-
-                    String formattedDate = '';
-                    if (timestamp != null && timestamp is Timestamp) {
-                      final date = timestamp.toDate();
-                      formattedDate =
-                          DateFormat('yyyy-MM-dd HH:mm').format(date);
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 72.w),
+                  child: Obx(() {
+                    List<Map<String, dynamic>> visibleList;
+                    switch (controller.selectedIndex.value) {
+                      case 1:
+                          visibleList = controller.dailyPostList;
+                        break;
+                      case 2:
+                        visibleList = controller.insightPostList;
+                        break;
+                      case 0:
+                      default:
+                        visibleList = controller.postList;
+                        break;
                     }
-
-                    print('지금 게시글 목록 ${controller.postList[index]['title']}');
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: AppColor.white,
-                        borderRadius: BorderRadius.circular(16.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColor.grey.withOpacity(0.2),
-                            blurRadius: 4.r,
-                            offset: Offset(0, 2.h),
-                          ),
-                        ],
+                    if (controller.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (visibleList.isEmpty) {
+                      return Center(
+                        child: Text('게시글이 없습니다.',
+                            style: AppTextStyle.koRegular18()),
+                      );
+                    }
+                    return GridView.builder(
+                      itemCount: visibleList.length, // 원하시는 개수로 변경하세요
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 40.w,
+                        mainAxisSpacing: 32.h,
+                        childAspectRatio: 0.7,
                       ),
-                      child: Padding(
-                          padding: EdgeInsets.all(16.w),
-                          child: Column(
-                            children: [
-                              // 상단 이미지 영역
-                              AspectRatio(
-                                aspectRatio: 5 / 3,
-                                child: Container(
-                                  width: double.infinity,
-                                  color: AppColor.grey,
-                                  child: Center(
-                                    child: Text('이미지 $index',
-                                        style: AppTextStyle.koRegular18()),
-                                  ),
-                                ),
+                      itemBuilder: (context, index) {
+                        final timestamp = visibleList[index]['updatedAt'] ??
+                            visibleList[index]['createdAt'];
+
+                        String formattedDate = '';
+                        if (timestamp != null && timestamp is Timestamp) {
+                          final date = timestamp.toDate();
+                          formattedDate =
+                              DateFormat('yyyy-MM-dd HH:mm').format(date);
+                        }
+
+                        print('지금 게시글 목록 ${visibleList[index]['title']}');
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: AppColor.white,
+                            borderRadius: BorderRadius.circular(16.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColor.grey.withOpacity(0.2),
+                                blurRadius: 4.r,
+                                offset: Offset(0, 2.h),
                               ),
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(top: 4.h),
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.all(4.w),
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Container(
-                                            margin: EdgeInsets.only(top: 8.h),
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 8.w),
-                                            decoration: BoxDecoration(
-                                              color: controller.postList[index]
-                                                          ['category'] ==
-                                                      '데일리 팩트'
-                                                  ? AppColor.primary
-                                                      .withOpacity(0.1)
-                                                  : AppColor.yellow
-                                                      .withOpacity(0.2),
-                                              borderRadius:
-                                                  BorderRadius.circular(80.r),
-                                            ),
-                                            child: Padding(
-                                              padding: EdgeInsets.all(2.w),
-                                              child: Text(
-                                                '${controller.postList[index]['category']}',
-                                                style: AppTextStyle
-                                                        .koSemiBold14()
-                                                    .copyWith(
-                                                        color: controller.postList[
-                                                                        index][
-                                                                    'category'] ==
-                                                                '데일리 팩트'
-                                                            ? AppColor.primary
-                                                            : AppColor.yellow),
-                                                textAlign: TextAlign.left,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
+                            ],
+                          ),
+                          child: Padding(
+                              padding: EdgeInsets.all(16.w),
+                              child: Column(
+                                children: [
+                                  // 상단 이미지 영역
+                                  AspectRatio(
+                                    aspectRatio: 5 / 3,
+                                    child: Container(
+                                      width: double.infinity,
+                                      color: AppColor.grey,
+                                      child: Center(
+                                        child: Text('이미지 $index',
+                                            style: AppTextStyle.koRegular18()),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(top: 4.h),
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.all(4.w),
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Container(
+                                                margin:
+                                                    EdgeInsets.only(top: 8.h),
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 8.w),
+                                                decoration: BoxDecoration(
+                                                  color: visibleList[index]
+                                                              ['category'] ==
+                                                          '데일리 팩트'
+                                                      ? AppColor.primary
+                                                          .withOpacity(0.1)
+                                                      : AppColor.yellow
+                                                          .withOpacity(0.2),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          80.r),
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(2.w),
+                                                  child: Text(
+                                                    '${visibleList[index]['category']}',
+                                                    style: AppTextStyle
+                                                            .koSemiBold14()
+                                                        .copyWith(
+                                                            color: visibleList[
+                                                                            index]
+                                                                        [
+                                                                        'category'] ==
+                                                                    '데일리 팩트'
+                                                                ? AppColor
+                                                                    .primary
+                                                                : AppColor
+                                                                    .yellow),
+                                                    textAlign: TextAlign.left,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
+                                          _buildFlexibleBox(
+                                            '${visibleList[index]['title']}',
+                                            style: AppTextStyle.koSemiBold18(),
+                                            maxLines: 2,
+                                            // flex: 2
+                                          ),
+                                          _buildFlexibleBox(
+                                            '${visibleList[index]['content']}',
+                                            style: AppTextStyle.koRegular14()
+                                                .copyWith(
+                                              color: AppColor.grey,
+                                            ),
+                                            maxLines: 5,
+                                            // flex: 3
+                                          ),
+                                          const Spacer(),
+                                          _buildFlexibleBox('$formattedDate',
+                                              style: AppTextStyle.koRegular12()
+                                                  .copyWith(
+                                                      color: AppColor.black),
+                                              // flex: 1,
+                                              maxLines: 1),
+                                        ],
                                       ),
-                                      _buildFlexibleBox(
-                                        '${controller.postList[index]['title']}',
-                                        style: AppTextStyle.koSemiBold18(),
-                                        maxLines: 2,
-                                        // flex: 2
-                                      ),
-                                      _buildFlexibleBox(
-                                        '${controller.postList[index]['content']}',
-                                        style:
-                                            AppTextStyle.koRegular14().copyWith(
-                                          color: AppColor.grey,
-                                        ),
-                                        maxLines: 5,
-                                        // flex: 3
-                                      ),
-                                      const Spacer(),
-                                      _buildFlexibleBox('$formattedDate',
-                                          style: AppTextStyle.koRegular12()
-                                              .copyWith(color: AppColor.black),
-                                          // flex: 1,
-                                          maxLines: 1),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
-                          )),
+                                ],
+                              )),
+                        );
+                      },
                     );
-                  },
-                );
-              }),
-            ),
-          )
-        ],
+                  }),
+                ),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
