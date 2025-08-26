@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
+import 'package:tnm_fact/view/page/detail_page.dart';
 import 'package:tnm_fact/view/widget/app_title_button.dart';
 
 class HomePage extends GetView<HomeController> {
@@ -174,115 +176,121 @@ class HomePage extends GetView<HomeController> {
                           formattedDate =
                               DateFormat('yyyy-MM-dd HH:mm').format(date);
                         }
+                        final post = visibleList[index];
 
                         print('지금 게시글 목록 ${visibleList[index]['title']}');
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: AppColor.white,
-                            borderRadius: BorderRadius.circular(16.r),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColor.grey.withOpacity(0.2),
-                                blurRadius: 4.r,
-                                offset: Offset(0, 2.h),
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                              padding: EdgeInsets.all(16.w),
-                              child: Column(
-                                children: [
-                                  // 상단 이미지 영역
-                                  AspectRatio(
-                                    aspectRatio: 5 / 3,
-                                    child: Container(
-                                      width: double.infinity,
-                                      color: AppColor.grey,
-                                      child: Center(
-                                        child: Text('이미지 $index',
-                                            style: AppTextStyle.koRegular18()),
+                        return GestureDetector(
+                          onTap: () {
+                            Get.toNamed(DetailPage.route, arguments: post);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColor.white,
+                              borderRadius: BorderRadius.circular(16.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColor.grey.withOpacity(0.2),
+                                  blurRadius: 4.r,
+                                  offset: Offset(0, 2.h),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                                padding: EdgeInsets.all(16.w),
+                                child: Column(
+                                  children: [
+                                    // 상단 이미지 영역
+                                    AspectRatio(
+                                      aspectRatio: 5 / 3,
+                                      child: Container(
+                                        width: double.infinity,
+                                        color: AppColor.grey,
+                                        child: Center(
+                                          child: Text('이미지 $index',
+                                              style: AppTextStyle.koRegular18()),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(top: 4.h),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.all(4.w),
-                                            child: Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Container(
-                                                margin:
-                                                    EdgeInsets.only(top: 8.h),
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 8.w),
-                                                decoration: BoxDecoration(
-                                                  color: visibleList[index]
-                                                              ['category'] ==
-                                                          '데일리 팩트'
-                                                      ? AppColor.primary
-                                                          .withOpacity(0.1)
-                                                      : AppColor.yellow
-                                                          .withOpacity(0.2),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          80.r),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsets.all(2.w),
-                                                  child: Text(
-                                                    '${visibleList[index]['category']}',
-                                                    style: AppTextStyle
-                                                            .koSemiBold14()
-                                                        .copyWith(
-                                                            color: visibleList[
-                                                                            index]
-                                                                        [
-                                                                        'category'] ==
-                                                                    '데일리 팩트'
-                                                                ? AppColor
-                                                                    .primary
-                                                                : AppColor
-                                                                    .yellow),
-                                                    textAlign: TextAlign.left,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                    Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(top: 4.h),
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.all(4.w),
+                                              child: Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Container(
+                                                  margin:
+                                                      EdgeInsets.only(top: 8.h),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 8.w),
+                                                  decoration: BoxDecoration(
+                                                    color: visibleList[index]
+                                                                ['category'] ==
+                                                            '데일리 팩트'
+                                                        ? AppColor.primary
+                                                            .withOpacity(0.1)
+                                                        : AppColor.yellow
+                                                            .withOpacity(0.2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            80.r),
+                                                  ),
+                                                  child: Padding(
+                                                    padding: EdgeInsets.all(2.w),
+                                                    child: Text(
+                                                      '${visibleList[index]['category']}',
+                                                      style: AppTextStyle
+                                                              .koSemiBold14()
+                                                          .copyWith(
+                                                              color: visibleList[
+                                                                              index]
+                                                                          [
+                                                                          'category'] ==
+                                                                      '데일리 팩트'
+                                                                  ? AppColor
+                                                                      .primary
+                                                                  : AppColor
+                                                                      .yellow),
+                                                      textAlign: TextAlign.left,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          _buildFlexibleBox(
-                                            '${visibleList[index]['title']}',
-                                            style: AppTextStyle.koSemiBold18(),
-                                            maxLines: 2,
-                                            // flex: 2
-                                          ),
-                                          _buildFlexibleBox(
-                                            '${visibleList[index]['content']}',
-                                            style: AppTextStyle.koRegular14()
-                                                .copyWith(
-                                              color: AppColor.grey,
+                                            _buildFlexibleBox(
+                                              '${visibleList[index]['title']}',
+                                              style: AppTextStyle.koSemiBold18(),
+                                              maxLines: 2,
+                                              // flex: 2
                                             ),
-                                            maxLines: 5,
-                                            // flex: 3
-                                          ),
-                                          const Spacer(),
-                                          _buildFlexibleBox('$formattedDate',
-                                              style: AppTextStyle.koRegular12()
+                                            _buildFlexibleBox(
+                                              '${visibleList[index]['content']}',
+                                              style: AppTextStyle.koRegular14()
                                                   .copyWith(
-                                                      color: AppColor.black),
-                                              // flex: 1,
-                                              maxLines: 1),
-                                        ],
+                                                color: AppColor.grey,
+                                              ),
+                                              maxLines: 5,
+                                              // flex: 3
+                                            ),
+                                            const Spacer(),
+                                            _buildFlexibleBox('$formattedDate',
+                                                style: AppTextStyle.koRegular12()
+                                                    .copyWith(
+                                                        color: AppColor.black),
+                                                // flex: 1,
+                                                maxLines: 1),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              )),
+                                  ],
+                                )),
+                          ),
                         );
                       },
                     );
