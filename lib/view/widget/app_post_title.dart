@@ -9,12 +9,12 @@ class AppPostTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-          width: double.infinity,
+        width: double.infinity,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-               flex: 15,
+              flex: 20,
               child: Text(
                 '제목',
                 style: AppTextStyle.koSemiBold16(),
@@ -54,23 +54,13 @@ class AppPostTitle extends StatelessWidget {
               ),
             ),
             Expanded(
-              flex: 7,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                
-                children: [
-                  Text(
-                    '수정',
-                    style: AppTextStyle.koSemiBold16(),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(width: 16.w), // 아이콘 사이 간격 조정
-                  Text(
-                    '삭제',
-                    style: AppTextStyle.koSemiBold16(),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+              flex: 5,
+              child: Center(
+                child: Text(
+                  '관리',
+                  style: AppTextStyle.koSemiBold16(),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
           ],

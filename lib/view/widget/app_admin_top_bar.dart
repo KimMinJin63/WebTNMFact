@@ -37,66 +37,63 @@ class AppAdminTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<AdminController>();
 
-    return Container(
-      color: const Color(0xFFF5F5F5),
-      padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // 왼쪽 탭 필터 영역
-          Row(
-            children: [
-              Obx(() => _buildTab('모두', totalCount, onTapAll, 0,
-                  controller.selectedIndex.value)),
-              _divider(),
-              Obx(() => _buildTab('발행됨', publishedCount, onTapPublished, 1,
-                  controller.selectedIndex.value)),
-              _divider(),
-              Obx(() => _buildTab('대기중', pendingCount, onTapPending, 2,
-                  controller.selectedIndex.value)),
-            ],
-          ),
-
-          // 오른쪽 검색 영역
-          Row(
-            children: [
-              SizedBox(
-                width: 180.w,
-                // height: 36.h,
-                child: TextField(
-                  onChanged: onChanged,
-                  controller: searchController,
-                  style: const TextStyle(fontSize: 14),
-                  decoration: InputDecoration(
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-                    hintText: '검색어를 입력하세요',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6.r),
-                    ),
-                    isDense: true,
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.blue),
-                  padding:
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // 왼쪽 탭 필터 영역
+        Row(
+          children: [
+            Obx(() => _buildTab('모두', totalCount, onTapAll, 0,
+                controller.selectedIndex.value)),
+            _divider(),
+            Obx(() => _buildTab('발행됨', publishedCount, onTapPublished, 1,
+                controller.selectedIndex.value)),
+            _divider(),
+            Obx(() => _buildTab('대기중', pendingCount, onTapPending, 2,
+                controller.selectedIndex.value)),
+          ],
+        ),
+    
+        // 오른쪽 검색 영역
+        Row(
+          children: [
+            SizedBox(
+              width: 180.w,
+              // height: 36.h,
+              child: TextField(
+                onChanged: onChanged,
+                controller: searchController,
+                style: const TextStyle(fontSize: 14),
+                decoration: InputDecoration(
+                  contentPadding:
                       EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                  hintText: '검색어를 입력하세요',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.r),
+                  ),
+                  
+                  isDense: true,
                 ),
-                onPressed: onTap,
-                // onPressed: () {
-                //   if (onSearch != null) {
-                //     onSearch!(searchController.text);
-                //   }
-                // },
-                child: const Text('글 검색', style: TextStyle(color: Colors.blue)),
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+            SizedBox(width: 8.w),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.blue),
+                padding:
+                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+              ),
+              onPressed: onTap,
+              // onPressed: () {
+              //   if (onSearch != null) {
+              //     onSearch!(searchController.text);
+              //   }
+              // },
+              child: const Text('글 검색', style: TextStyle(color: Colors.blue)),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

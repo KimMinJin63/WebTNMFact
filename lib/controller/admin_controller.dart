@@ -24,6 +24,7 @@ class AdminController extends GetxController {
   RxList<Map<String, dynamic>> originalNotPostList =
       <Map<String, dynamic>>[].obs;
   RxBool isSearching = false.obs;
+  RxInt menuSelectedIndex = 0.obs;
 
   @override
   void onInit() {
@@ -34,19 +35,22 @@ class AdminController extends GetxController {
     fetchDonePosts();
   }
 
-void selectTab(int index) {
-  selectedIndex.value = index;
+  void selectTab(int index) {
+    selectedIndex.value = index;
 
-  final hasKeyword = searchController.text.trim().isNotEmpty;
+    final hasKeyword = searchController.text.trim().isNotEmpty;
 
-  if (hasKeyword) {
-    findPost();
-  } else {
-    if (index == 0)      fetchAllPosts();
-    else if (index == 1) fetchDonePosts();
-    else                 fetchNotPosts();
+    if (hasKeyword) {
+      findPost();
+    } else {
+      if (index == 0)
+        fetchAllPosts();
+      else if (index == 1)
+        fetchDonePosts();
+      else
+        fetchNotPosts();
+    }
   }
-}
 
   Future findPost() async {
     final searchQuery = searchController.text.trim().toLowerCase();
@@ -111,13 +115,13 @@ void selectTab(int index) {
         final createdTimestamp = doc['createdAt'] as Timestamp?;
         final createdDate = createdTimestamp?.toDate() ?? DateTime.now();
         final formattedCreated =
-            DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR').format(createdDate);
+            DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR').format(createdDate);
 
         final updatedTimestamp = doc.data().containsKey('updatedAt')
             ? doc['updatedAt'] as Timestamp?
             : null;
         final formattedUpdated = updatedTimestamp != null
-            ? DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR')
+            ? DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR')
                 .format(updatedTimestamp.toDate())
             : null;
 
@@ -155,13 +159,13 @@ void selectTab(int index) {
         final createdTimestamp = doc['createdAt'] as Timestamp?;
         final createdDate = createdTimestamp?.toDate() ?? DateTime.now();
         final formattedCreated =
-            DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR').format(createdDate);
+            DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR').format(createdDate);
 
         final updatedTimestamp = doc.data().containsKey('updatedAt')
             ? doc['updatedAt'] as Timestamp?
             : null;
         final formattedUpdated = updatedTimestamp != null
-            ? DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR')
+            ? DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR')
                 .format(updatedTimestamp.toDate())
             : null;
 
@@ -199,13 +203,13 @@ void selectTab(int index) {
         final createdTimestamp = doc['createdAt'] as Timestamp?;
         final createdDate = createdTimestamp?.toDate() ?? DateTime.now();
         final formattedCreated =
-            DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR').format(createdDate);
+            DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR').format(createdDate);
 
         final updatedTimestamp = doc.data().containsKey('updatedAt')
             ? doc['updatedAt'] as Timestamp?
             : null;
         final formattedUpdated = updatedTimestamp != null
-            ? DateFormat('yyyy-MM-dd HH:mm:ss a', 'ko_KR')
+            ? DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR')
                 .format(updatedTimestamp.toDate())
             : null;
 

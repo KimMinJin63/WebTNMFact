@@ -16,6 +16,9 @@ class AppTextStyle {
   static TextStyle koBold13() => TextStyle(
       fontFamily: 'PretendardBold', fontSize: 13.sp, color: AppColor.primary);
 
+  static TextStyle koSemiBold25() => TextStyle(
+      fontFamily: 'PretendardSemiBold', fontSize: 25.sp, color: AppColor.black);
+
   static TextStyle koSemiBold22() => TextStyle(
       fontFamily: 'PretendardSemiBold', fontSize: 22.sp, color: AppColor.black);
 
@@ -27,6 +30,9 @@ class AppTextStyle {
       
   static TextStyle koSemiBold14() => TextStyle(
       fontFamily: 'PretendardSemiBold', fontSize: 14.sp, color: AppColor.black);
+
+  static TextStyle koSemiBold12() => TextStyle(
+      fontFamily: 'PretendardSemiBold', fontSize: 12.sp, color: AppColor.black);
 
   static TextStyle koRegular20() => TextStyle(
       fontFamily: 'PretendardRegular',

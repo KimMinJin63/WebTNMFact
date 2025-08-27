@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
+import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 
 class AppPost extends StatelessWidget {
@@ -32,12 +33,12 @@ class AppPost extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-            flex: 15,
+            flex: 20,
             child: InkWell(
               onTap: onContentTap,
               child: Text(
                 title,
-                style: TextStyle(fontSize: 16.sp),
+                style: AppTextStyle.koSemiBold16().copyWith(color: AppColor.black),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -75,7 +76,7 @@ class AppPost extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 7,
+            flex: 5,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
