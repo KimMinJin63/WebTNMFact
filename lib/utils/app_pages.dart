@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
 import 'package:tnm_fact/utils/app_routes.dart';
+import 'package:tnm_fact/view/page/admin_layout_page.dart';
 import 'package:tnm_fact/view/page/admin_page.dart';
 import 'package:tnm_fact/view/page/create_page.dart';
+import 'package:tnm_fact/view/page/dash_board_page.dart';
 import 'package:tnm_fact/view/page/detail_page.dart';
 import 'package:tnm_fact/view/page/edit_page.dart';
 import 'package:tnm_fact/view/page/home_page.dart';
@@ -32,6 +34,14 @@ class AppPages{
  GetPage(
         name: AppRoutes.detail,
         page: () => const DetailPage(),
+        transition: Transition.fadeIn),
+ GetPage(
+        name: AppRoutes.dash,
+        page: () => const DashBoardPage(),
+        transition: Transition.fadeIn),
+ GetPage(
+        name: AppRoutes.admin,
+        page: () => const AdminLayoutPage(),
         transition: Transition.fadeIn),
 //  GetPage(
 //         name: AppRoutes.erase,

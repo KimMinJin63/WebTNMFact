@@ -105,7 +105,7 @@ class AppAdminTopBar extends StatelessWidget {
       child: Text(
         '$label ($count)',
         style: TextStyle(
-          fontSize: 14,
+          fontSize: 14.sp,
           color: selectedIndex == index ? AppColor.black : AppColor.primary,
           fontWeight:
               selectedIndex == index ? FontWeight.bold : FontWeight.normal,

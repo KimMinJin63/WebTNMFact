@@ -25,6 +25,9 @@ class AdminController extends GetxController {
       <Map<String, dynamic>>[].obs;
   RxBool isSearching = false.obs;
   RxInt menuSelectedIndex = 0.obs;
+  var currentPage =
+      0.obs; // 0: Dashboard, 1: AdminList, 2: Settings, 3: EditPage
+  var currentPost = Rxn<Map<String, dynamic>>();
 
   @override
   void onInit() {

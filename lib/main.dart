@@ -9,6 +9,7 @@ import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/controller/login_controller.dart';
 import 'package:tnm_fact/firebase_options.dart';
 import 'package:tnm_fact/utils/app_pages.dart';
+import 'package:tnm_fact/view/page/admin_layout_page.dart';
 import 'package:tnm_fact/view/page/admin_page.dart';
 import 'package:tnm_fact/view/page/home_page.dart';
 import 'package:tnm_fact/view/page/login_page.dart';
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
           ),
           // home: const HomePage(),
-          home: const AdminPage(),
+          home: const AdminLayoutPage(),
           // home: const LoginPage(),
           getPages: AppPages.pages,
           // home: const HomePage(),

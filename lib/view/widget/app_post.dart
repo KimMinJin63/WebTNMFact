@@ -14,8 +14,7 @@ class AppPost extends StatelessWidget {
       required this.status,
       this.onTap,
       this.onContentTap,
-      this.onDeleteTap
-      });
+      this.onDeleteTap});
   final String title;
   final String author;
   final String category;
@@ -29,74 +28,77 @@ class AppPost extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 20,
-            child: InkWell(
-              onTap: onContentTap,
+      child: Padding(
+        padding: EdgeInsets.only(left :16.w, right: 16.w),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+              Expanded(
+                flex: 20,
+              child: InkWell(
+                onTap: onContentTap,
+                child: Text(
+                  title,
+                  style:
+                      AppTextStyle.koSemiBold16().copyWith(color: AppColor.black),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+              Expanded(
+                flex: 8,
               child: Text(
-                title,
-                style: AppTextStyle.koSemiBold16().copyWith(color: AppColor.black),
+                author,
+                style: TextStyle(fontSize: 16.sp),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-          ),
-          Expanded(
-            flex: 8,
-            child: Text(
-              author,
-              style: TextStyle(fontSize: 16.sp),
-              overflow: TextOverflow.ellipsis,
+              Expanded(
+                flex: 10,
+              child: Text(
+                category,
+                style: TextStyle(fontSize: 16.sp),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-          Expanded(
-            flex: 10,
-            child: Text(
-              category,
-              style: TextStyle(fontSize: 16.sp),
-              overflow: TextOverflow.ellipsis,
+              Expanded(
+                flex: 14,
+              child: Text(
+                createdAt,
+                style: TextStyle(fontSize: 16.sp),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-          Expanded(
-            flex: 14,
-            child: Text(
-              createdAt,
-              style: TextStyle(fontSize: 16.sp),
-              overflow: TextOverflow.ellipsis,
+              Expanded(
+                flex: 10,
+              child: Text(
+                status,
+                style: TextStyle(fontSize: 16.sp),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-          Expanded(
-            flex: 10,
-            child: Text(
-              status,
-              style: TextStyle(fontSize: 16.sp),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Expanded(
-            flex: 5,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(),
-                  icon: const Icon(Icons.edit),
-                  onPressed: onTap,
-                ),
-                SizedBox(width: 16.w),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(),
-                  icon: const Icon(Icons.delete),
-                  onPressed: onDeleteTap
-                ),
-              ],
-            ),
-          )
-        ],
+              Expanded(
+                flex: 5,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(),
+                    icon: Icon(Icons.edit, size: 30.w,),
+                    onPressed: onTap,
+                  ),
+                  SizedBox(width: 16.w),
+                  IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                      icon: Icon(Icons.delete, size: 30.w,),
+                      onPressed: onDeleteTap),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

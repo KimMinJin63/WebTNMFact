@@ -14,6 +14,7 @@ class EditPage extends GetView<EditController> {
 
   @override
   Widget build(BuildContext context) {
+    // final post = controller.currentPost.value;
     final AdminController adminController = Get.find<AdminController>();
     final post = Get.arguments;
     print('잘 받아오나?? : ${post['title']}');
