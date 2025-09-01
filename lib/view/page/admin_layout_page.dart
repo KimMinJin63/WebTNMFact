@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
@@ -85,6 +86,10 @@ class AdminLayoutPage extends StatelessWidget {
           /// 우측 콘텐츠 영역
           Expanded(
             child: Obx(() {
+                final AdminController adminController = Get.find<AdminController>();
+
+              // final box = GetStorage();
+
               switch (controller.menuSelectedIndex.value) {
                 case 0:
                   return const DashBoardPage();
@@ -93,7 +98,20 @@ class AdminLayoutPage extends StatelessWidget {
                 case 2:
                   return const HomePage();
                 case 3:
-                  return EditPage();
+                      final post = adminController.currentPost.value;
+
+
+                  // final post = box.read('post');
+                  print('레이아웃 잘 받아오나?? : ${post?['title']}');
+                  print('레이아웃 잘 받아오나?? : ${post?['content']}');
+                  print('레이아웃 잘 받아오나?? : ${post?['category']}');
+                  print('레이아웃 잘 받아오나?? : ${post?['status']}');
+
+                  if (post != null) {
+                    return EditPage();
+                  } else {
+                    return const Center(child: Text('게시글을 선택하세요.'));
+                  }
                 default:
                   return const DashBoardPage();
               }

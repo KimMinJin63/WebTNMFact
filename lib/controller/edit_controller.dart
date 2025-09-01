@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 
 class EditController extends GetxController {
@@ -10,12 +11,19 @@ class EditController extends GetxController {
   final TextEditingController contentController = TextEditingController();
   RxString selectedCategory = ''.obs;
   RxString selectedPublish = ''.obs;
+  final box = GetStorage();
 
   @override
   void onInit() {
     super.onInit();
+    // final post = box.read('post');
+    // final post = Get.arguments;
+    final post = adminController.currentPost.value;
+    print('컨트롤러에서는 잘 받아오나?? : ${post?['title']}');
+    print('컨트롤러에서는 잘 받아오나?? : ${post?['content']}');
+    print('컨트롤러에서는 잘 받아오나?? : ${post?['category']}');
+    print('컨트롤러에서는 잘 받아오나?? : ${post?['status']}');
 
-    final post = Get.arguments;
     if (post != null) {
       titleController.text = post['title'] ?? '';
       contentController.text = post['content'] ?? '';

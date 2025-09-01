@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
+import 'package:tnm_fact/view/page/create_page.dart';
 import 'package:tnm_fact/view/page/edit_page.dart';
 import 'package:tnm_fact/view/widget/app_admin_top_bar.dart';
 import 'package:tnm_fact/view/widget/app_post.dart';
@@ -18,6 +20,7 @@ class AdminPage extends GetView<AdminController> {
     final screenWidth = ScreenUtil().screenWidth;
     final bool isExtended = screenWidth > 600; // 기준 너비
     final double railWidth = isExtended ? 240.w : 72.w;
+    final box = GetStorage();
 
     return Scaffold(
       backgroundColor: AppColor.white,
@@ -34,15 +37,34 @@ class AdminPage extends GetView<AdminController> {
             child: SizedBox(
               width: double.infinity,
               height: 70.h,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('콘텐츠 관리',
-                      style: AppTextStyle.koBold28()
-                          .copyWith(color: AppColor.black)),
-                  Text('게시물을 관리하고 새 글을 작성합니다.',
-                      style: AppTextStyle.koSemiBold12()
-                          .copyWith(color: AppColor.grey)),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('콘텐츠 관리',
+                          style: AppTextStyle.koBold28()
+                              .copyWith(color: AppColor.black)),
+                      Text('게시물을 관리하고 새 글을 작성합니다.',
+                          style: AppTextStyle.koSemiBold12()
+                              .copyWith(color: AppColor.grey)),
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(right: 20.w),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: TextButton(
+                        child: Text('기사 작성'),
+                        onPressed: () {
+                          Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
+                          // 여기에 글 작성 로직 추가
+                          print('글 작성 버튼 클릭됨');
+                        },
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -131,6 +153,7 @@ class AdminPage extends GetView<AdminController> {
                             itemCount: visibleList.length,
                             itemBuilder: (context, index) {
                               final post = visibleList[index];
+
                               return Padding(
                                 padding: EdgeInsets.symmetric(vertical: 8.h),
                                 child: AppPost(
@@ -140,9 +163,32 @@ class AdminPage extends GetView<AdminController> {
                                   createdAt:
                                       post['updatedAt'] ?? post['createdAt'],
                                   status: post['status'] ?? '',
-                                  onContentTap: () => Get.toNamed(
-                                      EditPage.route,
-                                      arguments: post),
+                                  onContentTap: () {
+                                    // box.write('post', post);
+
+                                    controller.openEditPage(post);
+                                    print(
+                                        '어드민 페이지 잘 받아오나?? : ${post['title']}');
+                                    print(
+                                        '어드민 페이지 잘 받아오나?? : ${post['content']}');
+                                    print(
+                                        '어드민 페이지 잘 받아오나?? : ${post['category']}');
+                                    print(
+                                        '어드민 페이지 잘 받아오나?? : ${post['status']}');
+
+                                    // print(
+                                    //     '잘 받아오나?? : ${box.read('post')['title']}');
+                                    // print(
+                                    //     '잘 받아오나?? : ${box.read('post')['content']}');
+                                    // print(
+                                    //     '잘 받아오나?? : ${box.read('post')['category']}');
+                                    // print(
+                                    //     '잘 받아오나?? : ${box.read('post')['status']}');
+
+                                    // onContentTap: () => Get.toNamed(
+                                    //     EditPage.route,
+                                    //     arguments: post),
+                                  },
                                   onDeleteTap: () {
                                     Get.dialog(
                                       AlertDialog(
@@ -168,8 +214,10 @@ class AdminPage extends GetView<AdminController> {
                                       ),
                                     );
                                   },
-                                  onTap: () => Get.toNamed(EditPage.route,
-                                      arguments: post),
+                                  onTap: () => controller.openEditPage(post),
+
+                                  // onTap: () => Get.toNamed(EditPage.route,
+                                  //     arguments: post),
                                 ),
                               );
                             },

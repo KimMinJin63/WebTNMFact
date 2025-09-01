@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 
 class AdminController extends GetxController {
@@ -25,9 +26,22 @@ class AdminController extends GetxController {
       <Map<String, dynamic>>[].obs;
   RxBool isSearching = false.obs;
   RxInt menuSelectedIndex = 0.obs;
-  var currentPage =
-      0.obs; // 0: Dashboard, 1: AdminList, 2: Settings, 3: EditPage
-  var currentPost = Rxn<Map<String, dynamic>>();
+  // RxInt menuSelectedIndex = 0.obs;
+  Rx<Map<String, dynamic>?> currentPost = Rx<Map<String, dynamic>?>(null);
+  final box = GetStorage();
+
+  void openEditPage(Map<String, dynamic> post) {
+    // final post = Get.arguments;
+
+    // final post = box.read('post');
+    currentPost.value = post;
+    print('admin 컨트롤러에서는 잘 받아오나?? : ${post['title']}');
+    print('admin 컨트롤러에서는 잘 받아오나?? : ${post['content']}');
+    print('admin 컨트롤러에서는 잘 받아오나?? : ${post['category']}');
+    print('admin 컨트롤러에서는 잘 받아오나?? : ${post['status']}');
+
+    menuSelectedIndex.value = 3; // EditPage index
+  }
 
   @override
   void onInit() {

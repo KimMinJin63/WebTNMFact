@@ -27,10 +27,10 @@ class AppPages{
         name: AppRoutes.create,
         page: () => const CreatePage(),
         transition: Transition.fadeIn),
- GetPage(
-        name: AppRoutes.edit,
-        page: () => const EditPage(),
-        transition: Transition.fadeIn),
+//  GetPage(
+//         name: AppRoutes.edit,
+//         page: () => EditPage(),
+//         transition: Transition.fadeIn),
  GetPage(
         name: AppRoutes.detail,
         page: () => const DetailPage(),
