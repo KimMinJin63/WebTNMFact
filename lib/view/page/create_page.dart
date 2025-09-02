@@ -16,177 +16,247 @@ class CreatePage extends GetView<CreateController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('제목 없음 · 글'),
-        centerTitle: true,
+        title: Text(
+          '콘텐츠관리',
+          style: AppTextStyle.koSemiBold16(),
+        ),
+        leadingWidth: 54.w,
+        leading: Padding(
+          padding: EdgeInsets.only(left: 24.w),
+          child: IconButton(
+            padding: EdgeInsets.zero, // 🔹 아이콘 자체 패딩 제거
+            icon: Icon(
+              Icons.arrow_back,
+              color: AppColor.black,
+              size: 28.w,
+            ),
+            onPressed: () {
+              final adminController = Get.find<AdminController>();
+              adminController.isCreate.value = false;
+              // adminController.menuSelectedIndex.value = 1; // 콘텐츠 관리 탭으로 돌아가기
+            },
+          ),
+        ), // title: Text('제목 없음 · 글'),
+        centerTitle: false,
+
+        foregroundColor: AppColor.white,
         actions: [
           // Obx(
           //   () =>
-          TextButton(
-            onPressed: () {
-              controller.createPost(
-                  title: controller.titleController.text,
-                  content: controller.contentController.text,
-                  category: controller.selectedCategory.value,
-                  status: controller.selectedPublish.value,
-                  author: '김병국');
-              Get.dialog(
-                AlertDialog(
-                  title: const Text('게시글 작성 완료'),
-                  content: const Text('게시글이 성공적으로 작성되었습니다.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Get.back(); // 다이얼로그 닫기
-                        final adminController = Get.find<AdminController>();
-                        adminController.fetchAllPosts();
-                        adminController.fetchAllPostCounts();
-                        adminController.fetchDonePosts(); // ✅ 발행 글 갱신
-                        adminController.fetchNotPosts();
+          Obx(() {
+            return GestureDetector(
+              onTap: controller.isButtonActivate.value
+                  ? () {
+                      print('입력이 완료됨');
+                      controller.createPost(
+                          title: controller.titleController.text,
+                          content: controller.contentController.text,
+                          category: controller.selectedCategory.value,
+                          status: controller.selectedPublish.value,
+                          author: '김병국');
+                      Get.dialog(
+                        AlertDialog(
+                          title: const Text('게시글 작성 완료'),
+                          content: const Text('게시글이 성공적으로 작성되었습니다.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Get.back(); // 다이얼로그 닫기
+                                final adminController =
+                                    Get.find<AdminController>();
+                                adminController.fetchAllPosts();
+                                adminController.fetchAllPostCounts();
+                                adminController.fetchDonePosts(); // ✅ 발행 글 갱신
+                                adminController.fetchNotPosts();
 
-                        adminController.selectTab(
-                          controller.selectedPublish.value == '발행' ? 1 : 2,
-                        );
-                        adminController.selectedIndex.canUpdate;
-                        adminController.update();
-                        Get.offAllNamed(AdminPage.route); // 글 작성 후 관리자 페이지로 이동
-                      },
-                      child: const Text('확인'),
-                    ),
-                  ],
+                                adminController.selectTab(
+                                  controller.selectedPublish.value == '발행'
+                                      ? 1
+                                      : 2,
+                                );
+                                adminController.selectedIndex.canUpdate;
+                                adminController.update();
+                                adminController.isCreate.value = false;
+                                controller.titleController.clear();
+                                controller.contentController.clear();
+                                controller.selectedCategory.value = '';
+                                controller.selectedPublish.value = '';
+                              },
+                              child: const Text('확인'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  : null,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 20.w),
+                child: Container(
+                  // width: 50.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15.r),
+                    color: controller.isButtonActivate.value
+                        ? AppColor.navy
+                        : AppColor.lightGrey,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(8.w),
+                    child: Center(
+                        child:
+                            Text('공개', style: TextStyle(color: Colors.white))),
+                  ),
                 ),
-              );
-            },
-            child: Text(
-              '공개',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
+              ),
+            );
+          }),
           // )
         ],
-        backgroundColor: Colors.grey[900],
+        backgroundColor: Colors.white,
       ),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 왼쪽: 본문 입력 영역
-          Expanded(
-            flex: 3,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 32.h),
+      body: Container(
+        color: AppColor.lightGrey,
+        padding: EdgeInsets.all(20.w),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 왼쪽: 본문 입력 영역
+            Expanded(
+              flex: 3,
+              child: Container(
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15.r),
+                  color: AppColor.white,
+                ),
+                child: Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 40.w, vertical: 32.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 제목
+                      TextField(
+                        controller: controller.titleController,
+                        style: AppTextStyle.koBold35(),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: '제목 추가',
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+
+                      // 본문
+                      Expanded(
+                        child: TextField(
+                          controller: controller.contentController,
+                          maxLines: null,
+                          expands: true,
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            hintText: '/을 입력하여 블록 선택',
+                            border: InputBorder.none,
+                          ),
+                          style: AppTextStyle.koRegular18()
+                              .copyWith(color: AppColor.black),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 20.w,
+            ),
+
+            // 오른쪽: 카테고리 사이드바
+            Container(
+              width: 200.w,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15.r),
+                color: AppColor.white,
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 제목
-                  TextField(
-                    controller: controller.titleController,
-                    style: AppTextStyle.koBold35(),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: '제목 추가',
+                  Obx(
+                    () => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('설정',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        SizedBox(height: 16.h),
+                        Divider(),
+                        CheckboxListTile(
+                          title: Text('데일리 팩트'),
+                          value: controller.selectedCategory.value == '데일리 팩트',
+                          onChanged: (val) {
+                            controller.selectedCategory.value =
+                                val! ? '데일리 팩트' : ''; // 선택/해제
+                          },
+                          controlAffinity: ListTileControlAffinity.leading,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        CheckboxListTile(
+                          title: Text('인사이트 팩트'),
+                          value: controller.selectedCategory.value == '인사이트 팩트',
+                          onChanged: (val) {
+                            controller.selectedCategory.value =
+                                val! ? '인사이트 팩트' : '';
+                          },
+                          controlAffinity: ListTileControlAffinity.leading,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(height: 16.h),
-
-                  // 본문
-                  Expanded(
-                    child: TextField(
-                      controller: controller.contentController,
-                      maxLines: null,
-                      expands: true,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        hintText: '/을 입력하여 블록 선택',
-                        border: InputBorder.none,
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      checkboxTheme: CheckboxThemeData(
+                        shape: CircleBorder(), // 🔹 체크박스 자체를 원형으로
                       ),
-                      style: AppTextStyle.koRegular18()
-                          .copyWith(color: AppColor.black),
+                    ),
+                    child: Obx(
+                      () => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('발행여부',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          SizedBox(height: 16.h),
+                          CheckboxListTile(
+                            title: Text('발행'),
+                            // checkboxScaleFactor: 0.8,
+                            // visualDensity: VisualDensity.compact,
+                            value: controller.selectedPublish.value == '발행',
+                            onChanged: (val) {
+                              controller.selectedPublish.value =
+                                  val! ? '발행' : ''; // 선택/해제
+                            },
+                            controlAffinity: ListTileControlAffinity.leading,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          CheckboxListTile(
+                            title: Text('미발행'),
+                            visualDensity: VisualDensity.compact,
+                            value: controller.selectedPublish.value == '미발행',
+                            onChanged: (val) {
+                              controller.selectedPublish.value =
+                                  val! ? '미발행' : '';
+                            },
+                            controlAffinity: ListTileControlAffinity.leading,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-
-          // 오른쪽: 카테고리 사이드바
-          Container(
-            width: 200.w,
-            decoration: BoxDecoration(
-              border: Border(left: BorderSide(color: Colors.grey[300]!)),
-              color: Colors.grey[50],
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
-            child: Column(
-              children: [
-                Obx(
-                  () => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('카테고리',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      SizedBox(height: 16.h),
-                      CheckboxListTile(
-                        title: Text('데일리 팩트'),
-                        value: controller.selectedCategory.value == '데일리 팩트',
-                        onChanged: (val) {
-                          controller.selectedCategory.value =
-                              val! ? '데일리 팩트' : ''; // 선택/해제
-                        },
-                        controlAffinity: ListTileControlAffinity.leading,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                      CheckboxListTile(
-                        title: Text('인사이트 팩트'),
-                        value: controller.selectedCategory.value == '인사이트 팩트',
-                        onChanged: (val) {
-                          controller.selectedCategory.value =
-                              val! ? '인사이트 팩트' : '';
-                        },
-                        controlAffinity: ListTileControlAffinity.leading,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 18.h,
-                ),
-                Divider(),
-                SizedBox(
-                  height: 18.h,
-                ),
-                Obx(
-                  () => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('발행여부',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      SizedBox(height: 16.h),
-                      CheckboxListTile(
-                        title: Text('발행'),
-                        value: controller.selectedPublish.value == '발행',
-                        onChanged: (val) {
-                          controller.selectedPublish.value =
-                              val! ? '발행' : ''; // 선택/해제
-                        },
-                        controlAffinity: ListTileControlAffinity.leading,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                      CheckboxListTile(
-                        title: Text('미발행'),
-                        value: controller.selectedPublish.value == '미발행',
-                        onChanged: (val) {
-                          controller.selectedPublish.value = val! ? '미발행' : '';
-                        },
-                        controlAffinity: ListTileControlAffinity.leading,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

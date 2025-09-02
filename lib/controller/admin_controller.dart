@@ -29,6 +29,8 @@ class AdminController extends GetxController {
   // RxInt menuSelectedIndex = 0.obs;
   Rx<Map<String, dynamic>?> currentPost = Rx<Map<String, dynamic>?>(null);
   final box = GetStorage();
+  var isEditing = false.obs; // 🔹 편집 모드 여부
+  var isCreate = false.obs;
 
   void openEditPage(Map<String, dynamic> post) {
     // final post = Get.arguments;
@@ -39,8 +41,6 @@ class AdminController extends GetxController {
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['content']}');
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['category']}');
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['status']}');
-
-    menuSelectedIndex.value = 3; // EditPage index
   }
 
   @override
@@ -68,6 +68,7 @@ class AdminController extends GetxController {
         fetchNotPosts();
     }
   }
+
 
   Future findPost() async {
     final searchQuery = searchController.text.trim().toLowerCase();

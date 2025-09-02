@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 class AppTextStyle {
   static TextStyle koBold35() => TextStyle(
       fontFamily: 'PretendardBold', fontSize: 35.sp, color: AppColor.black);
+  static TextStyle koBold30() => TextStyle(
+      fontFamily: 'PretendardBold', fontSize: 30.sp, color: AppColor.black);
   static TextStyle koBold28() => TextStyle(
       fontFamily: 'PretendardBold', fontSize: 28.sp, color: AppColor.primary);
   static TextStyle koBold20() => TextStyle(

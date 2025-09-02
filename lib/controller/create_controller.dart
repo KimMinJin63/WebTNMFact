@@ -12,8 +12,19 @@ class CreateController extends GetxController {
   TextEditingController titleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
   final AdminController adminController = Get.find<AdminController>();
+  RxBool isButtonActivate = false.obs;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+   @override
+  void onInit() {
+    super.onInit();
+    // 🔹 입력값 변화 감지
+    titleController.addListener(activateButton);
+    contentController.addListener(activateButton);
+    ever(selectedCategory, (_) => activateButton());
+    ever(selectedPublish, (_) => activateButton());
+  }
 
   Future createPost({
     required String title,
@@ -35,6 +46,19 @@ class CreateController extends GetxController {
       final docId = docRef.id;
     } catch (e) {
       Get.snackbar('Error', 'Failed to create post: $e');
+    }
+  }
+
+  activateButton() {
+    if (titleController.text.isNotEmpty &&
+        contentController.text.isNotEmpty &&
+        selectedCategory.value.isNotEmpty &&
+        selectedPublish.value.isNotEmpty) {
+      print('입력이 완료됨');
+
+      isButtonActivate.value = true;
+    } else {
+      isButtonActivate.value = false;
     }
   }
 }

@@ -6,6 +6,7 @@ import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/page/admin_page.dart';
+import 'package:tnm_fact/view/page/create_page.dart';
 import 'package:tnm_fact/view/page/dash_board_page.dart';
 import 'package:tnm_fact/view/page/edit_page.dart';
 import 'package:tnm_fact/view/page/home_page.dart';
@@ -86,7 +87,33 @@ class AdminLayoutPage extends StatelessWidget {
           /// 우측 콘텐츠 영역
           Expanded(
             child: Obx(() {
-                final AdminController adminController = Get.find<AdminController>();
+              final AdminController adminController =
+                  Get.find<AdminController>();
+              if (adminController.isEditing.value) {
+                final post = adminController.currentPost.value;
+                if (post != null) {
+                  return WillPopScope(
+                    onWillPop: () async {
+                      adminController.isEditing.value = false;
+                      return false;
+                    },
+                    child: EditPage(),
+                  );
+                } else {
+                  return const Center(child: Text('게시글을 선택하세요.'));
+                }
+              }
+              if (adminController.isCreate.value) {
+               
+                  return WillPopScope(
+                    onWillPop: () async {
+                      adminController.isCreate.value = false;
+                      return false;
+                    },
+                    child: CreatePage(),
+                  );
+               
+              }
 
               // final box = GetStorage();
 
@@ -97,21 +124,6 @@ class AdminLayoutPage extends StatelessWidget {
                   return const AdminPage();
                 case 2:
                   return const HomePage();
-                case 3:
-                      final post = adminController.currentPost.value;
-
-
-                  // final post = box.read('post');
-                  print('레이아웃 잘 받아오나?? : ${post?['title']}');
-                  print('레이아웃 잘 받아오나?? : ${post?['content']}');
-                  print('레이아웃 잘 받아오나?? : ${post?['category']}');
-                  print('레이아웃 잘 받아오나?? : ${post?['status']}');
-
-                  if (post != null) {
-                    return EditPage();
-                  } else {
-                    return const Center(child: Text('게시글을 선택하세요.'));
-                  }
                 default:
                   return const DashBoardPage();
               }

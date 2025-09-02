@@ -25,9 +25,6 @@ class AdminPage extends GetView<AdminController> {
     return Scaffold(
       backgroundColor: AppColor.white,
       body:
-
-          /// 좌측 네비게이션 영역
-
           /// 우측 콘텐츠 영역
           Column(
         children: [
@@ -58,7 +55,8 @@ class AdminPage extends GetView<AdminController> {
                       child: TextButton(
                         child: Text('기사 작성'),
                         onPressed: () {
-                          Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
+                          controller.isCreate.value = true;
+                          // Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
                           // 여기에 글 작성 로직 추가
                           print('글 작성 버튼 클릭됨');
                         },
@@ -175,6 +173,8 @@ class AdminPage extends GetView<AdminController> {
                                         '어드민 페이지 잘 받아오나?? : ${post['category']}');
                                     print(
                                         '어드민 페이지 잘 받아오나?? : ${post['status']}');
+                                    controller.isEditing.value =
+                                        true; // 🔹 편집 모드 ON
 
                                     // print(
                                     //     '잘 받아오나?? : ${box.read('post')['title']}');
@@ -214,7 +214,11 @@ class AdminPage extends GetView<AdminController> {
                                       ),
                                     );
                                   },
-                                  onTap: () => controller.openEditPage(post),
+                                  onTap: () {
+                                    controller.openEditPage(post);
+                                    controller.isEditing.value =
+                                        true; // 🔹 편집 모드 ON
+                                  },
 
                                   // onTap: () => Get.toNamed(EditPage.route,
                                   //     arguments: post),
