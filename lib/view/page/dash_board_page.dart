@@ -82,6 +82,7 @@ class DashBoardPage extends StatelessWidget {
                     )),
                     Expanded(
                       child: AppContainer(
+                        height: 150.h,
                         content: Row(
                           children: [
                             Container(

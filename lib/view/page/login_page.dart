@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/controller/login_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 
@@ -10,6 +11,7 @@ class LoginPage extends GetView<LoginController> {
 
   @override
   Widget build(BuildContext context) {
+     AdminController adminController = Get.find<AdminController>();
     return Scaffold(
       backgroundColor: AppColor.shadowGrey,
       body: Center(
@@ -77,6 +79,9 @@ class LoginPage extends GetView<LoginController> {
                           controller.passwordController.text.trim();
                       print('로그인 성공: $email');
                       print('로그인 성공: $password');
+                      adminController.menuSelectedIndex.value =0;
+                      adminController.isCreate.value = false;
+                      adminController.isEditing.value = false;
 
                       if (email.isNotEmpty && password.isNotEmpty) {
                         await controller.login(email, password);

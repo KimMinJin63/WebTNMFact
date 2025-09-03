@@ -17,7 +17,7 @@ class AdminLayoutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AdminController controller = Get.put(AdminController());
+    final AdminController controller = Get.find<AdminController>();
     final screenWidth = ScreenUtil().screenWidth;
     final bool isExtended = screenWidth > 600; // 기준 너비
     final double railWidth = isExtended ? 240.w : 72.w;
@@ -73,7 +73,10 @@ class AdminLayoutPage extends StatelessWidget {
                           label: Text('설정'),
                         ),
                       ],
-                      selectedIndex: controller.menuSelectedIndex.value,
+                      selectedIndex: (controller.menuSelectedIndex.value >= 0 &&
+                              controller.menuSelectedIndex.value < 3)
+                          ? controller.menuSelectedIndex.value
+                          : 0,
                       onDestinationSelected: (index) {
                         controller.menuSelectedIndex.value = index;
                       },
@@ -87,6 +90,7 @@ class AdminLayoutPage extends StatelessWidget {
           /// 우측 콘텐츠 영역
           Expanded(
             child: Obx(() {
+              print('${controller.menuSelectedIndex.value}');
               final AdminController adminController =
                   Get.find<AdminController>();
               if (adminController.isEditing.value) {
@@ -104,15 +108,13 @@ class AdminLayoutPage extends StatelessWidget {
                 }
               }
               if (adminController.isCreate.value) {
-               
-                  return WillPopScope(
-                    onWillPop: () async {
-                      adminController.isCreate.value = false;
-                      return false;
-                    },
-                    child: CreatePage(),
-                  );
-               
+                return WillPopScope(
+                  onWillPop: () async {
+                    adminController.isCreate.value = false;
+                    return false;
+                  },
+                  child: CreatePage(),
+                );
               }
 
               // final box = GetStorage();

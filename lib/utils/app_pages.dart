@@ -40,7 +40,7 @@ class AppPages{
         page: () => const DashBoardPage(),
         transition: Transition.fadeIn),
  GetPage(
-        name: AppRoutes.admin,
+        name: AppRoutes.layout,
         page: () => const AdminLayoutPage(),
         transition: Transition.fadeIn),
 //  GetPage(
