@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/widget/app_container.dart';
+import 'package:tnm_fact/view/widget/app_visit_table.dart';
 
 class DashBoardPage extends StatelessWidget {
   const DashBoardPage({super.key});
   static const route = '/dash';
 
+  
+
   @override
   Widget build(BuildContext context) {
+    final AdminController controller = Get.find<AdminController>();
+    print('대시보드 총 게시물 수는 : ${controller.postList.length}');
+
     return Scaffold(
       backgroundColor: AppColor.white,
       body: Column(
@@ -70,11 +78,11 @@ class DashBoardPage extends StatelessWidget {
                                 style: AppTextStyle.koSemiBold16(),
                               ),
                               // SizedBox(height: 4.h),
-                              Text(
-                                '85',
-                                style: AppTextStyle.koBold28()
-                                    .copyWith(color: AppColor.navy),
-                              ),
+                              Obx(() => Text(
+                                    '${controller.postList.length}',
+                                    style: AppTextStyle.koBold28()
+                                        .copyWith(color: AppColor.navy),
+                                  )),
                             ],
                           ),
                         ],
@@ -94,7 +102,7 @@ class DashBoardPage extends StatelessWidget {
                                     AppColor.green.withOpacity(0.2), // 옅은 보라 배경
                               ),
                               child: Icon(
-                                Icons.newspaper,
+                                Icons.remove_red_eye,
                                 color: AppColor.green, // 메인 컬러 아이콘
                                 size: 28.w,
                               ),
@@ -142,11 +150,7 @@ class DashBoardPage extends StatelessWidget {
                                     .copyWith(color: AppColor.black),
                               ),
                               // SizedBox(height: 4.h),
-                              Text(
-                                '85',
-                                style: AppTextStyle.koBold28()
-                                    .copyWith(color: AppColor.green),
-                              ),
+                              AppVisitChart(),
                             ],
                           ),
                         ),

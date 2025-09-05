@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -43,6 +44,18 @@ class AdminController extends GetxController {
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['status']}');
   }
 
+
+//   @override
+// void onInit() {
+//   super.onInit();
+//   initAuth().then((_) {
+//     fetchAllPostCounts();
+//     fetchAllPosts();
+//     fetchNotPosts();
+//     fetchDonePosts();
+//   });
+// }
+
   @override
   void onInit() {
     super.onInit();
@@ -50,7 +63,11 @@ class AdminController extends GetxController {
     fetchAllPosts();
     fetchNotPosts();
     fetchDonePosts();
+    print('컨트롤러 총 게시물 수는 : ${postList.length}');
   }
+
+
+
 
   void selectTab(int index) {
     selectedIndex.value = index;
@@ -68,7 +85,6 @@ class AdminController extends GetxController {
         fetchNotPosts();
     }
   }
-
 
   Future findPost() async {
     final searchQuery = searchController.text.trim().toLowerCase();
@@ -276,4 +292,6 @@ class AdminController extends GetxController {
       print('🔥 게시글 카운트 불러오기 실패: $e');
     }
   }
+
+
 }

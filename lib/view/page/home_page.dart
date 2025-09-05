@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:intl/intl.dart';
+import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
@@ -17,6 +19,8 @@ class HomePage extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    final AdminController adminController = Get.find<AdminController>();
+
     return Scaffold(
       appBar: AppBar(
           leadingWidth: ScreenUtil().screenWidth / 5,
@@ -139,7 +143,7 @@ class HomePage extends GetView<HomeController> {
                     List<Map<String, dynamic>> visibleList;
                     switch (controller.selectedIndex.value) {
                       case 1:
-                          visibleList = controller.dailyPostList;
+                        visibleList = controller.dailyPostList;
                         break;
                       case 2:
                         visibleList = controller.insightPostList;
@@ -180,8 +184,21 @@ class HomePage extends GetView<HomeController> {
 
                         print('지금 게시글 목록 ${visibleList[index]['title']}');
                         return GestureDetector(
-                          onTap: () {
-                            Get.toNamed(DetailPage.route, arguments: post);
+                          onTap: () async {
+                            print('onTap 눌림');
+                            final user = FirebaseAuth.instance.currentUser;
+                            if (user == null) {
+                              // 로그인 안 되어 있으면 여기서 즉시 로그인 처리
+                              final cred = await FirebaseAuth.instance
+                                  .signInAnonymously();
+                              final userId = cred.user!.uid;
+                              controller.logVisit(userId);
+                              Get.toNamed(DetailPage.route, arguments: post);
+                            } else {
+                              final userId = user.uid;
+                              Get.toNamed(DetailPage.route, arguments: post);
+                              controller.logVisit(userId);
+                            }
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -207,7 +224,8 @@ class HomePage extends GetView<HomeController> {
                                         color: AppColor.grey,
                                         child: Center(
                                           child: Text('이미지 $index',
-                                              style: AppTextStyle.koRegular18()),
+                                              style:
+                                                  AppTextStyle.koRegular18()),
                                         ),
                                       ),
                                     ),
@@ -238,7 +256,8 @@ class HomePage extends GetView<HomeController> {
                                                             80.r),
                                                   ),
                                                   child: Padding(
-                                                    padding: EdgeInsets.all(2.w),
+                                                    padding:
+                                                        EdgeInsets.all(2.w),
                                                     child: Text(
                                                       '${visibleList[index]['category']}',
                                                       style: AppTextStyle
@@ -264,7 +283,8 @@ class HomePage extends GetView<HomeController> {
                                             ),
                                             _buildFlexibleBox(
                                               '${visibleList[index]['title']}',
-                                              style: AppTextStyle.koSemiBold18(),
+                                              style:
+                                                  AppTextStyle.koSemiBold18(),
                                               maxLines: 2,
                                               // flex: 2
                                             ),
@@ -274,14 +294,16 @@ class HomePage extends GetView<HomeController> {
                                                   .copyWith(
                                                 color: AppColor.grey,
                                               ),
-                                              maxLines: 5,
+                                              maxLines: 4,
                                               // flex: 3
                                             ),
                                             const Spacer(),
                                             _buildFlexibleBox('$formattedDate',
-                                                style: AppTextStyle.koRegular12()
-                                                    .copyWith(
-                                                        color: AppColor.black),
+                                                style:
+                                                    AppTextStyle.koRegular12()
+                                                        .copyWith(
+                                                            color:
+                                                                AppColor.black),
                                                 // flex: 1,
                                                 maxLines: 1),
                                           ],

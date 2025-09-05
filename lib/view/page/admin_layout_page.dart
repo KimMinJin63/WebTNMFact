@@ -42,44 +42,105 @@ class AdminLayoutPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                // Expanded(
+                //   child: Obx(
+                //     () => NavigationRail(
+                //       useIndicator: false,
+                //       selectedIconTheme:
+                //           IconThemeData(size: 32.w, color: Colors.white),
+                //       unselectedIconTheme:
+                //           IconThemeData(size: 28.w, color: Colors.white70),
+                //       extended: isExtended, // 반응형 제어
+                //       // indicatorColor: AppColor.shadowGrey,
+                //       selectedLabelTextStyle: AppTextStyle.koSemiBold16()
+                //           .copyWith(color: Colors.white),
+                //       unselectedLabelTextStyle: AppTextStyle.koRegular14()
+                //           .copyWith(color: Colors.white70),
+                //       backgroundColor: Colors.transparent,
+                //       groupAlignment: -1.0,
+                //       destinations: [
+                //         NavigationRailDestination(
+                //           icon: Icon(Icons.space_dashboard_outlined,
+                //               color: Colors.white70),
+                //           selectedIcon: Container(
+                //             // padding: EdgeInsets.symmetric(horizontal: 8.w),
+                //               width: 60.w,
+                //               height: 45.h,
+                //               decoration: BoxDecoration(
+                //                 borderRadius: BorderRadius.circular(10.w),
+                //                 color: AppColor.shadowGrey,
+                //               ),
+                //               child: Icon(Icons.space_dashboard)),
+                //           label: Padding(
+                //             padding: EdgeInsets.only(left: 4.w),
+                //             child: Text('대시보드'),
+                //           ),
+                //         ),
+                //         NavigationRailDestination(
+                //           icon: Icon(Icons.description_outlined,
+                //               color: Colors.white70),
+                //           selectedIcon: Icon(
+                //             Icons.description,
+                //           ),
+                //           label: Text('콘텐츠 관리'),
+                //         ),
+                //         NavigationRailDestination(
+                //           icon: Icon(Icons.settings_outlined,
+                //               color: Colors.white70),
+                //           selectedIcon: Icon(Icons.settings, size: 30.w),
+                //           label: Text('설정'),
+                //         ),
+                //         NavigationRailDestination(
+                //           icon: Icon(Icons.space_dashboard_outlined,
+                //               color: Colors.white70),
+                //           selectedIcon: Container(
+                //             // padding: EdgeInsets.symmetric(horizontal: 8.w),
+                //               width: 60.w,
+                //               height: 45.h,
+                //               decoration: BoxDecoration(
+                //                 borderRadius: BorderRadius.circular(10.w),
+                //                 color: AppColor.shadowGrey,
+                //               ),
+                //               child: Icon(Icons.space_dashboard)),
+                //           label: Padding(
+                //             padding: EdgeInsets.only(left: 4.w),
+                //             child: Text('대시보드'),
+                //           ),
+                //         ),
+                //         NavigationRailDestination(
+                //           icon: Icon(Icons.description_outlined,
+                //               color: Colors.white70),
+                //           selectedIcon: Icon(
+                //             Icons.description,
+                //           ),
+                //           label: Text('콘텐츠 관리'),
+                //         ),
+                //         NavigationRailDestination(
+                //           icon: Icon(Icons.settings_outlined,
+                //               color: Colors.white70),
+                //           selectedIcon: Icon(Icons.settings, size: 30.w),
+                //           label: Text('설정'),
+                //         ),
+                //       ],
+                //       selectedIndex: (controller.menuSelectedIndex.value >= 0 &&
+                //               controller.menuSelectedIndex.value < 3)
+                //           ? controller.menuSelectedIndex.value
+                //           : 0,
+                //       onDestinationSelected: (index) {
+                //         controller.menuSelectedIndex.value = index;
+                //       },
+                //     ),
+                //   ),
+                // ),
                 Expanded(
                   child: Obx(
-                    () => NavigationRail(
-                      extended: isExtended, // 반응형 제어
-                      indicatorColor: AppColor.shadowGrey,
-                      selectedLabelTextStyle: AppTextStyle.koSemiBold16()
-                          .copyWith(color: Colors.white),
-                      unselectedLabelTextStyle: AppTextStyle.koRegular14()
-                          .copyWith(color: Colors.white70),
-                      backgroundColor: Colors.transparent,
-                      groupAlignment: -1.0,
-                      destinations: [
-                        NavigationRailDestination(
-                          icon: Icon(Icons.space_dashboard_outlined,
-                              size: 30.w, color: Colors.white70),
-                          selectedIcon: Icon(Icons.space_dashboard, size: 30.w),
-                          label: Text('대시보드'),
-                        ),
-                        NavigationRailDestination(
-                          icon: Icon(Icons.description_outlined,
-                              size: 30.w, color: Colors.white70),
-                          selectedIcon: Icon(Icons.description, size: 30.w),
-                          label: Text('콘텐츠 관리'),
-                        ),
-                        NavigationRailDestination(
-                          icon: Icon(Icons.settings_outlined,
-                              size: 30.w, color: Colors.white70),
-                          selectedIcon: Icon(Icons.settings, size: 30.w),
-                          label: Text('설정'),
-                        ),
+                    () => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildMenuItem(Icons.dashboard, "대시보드", 0),
+                        _buildMenuItem(Icons.description, "콘텐츠 관리", 1),
+                        _buildMenuItem(Icons.settings, "설정", 2),
                       ],
-                      selectedIndex: (controller.menuSelectedIndex.value >= 0 &&
-                              controller.menuSelectedIndex.value < 3)
-                          ? controller.menuSelectedIndex.value
-                          : 0,
-                      onDestinationSelected: (index) {
-                        controller.menuSelectedIndex.value = index;
-                      },
                     ),
                   ),
                 ),
@@ -135,4 +196,40 @@ class AdminLayoutPage extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildMenuItem(IconData icon, String label, int index,
+    {bool extended = true}) {
+  final AdminController controller = Get.find<AdminController>();
+  final isSelected = controller.menuSelectedIndex.value == index;
+
+  return GestureDetector(
+    onTap: () => controller.menuSelectedIndex.value = index,
+    child: Container(
+      margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 12.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: isSelected ? AppColor.primary : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: isSelected ? 32.w : 28.w,
+            color: isSelected ? Colors.white : Colors.white70,
+          ),
+          if (extended) ...[
+            SizedBox(width: 8),
+            Text(
+              label,
+              style: isSelected
+                  ? AppTextStyle.koSemiBold16().copyWith(color: Colors.white)
+                  : AppTextStyle.koRegular14().copyWith(color: Colors.white70),
+            ),
+          ]
+        ],
+      ),
+    ),
+  );
 }
