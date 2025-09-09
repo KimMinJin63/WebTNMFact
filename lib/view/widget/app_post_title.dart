@@ -52,10 +52,12 @@ class AppPostTitle extends StatelessWidget {
               ),
               Expanded(
                 flex: 10,
-                child: Text(
-                  '발행여부',
-                  style: AppTextStyle.koSemiBold16(),
-                  overflow: TextOverflow.ellipsis,
+                child: Center(
+                  child: Text(
+                    '발행여부',
+                    style: AppTextStyle.koSemiBold16(),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
               Expanded(

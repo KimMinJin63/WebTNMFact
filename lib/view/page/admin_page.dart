@@ -161,6 +161,7 @@ class AdminPage extends GetView<AdminController> {
                                   createdAt:
                                       post['updatedAt'] ?? post['createdAt'],
                                   status: post['status'] ?? '',
+                                  color: post['status'] == '발행' ? AppColor.green : AppColor.lightGrey,
                                   onContentTap: () {
                                     // box.write('post', post);
 

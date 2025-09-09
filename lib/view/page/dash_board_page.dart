@@ -138,7 +138,7 @@ class DashBoardPage extends StatelessWidget {
                     children: [
                       // 첫 번째 카드
                       Expanded(
-                        flex: 3,
+                        flex: 2,
                         child: AppContainer(
                           content: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +149,7 @@ class DashBoardPage extends StatelessWidget {
                                 style: AppTextStyle.koBold20()
                                     .copyWith(color: AppColor.black),
                               ),
-                              // SizedBox(height: 4.h),
+                              SizedBox(height: 48.h),
                               AppVisitChart(),
                             ],
                           ),

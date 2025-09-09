@@ -14,12 +14,14 @@ class AppPost extends StatelessWidget {
       required this.status,
       this.onTap,
       this.onContentTap,
-      this.onDeleteTap});
+      this.onDeleteTap,
+      this.color});
   final String title;
   final String author;
   final String category;
   final String createdAt;
   final String status;
+  final Color? color;
   final Function()? onTap;
   final Function()? onContentTap;
   final Function()? onDeleteTap;
@@ -29,70 +31,77 @@ class AppPost extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: Padding(
-        padding: EdgeInsets.only(left :16.w, right: 16.w),
+        padding: EdgeInsets.only(left: 16.w, right: 16.w),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-              Expanded(
-                flex: 20,
+            Expanded(
+              flex: 20,
               child: InkWell(
                 onTap: onContentTap,
                 child: Text(
                   title,
-                  style:
-                      AppTextStyle.koSemiBold16().copyWith(color: AppColor.black),
+                  style: AppTextStyle.koSemiBold16()
+                      .copyWith(color: AppColor.black),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
-              Expanded(
-                flex: 8,
+            Expanded(
+              flex: 8,
               child: Text(
                 author,
                 style: TextStyle(fontSize: 16.sp),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-              Expanded(
-                flex: 10,
+            Expanded(
+              flex: 10,
               child: Text(
                 category,
                 style: TextStyle(fontSize: 16.sp),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-              Expanded(
-                flex: 14,
+            Expanded(
+              flex: 14,
               child: Text(
                 createdAt,
                 style: TextStyle(fontSize: 16.sp),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-              Expanded(
-                flex: 10,
-              child: Text(
-                status,
-                style: TextStyle(fontSize: 16.sp),
-                overflow: TextOverflow.ellipsis,
+            Expanded(
+              flex: 10,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(20.r)
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  status,
+                  style: TextStyle(fontSize: 16.sp),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
-              Expanded(
-                flex: 5,
+            Expanded(
+              flex: 5,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   IconButton(
                     padding: EdgeInsets.zero,
                     constraints: BoxConstraints(),
-                    icon: Icon(Icons.edit, size: 30.w,),
+                    icon: Icon(Icons.edit, size: 30.w, color: AppColor.primary),
                     onPressed: onTap,
                   ),
                   SizedBox(width: 16.w),
                   IconButton(
                       padding: EdgeInsets.zero,
                       constraints: BoxConstraints(),
-                      icon: Icon(Icons.delete, size: 30.w,),
+                      icon: Icon(Icons.delete, size: 30.w, color: AppColor.red),
                       onPressed: onDeleteTap),
                 ],
               ),
