@@ -44,6 +44,10 @@ class AppTextStyle {
       fontFamily: 'PretendardRegular',
       fontSize: 18.sp,
       color: AppColor.primary);
+  static TextStyle koRegular16() => TextStyle(
+      fontFamily: 'PretendardRegular',
+      fontSize: 16.sp,
+      color: AppColor.black);
   static TextStyle koRegular15() => TextStyle(
       fontFamily: 'PretendardRegular',
       fontSize: 15.sp,

@@ -15,13 +15,14 @@ class AppPost extends StatelessWidget {
       this.onTap,
       this.onContentTap,
       this.onDeleteTap,
-      this.color});
+      this.color, this.textColor});
   final String title;
   final String author;
   final String category;
   final String createdAt;
   final String status;
   final Color? color;
+  final Color? textColor;
   final Function()? onTap;
   final Function()? onContentTap;
   final Function()? onDeleteTap;
@@ -49,40 +50,49 @@ class AppPost extends StatelessWidget {
             ),
             Expanded(
               flex: 8,
-              child: Text(
-                author,
-                style: TextStyle(fontSize: 16.sp),
-                overflow: TextOverflow.ellipsis,
+              child: Center(
+                child: Text(
+                  author,
+                  style: TextStyle(fontSize: 16.sp),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
             Expanded(
               flex: 10,
-              child: Text(
-                category,
-                style: TextStyle(fontSize: 16.sp),
-                overflow: TextOverflow.ellipsis,
+              child: Center(
+                child: Text(
+                  category,
+                  style: TextStyle(fontSize: 16.sp),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
             Expanded(
               flex: 14,
-              child: Text(
-                createdAt,
-                style: TextStyle(fontSize: 16.sp),
-                overflow: TextOverflow.ellipsis,
+              child: Center(
+                child: Text(
+                  createdAt,
+                  style: TextStyle(fontSize: 16.sp),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
             Expanded(
               flex: 10,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(20.r)
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  status,
-                  style: TextStyle(fontSize: 16.sp),
-                  overflow: TextOverflow.ellipsis,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(20.r)
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    status,
+                    style: AppTextStyle.koSemiBold16().copyWith(color: textColor),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ),

@@ -53,7 +53,7 @@ class AdminPage extends GetView<AdminController> {
                     child: Align(
                       alignment: Alignment.bottomLeft,
                       child: TextButton(
-                        child: Text('기사 작성'),
+                        child: Text('기사 작성', style: AppTextStyle.koBold13()),
                         onPressed: () {
                           controller.isCreate.value = true;
                           // Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동
@@ -161,7 +161,8 @@ class AdminPage extends GetView<AdminController> {
                                   createdAt:
                                       post['updatedAt'] ?? post['createdAt'],
                                   status: post['status'] ?? '',
-                                  color: post['status'] == '발행' ? AppColor.green : AppColor.lightGrey,
+                                  textColor: post['status'] == '발행' ? AppColor.deepGreen : AppColor.black,
+                                  color: post['status'] == '발행' ? AppColor.green.withOpacity(0.2) : AppColor.lightGrey,
                                   onContentTap: () {
                                     // box.write('post', post);
 

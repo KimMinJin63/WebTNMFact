@@ -34,14 +34,11 @@ class AppVisitChart extends StatelessWidget {
 
         final dailyCounts = snapshot.data!;
         print('dailyCounts: $dailyCounts');
-
+        final today = DateTime.now();
         final allDates = List.generate(5, (i) {
-          final date = DateTime(2025, 9, 5).add(Duration(days: i));
+          final date = today.subtract(Duration(days: 4 - i));
           return DateFormat('yyyy-MM-dd').format(date);
         });
-        if (dailyCounts.isEmpty) {
-          return const Text("📭 방문자 데이터 없음");
-        }
 
         final filledCounts = {for (var d in allDates) d: (dailyCounts[d] ?? 0)};
 
@@ -64,6 +61,7 @@ class AppVisitChart extends StatelessWidget {
                     sideTitles: SideTitles(
                       showTitles: true,
                       interval: 1, // ✅ 인덱스마다 하나씩 라벨 출력
+                      reservedSize: 28.h, // 날짜와 그래프 사이 여백
                       getTitlesWidget: (value, meta) {
                         final idx = value.toInt();
                         if (idx < 0 || idx >= sorted.length)
@@ -71,13 +69,28 @@ class AppVisitChart extends StatelessWidget {
                         final fullDate = sorted[idx].key; // yyyy-MM-dd
                         final month = fullDate.substring(5, 7);
                         final day = fullDate.substring(8, 10);
-                        return Text("$month/$day",
-                            style: const TextStyle(fontSize: 12));
+                        return Padding(
+                          padding: EdgeInsets.only(top: 4.h),
+                          child: Text("$month/$day",
+                              style: const TextStyle(fontSize: 12)),
+                        );
                       },
                     ),
                   ),
                   leftTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: true),
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40.w, // 반응형: 화면 크기에 따라 여백 자동 조절
+                      getTitlesWidget: (value, meta) {
+                        return Padding(
+                          padding: EdgeInsets.only(right: 6.w), // 숫자와 축 사이 간격
+                          child: Text(
+                            value.toInt().toString(),
+                            style: TextStyle(fontSize: 12.sp),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                   topTitles: AxisTitles(
                       sideTitles: SideTitles(showTitles: false)), // ✅ 위쪽 라벨 제거

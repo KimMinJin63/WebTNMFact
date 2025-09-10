@@ -28,26 +28,32 @@ class AppPostTitle extends StatelessWidget {
               ),
               Expanded(
                 flex: 8,
-                child: Text(
-                  '작성자',
-                  style: AppTextStyle.koSemiBold16(),
-                  overflow: TextOverflow.ellipsis,
+                child: Center(
+                  child: Text(
+                    '작성자',
+                    style: AppTextStyle.koSemiBold16(),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
               Expanded(
                 flex: 10,
-                child: Text(
-                  '카테고리',
-                  style: AppTextStyle.koSemiBold16(),
-                  overflow: TextOverflow.ellipsis,
+                child: Center(
+                  child: Text(
+                    '카테고리',
+                    style: AppTextStyle.koSemiBold16(),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
               Expanded(
                 flex: 14,
-                child: Text(
-                  '날짜',
-                  style: AppTextStyle.koSemiBold16(),
-                  overflow: TextOverflow.ellipsis,
+                child: Center(
+                  child: Text(
+                    '날짜',
+                    style: AppTextStyle.koSemiBold16(),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
               Expanded(

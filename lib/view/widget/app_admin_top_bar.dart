@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
+import 'package:tnm_fact/utils/app_text_style.dart';
 
 class AppAdminTopBar extends StatelessWidget {
   final int totalCount;
@@ -63,11 +64,12 @@ class AppAdminTopBar extends StatelessWidget {
               child: TextField(
                 onChanged: onChanged,
                 controller: searchController,
-                style: const TextStyle(fontSize: 14),
+                style: AppTextStyle.koRegular16(),
                 decoration: InputDecoration(
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
                   hintText: '검색어를 입력하세요',
+                  hintStyle: AppTextStyle.koRegular16(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.r),
                   ),
@@ -77,19 +79,17 @@ class AppAdminTopBar extends StatelessWidget {
               ),
             ),
             SizedBox(width: 8.w),
-            OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.blue),
-                padding:
-                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+            SizedBox(
+              width: 90.w,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColor.primary),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                ),
+                onPressed: onTap,
+                child: Text('글 검색', style: AppTextStyle.koRegular18().copyWith(color: AppColor.primary),),
               ),
-              onPressed: onTap,
-              // onPressed: () {
-              //   if (onSearch != null) {
-              //     onSearch!(searchController.text);
-              //   }
-              // },
-              child: const Text('글 검색', style: TextStyle(color: Colors.blue)),
             ),
           ],
         ),
