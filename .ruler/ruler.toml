@@ -1,0 +1,31 @@
+# --- 기본 에이전트 설정 ---
+default_agents = ["copilot", "cursor", "claude"]
+
+# --- 에이전트별 세부 설정 ---
+
+[agents.copilot]
+enabled = true
+output_path = ".github/copilot-instructions.md"
+
+[agents.cursor]
+enabled = true
+output_path = ".cursor/rules.md"
+
+[agents.claude]
+enabled = true
+output_path = ".claude/rules.md"
+
+# --- 규칙 번들 참조 ---
+[[bundles]]
+name = "global_coding_rules"
+include = [
+  "rules/flutter_ui.md",
+  "rules/text_style.md",
+  "rules/navigation.md",
+  "rules/naming_convention.md"
+]
+
+# --- 코드 재작성 규칙 (예: Flutter 스타일 교정) ---
+[rewrites]
+"Color\\(0x[a-fA-F0-9]{6,8}\\)" = "AppColor에서 가져오세요. 예: AppColor.primary"
+"TextStyle\\(" = "AppTextStyle 프리셋을 먼저 검토하세요."

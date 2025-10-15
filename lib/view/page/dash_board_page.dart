@@ -11,8 +11,6 @@ class DashBoardPage extends StatelessWidget {
   const DashBoardPage({super.key});
   static const route = '/dash';
 
-  
-
   @override
   Widget build(BuildContext context) {
     final AdminController controller = Get.find<AdminController>();
@@ -117,10 +115,22 @@ class DashBoardPage extends StatelessWidget {
                                   style: AppTextStyle.koSemiBold16(),
                                 ),
                                 // SizedBox(height: 4.h),
-                                Text(
-                                  '85',
-                                  style: AppTextStyle.koBold28()
-                                      .copyWith(color: AppColor.green),
+                                FutureBuilder<int>(
+                                  future: controller
+                                      .fetchTotalVisits(), // ✅ Firestore에서 불러오기
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Text(
+                                        '-',
+                                        style: TextStyle(color: Colors.grey),
+                                      );
+                                    }
+                                    return Text(
+                                      '${snapshot.data}',
+                                      style: AppTextStyle.koBold28()
+                                          .copyWith(color: AppColor.green),
+                                    );
+                                  },
                                 ),
                               ],
                             ),

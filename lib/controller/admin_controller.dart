@@ -44,7 +44,6 @@ class AdminController extends GetxController {
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['status']}');
   }
 
-
 //   @override
 // void onInit() {
 //   super.onInit();
@@ -64,10 +63,23 @@ class AdminController extends GetxController {
     fetchNotPosts();
     fetchDonePosts();
     print('컨트롤러 총 게시물 수는 : ${postList.length}');
+    // print('')
   }
 
+  fetchDailyVisits() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('visits').get();
+    Map<String, int> dailyCounts = {};
 
-
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+      final date = data['date'] ?? '';
+      if (date.isNotEmpty) {
+        dailyCounts[date] = (dailyCounts[date] ?? 0) + 1;
+      }
+    }
+    return dailyCounts;
+  }
 
   void selectTab(int index) {
     selectedIndex.value = index;
@@ -293,5 +305,8 @@ class AdminController extends GetxController {
     }
   }
 
-
+  Future<int> fetchTotalVisits() async {
+  final snapshot = await FirebaseFirestore.instance.collection('visits').get();
+  return snapshot.docs.length; // ✅ 문서 개수 = 총 방문자 수
+}
 }

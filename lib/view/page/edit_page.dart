@@ -9,6 +9,7 @@ import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/page/admin_layout_page.dart';
 import 'package:tnm_fact/view/page/admin_page.dart';
+import 'package:tnm_fact/view/widget/%08app_checkbox.dart';
 
 class EditPage extends GetView<EditController> {
   const EditPage({super.key});
@@ -94,7 +95,7 @@ class EditPage extends GetView<EditController> {
 
                 adminController.isEditing.value = false; // 수정 완료 후 관리자 페이지로 이동
               },
-              child: const Text('수정', style: TextStyle(color: Colors.black)),
+              child: Text('수정', style: AppTextStyle.koSemiBold16().copyWith(color: AppColor.black)),
             ) // )
           ],
           backgroundColor: Colors.white,
@@ -173,37 +174,35 @@ class EditPage extends GetView<EditController> {
                     Obx(
                       () => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text('설정',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                              style: AppTextStyle.koBold20().copyWith(color: AppColor.black)),
                           SizedBox(height: 16.h),
                           Divider(),
-                          CheckboxListTile(
-                            title: Text('데일리 팩트'),
+                          SizedBox(height: 16.h),
+                          AppCheckboxTile(
+                            label: '데일리 팩트',
                             value:
                                 controller.selectedCategory.value == '데일리 팩트',
-                            onChanged: (val) {
+                            onChanged: (v) {
                               controller.selectedCategory.value =
-                                  val! ? '데일리 팩트' : ''; // 선택/해제
+                                  v! ? '데일리 팩트' : '';
                             },
-                            controlAffinity: ListTileControlAffinity.leading,
-                            contentPadding: EdgeInsets.zero,
                           ),
-                          CheckboxListTile(
-                            title: Text('인사이트 팩트'),
+                          AppCheckboxTile(
+                            label: '인사이트 팩트',
                             value:
                                 controller.selectedCategory.value == '인사이트 팩트',
-                            onChanged: (val) {
+                            onChanged: (v) {
                               controller.selectedCategory.value =
-                                  val! ? '인사이트 팩트' : '';
+                                  v! ? '인사이트 팩트' : '';
                             },
-                            controlAffinity: ListTileControlAffinity.leading,
-                            contentPadding: EdgeInsets.zero,
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: 20.h),
                     Theme(
                       data: Theme.of(context).copyWith(
                         checkboxTheme: CheckboxThemeData(
@@ -215,31 +214,53 @@ class EditPage extends GetView<EditController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('발행여부',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                                style: AppTextStyle.koBold20().copyWith(color: AppColor.black)),
                             SizedBox(height: 16.h),
-                            CheckboxListTile(
-                              title: Text('발행'),
-                              // checkboxScaleFactor: 0.8,
-                              // visualDensity: VisualDensity.compact,
+                            AppCheckboxTile(
+                              label: '발행',
+                              shape: CircleBorder(),
                               value: controller.selectedPublish.value == '발행',
-                              onChanged: (val) {
+                              onChanged: (v) {
                                 controller.selectedPublish.value =
-                                    val! ? '발행' : ''; // 선택/해제
+                                    v! ? '발행' : '';
                               },
-                              controlAffinity: ListTileControlAffinity.leading,
-                              contentPadding: EdgeInsets.zero,
                             ),
-                            CheckboxListTile(
-                              title: Text('미발행'),
-                              visualDensity: VisualDensity.compact,
+                            AppCheckboxTile(
+                              label: '미발행',
+                              shape: CircleBorder(),
                               value: controller.selectedPublish.value == '미발행',
-                              onChanged: (val) {
+                              onChanged: (v) {
                                 controller.selectedPublish.value =
-                                    val! ? '미발행' : '';
+                                    v! ? '미발행' : '';
                               },
-                              controlAffinity: ListTileControlAffinity.leading,
-                              contentPadding: EdgeInsets.zero,
                             ),
+                            // CheckboxListTile(
+                            //   title: Text('발행',
+                            //       style: AppTextStyle.koRegular18()
+                            //           .copyWith(color: AppColor.black)),
+                            //   // checkboxScaleFactor: 0.8,
+                            //   // visualDensity: VisualDensity.compact,
+                            //   value: controller.selectedPublish.value == '발행',
+                            //   onChanged: (val) {
+                            //     controller.selectedPublish.value =
+                            //         val! ? '발행' : ''; // 선택/해제
+                            //   },
+                            //   controlAffinity: ListTileControlAffinity.leading,
+                            //   contentPadding: EdgeInsets.zero,
+                            // ),
+                            // CheckboxListTile(
+                            //   title: Text('미발행',
+                            //       style: AppTextStyle.koRegular18()
+                            //           .copyWith(color: AppColor.black)),
+                            //   visualDensity: VisualDensity.compact,
+                            //   value: controller.selectedPublish.value == '미발행',
+                            //   onChanged: (val) {
+                            //     controller.selectedPublish.value =
+                            //         val! ? '미발행' : '';
+                            //   },
+                            //   controlAffinity: ListTileControlAffinity.leading,
+                            //   contentPadding: EdgeInsets.zero,
+                            // ),
                           ],
                         ),
                       ),

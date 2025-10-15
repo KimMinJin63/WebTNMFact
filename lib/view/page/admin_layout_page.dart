@@ -152,32 +152,34 @@ class AdminLayoutPage extends StatelessWidget {
           Expanded(
             child: Obx(() {
               print('${controller.menuSelectedIndex.value}');
-              final AdminController adminController =
-                  Get.find<AdminController>();
-              if (adminController.isEditing.value) {
-                final post = adminController.currentPost.value;
+              // final AdminController adminController =
+              //     Get.find<AdminController>();
+              final admin = Get.find<AdminController>();
+              final tab = controller.menuSelectedIndex.value;
+              if (admin.isEditing.value && tab == 1) {
+                final post = admin.currentPost.value;
                 if (post != null) {
                   return WillPopScope(
                     onWillPop: () async {
-                      adminController.isEditing.value = false;
+                      admin.isEditing.value = false;
                       return false;
                     },
-                    child: EditPage(),
+                    child: const EditPage(),
                   );
                 } else {
                   return const Center(child: Text('게시글을 선택하세요.'));
                 }
               }
-              if (adminController.isCreate.value) {
+
+              if (admin.isCreate.value && tab == 1) {
                 return WillPopScope(
                   onWillPop: () async {
-                    adminController.isCreate.value = false;
+                    admin.isCreate.value = false;
                     return false;
                   },
-                  child: CreatePage(),
+                  child: const CreatePage(),
                 );
               }
-
               // final box = GetStorage();
 
               switch (controller.menuSelectedIndex.value) {
@@ -198,13 +200,121 @@ class AdminLayoutPage extends StatelessWidget {
   }
 }
 
+Future<bool> showTNMMoveGuardDialog(BuildContext context) async {
+    final w = MediaQuery.of(context).size.width;
+  // 화면에 따라 92% 이내로, 최대 480(또는 420)까지로 제한
+  final double maxWidth = 480.w; // 원하는 최대 가로폭
+  final double dialogWidth = w * 0.92 > maxWidth ? maxWidth : w * 0.92;
+
+  return await showDialog<bool>(
+        context: context,
+        barrierDismissible: true, // 바깥 탭해도 닫기
+        builder: (_) => Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          insetPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+          child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: dialogWidth,   // ✅ 가로 최대폭 제한
+          // 필요하면 minWidth도 줄 수 있음: minWidth: 320.w,
+        ),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 16.h),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 헤더 아이콘 배지
+                  Container(
+                    width: 56.w, height: 56.w,
+                    decoration: BoxDecoration(
+                      color: AppColor.primary.withOpacity(.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.edit_note_rounded, size: 32.w, color: AppColor.primary),
+                  ),
+                  SizedBox(height: 16.h),
+            
+                  // 제목 / 서브텍스트
+                  Text('수정을 완료해야 이동할 수 있어요', style: AppTextStyle.koSemiBold18()),
+                  SizedBox(height: 8.h),
+                  Text(
+                    '이동하면 현재 수정 중인 내용은 저장되지 않습니다.\n그래도 이동하시겠어요?',
+                    style: AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20.h),
+            
+                  // 버튼들
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: AppColor.shadowGrey),
+                            padding: EdgeInsets.symmetric(vertical: 12.h),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+                            foregroundColor: AppColor.black,
+                            textStyle: AppTextStyle.koSemiBold16(),
+                          ),
+                          onPressed: () => Navigator.pop(context, false), // 닫기(계속 편집)
+                          child: const Text('닫기'),
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColor.primary,
+                            padding: EdgeInsets.symmetric(vertical: 12.h),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+                            textStyle: AppTextStyle.koSemiBold16().copyWith(color: AppColor.white),
+                          ),
+                          onPressed: () => Navigator.pop(context, true), // 이동(저장 안 함)
+                          child: const Text('이동', style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ) ??
+      false;
+}
+
 Widget _buildMenuItem(IconData icon, String label, int index,
     {bool extended = true}) {
   final AdminController controller = Get.find<AdminController>();
+  final admin = Get.find<AdminController>(); // 편집 상태 접근
   final isSelected = controller.menuSelectedIndex.value == index;
 
   return GestureDetector(
-    onTap: () => controller.menuSelectedIndex.value = index,
+    onTap: () async {
+      final admin = Get.find<AdminController>();
+      final currentTab = controller.menuSelectedIndex.value;
+
+      // 편집/작성 중이고, 다른 탭으로 이동하려 할 때만 다이얼로그
+      if ((admin.isEditing.value || admin.isCreate.value) &&
+          currentTab != index) {
+        final go = await showTNMMoveGuardDialog(Get.context!);
+        if (!go) return; // 닫기 → 그대로 편집 유지
+
+        // 이동 선택 → 편집 상태 해제 후 이동
+        admin.isEditing.value = false;
+        admin.isCreate.value = false;
+        admin.currentPost.value = null;
+      }
+
+      // 2번 탭을 눌렀을 땐 항상 목록부터 시작하고 싶다면 안전망
+      if (index == 1) {
+        admin.isEditing.value = false;
+        admin.isCreate.value = false;
+        admin.currentPost.value = null;
+      }
+
+      controller.menuSelectedIndex.value = index;
+    },
     child: Container(
       margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 12.w),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),

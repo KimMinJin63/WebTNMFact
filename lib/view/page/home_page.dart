@@ -162,13 +162,14 @@ class HomePage extends GetView<HomeController> {
                             style: AppTextStyle.koRegular18()),
                       );
                     }
+                    print('maxLines: ${MediaQuery.of(context).size.width}');
                     return GridView.builder(
                       itemCount: visibleList.length, // 원하시는 개수로 변경하세요
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
                         crossAxisSpacing: 40.w,
                         mainAxisSpacing: 32.h,
-                        childAspectRatio: 0.7,
+                        childAspectRatio: 0.65,
                       ),
                       itemBuilder: (context, index) {
                         final timestamp = visibleList[index]['updatedAt'] ??
@@ -294,9 +295,10 @@ class HomePage extends GetView<HomeController> {
                                                   .copyWith(
                                                 color: AppColor.grey,
                                               ),
-                                              maxLines: 4,
+                                               maxLines: MediaQuery.of(context).size.width < 1000 ? 2 : 3,
                                               // flex: 3
                                             ),
+                                            
                                             const Spacer(),
                                             _buildFlexibleBox('$formattedDate',
                                                 style:

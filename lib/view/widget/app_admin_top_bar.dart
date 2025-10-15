@@ -60,6 +60,7 @@ class AppAdminTopBar extends StatelessWidget {
           children: [
             SizedBox(
               width: 180.w,
+              height: ScreenUtil().screenHeight * 0.045,
               // height: 36.h,
               child: TextField(
                 onChanged: onChanged,
@@ -81,6 +82,8 @@ class AppAdminTopBar extends StatelessWidget {
             SizedBox(width: 8.w),
             SizedBox(
               width: 90.w,
+                            height: ScreenUtil().screenHeight * 0.045,
+
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColor.primary),
