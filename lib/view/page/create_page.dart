@@ -7,6 +7,7 @@ import 'package:tnm_fact/controller/create_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/page/admin_page.dart';
+import 'package:tnm_fact/view/widget/%08app_checkbox.dart';
 
 class CreatePage extends GetView<CreateController> {
   const CreatePage({super.key});
@@ -53,7 +54,8 @@ class CreatePage extends GetView<CreateController> {
                           content: controller.contentController.text,
                           category: controller.selectedCategory.value,
                           status: controller.selectedPublish.value,
-                          author: '김병국');
+                          author: '김병국',
+                          viewPoint: 0,);
                       Get.dialog(
                         AlertDialog(
                           title: const Text('게시글 작성 완료'),
@@ -185,28 +187,26 @@ class CreatePage extends GetView<CreateController> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('설정',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                            style: AppTextStyle.koBold20()
+                                .copyWith(color: AppColor.black)),
                         SizedBox(height: 16.h),
                         Divider(),
-                        CheckboxListTile(
-                          title: Text('데일리 팩트'),
+                        SizedBox(height: 16.h),
+                        AppCheckboxTile(
+                          label: '데일리 팩트',
                           value: controller.selectedCategory.value == '데일리 팩트',
-                          onChanged: (val) {
+                          onChanged: (v) {
                             controller.selectedCategory.value =
-                                val! ? '데일리 팩트' : ''; // 선택/해제
+                                v! ? '데일리 팩트' : '';
                           },
-                          controlAffinity: ListTileControlAffinity.leading,
-                          contentPadding: EdgeInsets.zero,
                         ),
-                        CheckboxListTile(
-                          title: Text('인사이트 팩트'),
+                        AppCheckboxTile(
+                          label: '인사이트 팩트',
                           value: controller.selectedCategory.value == '인사이트 팩트',
-                          onChanged: (val) {
+                          onChanged: (v) {
                             controller.selectedCategory.value =
-                                val! ? '인사이트 팩트' : '';
+                                v! ? '인사이트 팩트' : '';
                           },
-                          controlAffinity: ListTileControlAffinity.leading,
-                          contentPadding: EdgeInsets.zero,
                         ),
                       ],
                     ),
@@ -225,28 +225,22 @@ class CreatePage extends GetView<CreateController> {
                           Text('발행여부',
                               style: TextStyle(fontWeight: FontWeight.bold)),
                           SizedBox(height: 16.h),
-                          CheckboxListTile(
-                            title: Text('발행'),
-                            // checkboxScaleFactor: 0.8,
-                            // visualDensity: VisualDensity.compact,
+                          AppCheckboxTile(
+                            label: '발행',
+                            shape: CircleBorder(),
                             value: controller.selectedPublish.value == '발행',
-                            onChanged: (val) {
-                              controller.selectedPublish.value =
-                                  val! ? '발행' : ''; // 선택/해제
+                            onChanged: (v) {
+                              controller.selectedPublish.value = v! ? '발행' : '';
                             },
-                            controlAffinity: ListTileControlAffinity.leading,
-                            contentPadding: EdgeInsets.zero,
                           ),
-                          CheckboxListTile(
-                            title: Text('미발행'),
-                            visualDensity: VisualDensity.compact,
+                          AppCheckboxTile(
+                            label: '미발행',
+                            shape: CircleBorder(),
                             value: controller.selectedPublish.value == '미발행',
-                            onChanged: (val) {
+                            onChanged: (v) {
                               controller.selectedPublish.value =
-                                  val! ? '미발행' : '';
+                                  v! ? '미발행' : '';
                             },
-                            controlAffinity: ListTileControlAffinity.leading,
-                            contentPadding: EdgeInsets.zero,
                           ),
                         ],
                       ),

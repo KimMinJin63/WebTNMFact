@@ -62,6 +62,7 @@ class AdminController extends GetxController {
     fetchAllPosts();
     fetchNotPosts();
     fetchDonePosts();
+    _bindPosts();
     print('컨트롤러 총 게시물 수는 : ${postList.length}');
     // print('')
   }
@@ -177,10 +178,12 @@ class AdminController extends GetxController {
           'content': doc['content'],
           'category': doc['category'],
           'author': doc['author'],
-          'createdAt': formattedCreated,
-          'updatedAt': formattedUpdated,
-          'status': doc['status'], // 기본값 설정
-          // 'imageUrl': doc['imageUrl'] ?? '', // 이미지 URL이 없을 경우
+          'createdAt': formattedCreated, // 표시용 문자열
+          'updatedAt': formattedUpdated, // 표시용 문자열
+          'createdAtTs': createdTimestamp, // ✅ 계산/필터용 Timestamp
+          'updatedAtTs': updatedTimestamp, // ✅ 계산/필터용 Timestamp
+          'status': doc['status'],
+          'viewPoint': doc['viewPoint'] ?? 0,
         };
       }).toList();
 
@@ -221,10 +224,12 @@ class AdminController extends GetxController {
           'content': doc['content'],
           'category': doc['category'],
           'author': doc['author'],
-          'createdAt': formattedCreated,
-          'updatedAt': formattedUpdated,
-          'status': doc['status'], // 기본값 설정
-          // 'imageUrl': doc['imageUrl'] ?? '', // 이미지 URL이 없을 경우
+          'createdAt': formattedCreated, // 표시용 문자열
+          'updatedAt': formattedUpdated, // 표시용 문자열
+          'createdAtTs': createdTimestamp, // ✅ 계산/필터용 Timestamp
+          'updatedAtTs': updatedTimestamp, // ✅ 계산/필터용 Timestamp
+          'status': doc['status'],
+          'viewPoint': doc['viewPoint'] ?? 0,
         };
       }).toList();
 
@@ -265,10 +270,12 @@ class AdminController extends GetxController {
           'content': doc['content'],
           'category': doc['category'],
           'author': doc['author'],
-          'createdAt': formattedCreated,
-          'updatedAt': formattedUpdated,
-          'status': doc['status'], // 기본값 설정
-          // 'imageUrl': doc['imageUrl'] ?? '', // 이미지 URL이 없을 경우
+          'createdAt': formattedCreated, // 표시용 문자열
+          'updatedAt': formattedUpdated, // 표시용 문자열
+          'createdAtTs': createdTimestamp, // ✅ 계산/필터용 Timestamp
+          'updatedAtTs': updatedTimestamp, // ✅ 계산/필터용 Timestamp
+          'status': doc['status'],
+          'viewPoint': doc['viewPoint'] ?? 0,
         };
       }).toList();
 
@@ -306,7 +313,91 @@ class AdminController extends GetxController {
   }
 
   Future<int> fetchTotalVisits() async {
-  final snapshot = await FirebaseFirestore.instance.collection('visits').get();
-  return snapshot.docs.length; // ✅ 문서 개수 = 총 방문자 수
+    final snapshot =
+        await FirebaseFirestore.instance.collection('visits').get();
+    return snapshot.docs.length; // ✅ 문서 개수 = 총 방문자 수
+  }
+
+  Future<void> incrementViewCount(String postId) async {
+    try {
+      final postRef =
+          FirebaseFirestore.instance.collection('posts').doc(postId);
+      await postRef.update({'viewPoint': FieldValue.increment(1)});
+      final snap = await postRef.get();
+      final now = (snap.data()?['viewPoint'] ?? 0);
+      print('viewPoint now for $postId: $now');
+    } catch (e) {
+      debugPrint('increment 실패: $e');
+    }
+  }
+
+  List<Map<String, dynamic>> topPostsLast7Days(int n) {
+    final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7));
+
+    DateTime? toDate(dynamic v) {
+      if (v == null) return null;
+      if (v is Timestamp) return v.toDate();
+      if (v is DateTime) return v;
+      if (v is String && v.isNotEmpty) {
+        try {
+          return DateTime.parse(v.replaceFirst(' ', 'T'));
+        } catch (_) {}
+      }
+      return null;
+    }
+
+    // 스냅샷 고정 후 필터 + 정렬
+    final items = postList.toList().where((p) {
+      final u = toDate(p['updatedAtTs']);
+      final c = toDate(p['createdAtTs']);
+      final d = u ?? c;
+      return d != null && d.isAfter(sevenDaysAgo);
+    }).toList()
+      ..sort((a, b) => ((b['viewPoint'] ?? 0) as int)
+          .compareTo((a['viewPoint'] ?? 0) as int));
+
+    return items.take(n).toList();
+  }
+
+
+  void _bindPosts() {
+  firestore
+      .collection('posts')
+      .orderBy('createdAt', descending: true)
+      .snapshots()
+      .listen((qs) {
+    final mapped = qs.docs.map((doc) {
+      final createdTs = doc['createdAt'] as Timestamp?;
+      final updatedTs = doc.data().containsKey('updatedAt')
+          ? doc['updatedAt'] as Timestamp?
+          : null;
+      return {
+        'id': doc.id,
+        'title': doc['title'],
+        'content': doc['content'],
+        'category': doc['category'],
+        'author': doc['author'],
+        'createdAt': DateFormat('yyyy-MM-dd HH:mm:ss','ko_KR')
+            .format((createdTs?.toDate() ?? DateTime.now())),
+        'updatedAt': updatedTs != null
+            ? DateFormat('yyyy-MM-dd HH:mm:ss','ko_KR').format(updatedTs.toDate())
+            : null,
+        'createdAtTs': createdTs,
+        'updatedAtTs': updatedTs,
+        'status': doc['status'],
+        'viewPoint': doc['viewPoint'] ?? 0,
+      };
+    }).toList();
+
+    postList.value = mapped;                // ✅ RxList 갱신 → Obx 리빌드
+    originalPostList.value = mapped.toList();
+  });
 }
+
+  // Future fetchViewPoint(String postId) async {
+  //   final postRef = FirebaseFirestore.instance.collection('posts').doc(postId);
+  //   final snap = await postRef.get();
+  //   final viewPoint = snap.data()?['viewPoint'] ?? 0;
+  //   return viewPoint;
+  // }
 }

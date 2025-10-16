@@ -98,7 +98,7 @@ class HomeController extends GetxController {
       print('총 게시글 수: ${snapshot.docs.length}');
       print('게시글 목록: ${postList[0]}');
     } catch (e) {
-      print('🔥 게시글 로딩 중 오류 발생: $e');
+      print('🔥 모든 게시글 로딩 중 오류 발생: $e');
     }
   }
 
@@ -121,7 +121,7 @@ class HomeController extends GetxController {
       print('데일리 팩트 게시글 수: ${snapshot.docs.length}');
       print('데일리 팩트 목록: ${dailyPostList[0]}');
     } catch (e) {
-      print('🔥 게시글 로딩 중 오류 발생: $e');
+      print('🔥 데일리 팩트 게시글 로딩 중 오류 발생: $e');
     }
   }
 
@@ -144,7 +144,7 @@ class HomeController extends GetxController {
       print('인사이트 팩트 게시글 수: ${snapshot.docs.length}');
       print('인사이트 팩트 목록: ${insightPostList[0]}');
     } catch (e) {
-      print('🔥 게시글 로딩 중 오류 발생: $e');
+      print('🔥 인사이트 팩트 게시글 로딩 중 오류 발생: $e');
     }
   }
 }

@@ -181,23 +181,26 @@ class HomePage extends GetView<HomeController> {
                           formattedDate =
                               DateFormat('yyyy-MM-dd HH:mm').format(date);
                         }
-                        final post = visibleList[index];
 
                         print('지금 게시글 목록 ${visibleList[index]['title']}');
                         return GestureDetector(
                           onTap: () async {
                             print('onTap 눌림');
                             final user = FirebaseAuth.instance.currentUser;
+                            final post = visibleList[index];
+                            final postId = post['id'];
                             if (user == null) {
                               // 로그인 안 되어 있으면 여기서 즉시 로그인 처리
                               final cred = await FirebaseAuth.instance
                                   .signInAnonymously();
                               final userId = cred.user!.uid;
+                              await adminController.incrementViewCount(postId);
                               controller.logVisit(userId);
                               Get.toNamed(DetailPage.route, arguments: post);
                             } else {
                               final userId = user.uid;
                               Get.toNamed(DetailPage.route, arguments: post);
+                              await adminController.incrementViewCount(postId);
                               controller.logVisit(userId);
                             }
                           },
@@ -295,10 +298,14 @@ class HomePage extends GetView<HomeController> {
                                                   .copyWith(
                                                 color: AppColor.grey,
                                               ),
-                                               maxLines: MediaQuery.of(context).size.width < 1000 ? 2 : 3,
+                                              maxLines: MediaQuery.of(context)
+                                                          .size
+                                                          .width <
+                                                      1000
+                                                  ? 2
+                                                  : 3,
                                               // flex: 3
                                             ),
-                                            
                                             const Spacer(),
                                             _buildFlexibleBox('$formattedDate',
                                                 style:

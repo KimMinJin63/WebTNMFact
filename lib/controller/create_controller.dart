@@ -32,6 +32,7 @@ class CreateController extends GetxController {
     required String category,
     required String author,
     required String status,
+    required int viewPoint,
   }) async {
     try {
       final docRef = await firestore.collection('posts').add({
@@ -41,6 +42,7 @@ class CreateController extends GetxController {
         'author': author,
         'createdAt': FieldValue.serverTimestamp(),
         'status': status,
+        'viewPoint': 0,
       });
 
       final docId = docRef.id;

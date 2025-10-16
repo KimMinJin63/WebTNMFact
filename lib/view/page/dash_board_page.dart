@@ -177,13 +177,83 @@ class DashBoardPage extends StatelessWidget {
                                 style: AppTextStyle.koBold20()
                                     .copyWith(color: AppColor.black),
                               ),
-                              // SizedBox(height: 4.h),
-                              Text(
-                                '85',
-                                style: AppTextStyle.koBold28()
-                                    .copyWith(color: AppColor.green),
-                              ),
-                            ],
+                              SizedBox(height: 16.h),
+                              Expanded(
+                                child: Obx(() {
+                                  final top5 = controller.topPostsLast7Days(5);
+
+                                  if (top5.isEmpty) {
+                                    return const Center(
+                                        child: Text('최근 7일 인기 게시물이 없습니다.'));
+                                  }
+
+                                  return ListView.separated(
+                                    itemCount: top5.length,
+                                    separatorBuilder: (_, __) => Divider(
+                                        height: 16.h,
+                                        color: AppColor.lightGrey),
+                                    // 부모 컬럼 안에서 높이 제약은 Expanded가 이미 주고 있으니 shrinkWrap 불필요
+                                    itemBuilder: (context, index) {
+                                      final p = top5[index];
+                                      final title =
+                                          (p['title'] ?? '') as String;
+                                      final vp = (p['viewPoint'] ?? 0) as int;
+
+                                      return Row(
+                                        children: [
+                                          // 순위 뱃지
+                                          Container(
+                                            width: 28.w,
+                                            height: 28.w,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: AppColor.primary
+                                                  .withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(6.r),
+                                            ),
+                                            child: Text('${index + 1}',
+                                                style:
+                                                    AppTextStyle.koSemiBold14()
+                                                        .copyWith(
+                                                            color: AppColor
+                                                                .primary)),
+                                          ),
+                                          SizedBox(width: 20.w),
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  title,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: AppTextStyle
+                                                      .koSemiBold16(),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    const Icon(
+                                                        Icons.remove_red_eye,
+                                                        size: 16, color: AppColor.grey,),
+                                                    SizedBox(width: 4.w),
+                                                    Text('$vp views',
+                                                        style: AppTextStyle
+                                                            .koRegular12().copyWith(color: AppColor.grey)),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          // SizedBox(width: 12.w),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }),
+                              ),                            ],
                           ),
                         ),
                       ),
