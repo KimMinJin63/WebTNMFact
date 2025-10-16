@@ -77,7 +77,7 @@ class DashBoardPage extends StatelessWidget {
                               ),
                               // SizedBox(height: 4.h),
                               Obx(() => Text(
-                                    '${controller.postList.length}',
+                                    '${controller.donePostList.length}',
                                     style: AppTextStyle.koBold28()
                                         .copyWith(color: AppColor.navy),
                                   )),
