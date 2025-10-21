@@ -181,6 +181,7 @@ class DashBoardPage extends StatelessWidget {
                               Expanded(
                                 child: Obx(() {
                                   final top5 = controller.topPostsLast7Days(5);
+                                  print('대시보드 인기 게시물 top5: $top5');
 
                                   if (top5.isEmpty) {
                                     return const Center(
@@ -197,7 +198,7 @@ class DashBoardPage extends StatelessWidget {
                                       final p = top5[index];
                                       final title =
                                           (p['title'] ?? '') as String;
-                                      final vp = (p['viewPoint'] ?? 0) as int;
+                                      final vp = (p['viewpoint'] ?? 0) as int;
 
                                       return Row(
                                         children: [

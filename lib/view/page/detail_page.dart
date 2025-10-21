@@ -14,17 +14,24 @@ class DetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final post = Get.arguments;
     print('잘받아오나???');
-    print('잘 받아오나?? : ${post['title']}');
-    print('잘 받아오나?? : ${post['content']}');
+    print('잘 받아오나?? : ${post['date']}');
+    // print('잘 받아오나?? : ${post['final_article']}');
     print('잘 받아오나?? : ${post['category']}');
     print('잘 받아오나?? : ${post['status']}');
     final timestamp = post['updatedAt'] ?? post['createdAt'];
+    final rawDateStr = post['date'];
+    final parsed = DateFormat('yy-MM-dd').parse(rawDateStr);
+    final titleDate = DateFormat('yy-MM-dd').format(parsed);
 
     String formattedDate = '';
     if (timestamp != null && timestamp is Timestamp) {
       final date = timestamp.toDate();
       formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(date);
     }
+
+    final String displayDate =
+        formattedDate.isNotEmpty ? formattedDate : (rawDateStr ?? '');
+
     return Scaffold(
       backgroundColor: AppColor.white,
       body: SafeArea(
@@ -40,10 +47,11 @@ class DetailPage extends StatelessWidget {
                     onTap: () => Get.back(),
                     child: Row(
                       children: [
-                        Icon(Icons.arrow_back, color: AppColor.primary,),
-                        SizedBox(
-                          width :2.w
+                        Icon(
+                          Icons.arrow_back,
+                          color: AppColor.primary,
                         ),
+                        SizedBox(width: 2.w),
                         Text('목록으로 돌아가기',
                             style: AppTextStyle.koSemiBold14().copyWith(
                               color: AppColor.primary,
@@ -78,14 +86,14 @@ class DetailPage extends StatelessWidget {
                 ),
               ),
               Text(
-                post['title'],
+                '[오늘의 교육 뉴스] $titleDate',
                 style: AppTextStyle.koBold35(),
               ),
               SizedBox(
                 height: 16.h,
               ),
               Text(
-                '작성자:${post['author']}|$formattedDate',
+                '작성자:${post['editor']}|$displayDate',
                 style:
                     AppTextStyle.koRegular14().copyWith(color: AppColor.black),
               ),
@@ -93,7 +101,7 @@ class DetailPage extends StatelessWidget {
                 height: 36.h,
               ),
               Text(
-                post['content'],
+                post['final_article'],
                 style:
                     AppTextStyle.koRegular18().copyWith(color: AppColor.black),
               )

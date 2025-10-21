@@ -83,9 +83,9 @@ class HomeController extends GetxController {
   Future loadAllPosts() async {
     try {
       final snapshot = await FirebaseFirestore.instance
-          .collection('posts')
+          .collection('post')
           .where('status', isEqualTo: '발행')
-          .orderBy('createdAt', descending: true)
+          .orderBy('date', descending: true)
           .get();
 
       postList.value = snapshot.docs.map((doc) {
@@ -105,10 +105,10 @@ class HomeController extends GetxController {
   Future loadDailyPosts() async {
     try {
       final snapshot = await FirebaseFirestore.instance
-          .collection('posts')
+          .collection('post')
           .where('category', isEqualTo: '데일리 팩트')
           .where('status', isEqualTo: '발행')
-          .orderBy('createdAt', descending: true)
+          .orderBy('date', descending: true)
           .get();
 
       dailyPostList.value = snapshot.docs.map((doc) {
@@ -119,7 +119,7 @@ class HomeController extends GetxController {
       }).toList();
       print('게시글 불러오기 성공');
       print('데일리 팩트 게시글 수: ${snapshot.docs.length}');
-      print('데일리 팩트 목록: ${dailyPostList[0]}');
+      print('데일리 팩트 목록: ${dailyPostList[0]['date']}');
     } catch (e) {
       print('🔥 데일리 팩트 게시글 로딩 중 오류 발생: $e');
     }
@@ -128,10 +128,10 @@ class HomeController extends GetxController {
   Future loadInsightPosts() async {
     try {
       final snapshot = await FirebaseFirestore.instance
-          .collection('posts')
+          .collection('post')
           .where('category', isEqualTo: '인사이트 팩트')
           .where('status', isEqualTo: '발행')
-          .orderBy('createdAt', descending: true)
+          .orderBy('date', descending: true)
           .get();
 
       insightPostList.value = snapshot.docs.map((doc) {

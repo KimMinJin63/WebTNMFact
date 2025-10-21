@@ -35,10 +35,12 @@ class AppVisitChart extends StatelessWidget {
         final dailyCounts = snapshot.data!;
         print('dailyCounts: $dailyCounts');
         final today = DateTime.now();
+        print('today: $today');
         final allDates = List.generate(5, (i) {
           final date = today.subtract(Duration(days: 4 - i));
           return DateFormat('yyyy-MM-dd').format(date);
         });
+        print('allDates: $allDates');
 
         final filledCounts = {for (var d in allDates) d: (dailyCounts[d] ?? 0)};
 
@@ -80,6 +82,7 @@ class AppVisitChart extends StatelessWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
+                      interval: 1,    
                       reservedSize: 40.w, // 반응형: 화면 크기에 따라 여백 자동 조절
                       getTitlesWidget: (value, meta) {
                         return Padding(

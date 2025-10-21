@@ -129,12 +129,12 @@ class AdminController extends GetxController {
   Future deletePost(String docId) async {
     try {
       print('게시글 삭제 중... ID: $docId');
-      await firestore.collection('posts').doc(docId).delete();
+      await firestore.collection('post').doc(docId).delete();
 
       Get.dialog(
         AlertDialog(
           title: const Text('삭제 완료'),
-          content: const Text('게시글이 성공적으로 삭제되었습니다.'),
+          content: const Text('게시글이 성공적으로 삭제되었습니다3.'),
           actions: [
             TextButton(
               onPressed: () async {
@@ -154,43 +154,63 @@ class AdminController extends GetxController {
   Future<void> fetchAllPosts({String? searchQuery}) async {
     try {
       final snapshot = await firestore
-          .collection('posts')
-          .orderBy('createdAt', descending: true)
+          .collection('post')
+          .orderBy('date', descending: true)
           .get();
 
       postList.value = snapshot.docs.map((doc) {
-        final createdTimestamp = doc['createdAt'] as Timestamp?;
-        final createdDate = createdTimestamp?.toDate() ?? DateTime.now();
+        // 1) date 필드 안전 파싱 (Timestamp 또는 String 모두 지원)
+        final dynamic rawDate = doc['date'];
+
+        DateTime createdDate;
+        if (rawDate is String) {
+          DateTime? parsed;
+          print('rawDate string: $parsed');
+          try {
+            parsed = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').parse(rawDate);
+            print('parsed createdDate in try: $rawDate');
+          } catch (_) {
+            try {
+              parsed =
+                  DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR').parse(rawDate);
+            } catch (_) {}
+          }
+          createdDate = parsed ?? DateTime.now();
+          print('parsed createdDate: $createdDate');
+        } else {
+          createdDate = DateTime.now();
+        }
+        final titleDate = DateFormat('yy-MM-dd').format(createdDate);
         final formattedCreated =
             DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR').format(createdDate);
-
-        final updatedTimestamp = doc.data().containsKey('updatedAt')
-            ? doc['updatedAt'] as Timestamp?
-            : null;
-        final formattedUpdated = updatedTimestamp != null
-            ? DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR')
-                .format(updatedTimestamp.toDate())
-            : null;
-
+        print('formattedCreated: $formattedCreated');
         return {
           'id': doc.id,
-          'title': doc['title'],
-          'content': doc['content'],
-          'category': doc['category'],
-          'author': doc['author'],
-          'createdAt': formattedCreated, // 표시용 문자열
-          'updatedAt': formattedUpdated, // 표시용 문자열
-          'createdAtTs': createdTimestamp, // ✅ 계산/필터용 Timestamp
-          'updatedAtTs': updatedTimestamp, // ✅ 계산/필터용 Timestamp
+          'final_article': doc['final_article'],
+          'title': titleDate,
+          'editor': doc['editor'],
+          'date': formattedCreated, // 표시용 문자열
+          'viewpoint': doc['viewpoint'] ?? 0,
           'status': doc['status'],
-          'viewPoint': doc['viewPoint'] ?? 0,
+          'category': doc['category'],
+          // 'id': doc.id,
+          // 'title': doc['title'],
+          // 'content': doc['content'],
+          // 'category': doc['category'],
+          // 'author': doc['author'],
+          // 'createdAt': formattedCreated, // 표시용 문자열
+          // 'updatedAt': formattedUpdated, // 표시용 문자열
+          // 'createdAtTs': createdTimestamp, // ✅ 계산/필터용 Timestamp
+          // 'updatedAtTs': updatedTimestamp, // ✅ 계산/필터용 Timestamp
+          // 'status': doc['status'],
+          // 'viewpoint': doc['viewPoint'] ?? 0,
         };
       }).toList();
 
       originalPostList.value = postList.toList();
 
       print('게시글 불러오기 성공');
-      print('총 게시글 수: ${snapshot.docs.length}');
+      print('fetchAllPosts 총 게시글 수: ${snapshot.docs.length}');
     } catch (e) {
       print('🔥 게시글 불러오기 실패: $e');
     }
@@ -205,8 +225,30 @@ class AdminController extends GetxController {
           .get();
 
       notPostList.value = snapshot.docs.map((doc) {
-        final createdTimestamp = doc['createdAt'] as Timestamp?;
-        final createdDate = createdTimestamp?.toDate() ?? DateTime.now();
+        final dynamic rawDate = doc['date'];
+
+        DateTime createdDate;
+        if (rawDate is String) {
+          DateTime? parsed;
+          print('rawDate string: $parsed');
+          try {
+            parsed = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').parse(rawDate);
+            print('parsed createdDate in try: $rawDate');
+          } catch (_) {
+            try {
+              parsed =
+                  DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR').parse(rawDate);
+            } catch (_) {}
+          }
+          createdDate = parsed ?? DateTime.now();
+          print('parsed createdDate: $createdDate');
+        } else {
+          createdDate = DateTime.now();
+        }
+        final titleDate = DateFormat('yy-MM-dd').format(createdDate);
+
+        // final createdTimestamp = doc['createdAt'] as Timestamp?;
+        // final createdDate = createdTimestamp?.toDate() ?? DateTime.now();
         final formattedCreated =
             DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR').format(createdDate);
 
@@ -220,16 +262,25 @@ class AdminController extends GetxController {
 
         return {
           'id': doc.id,
-          'title': doc['title'],
-          'content': doc['content'],
-          'category': doc['category'],
-          'author': doc['author'],
-          'createdAt': formattedCreated, // 표시용 문자열
-          'updatedAt': formattedUpdated, // 표시용 문자열
-          'createdAtTs': createdTimestamp, // ✅ 계산/필터용 Timestamp
-          'updatedAtTs': updatedTimestamp, // ✅ 계산/필터용 Timestamp
+          'final_article': doc['final_article'],
+          'title': titleDate,
+          'editor': doc['editor'],
+          'date': formattedCreated, // 표시용 문자열
+          'viewpoint': doc['viewpoint'] ?? 0,
           'status': doc['status'],
-          'viewPoint': doc['viewPoint'] ?? 0,
+          'category': doc['category'],
+
+          // 'id': doc.id,
+          // 'title': doc['title'],
+          // 'content': doc['content'],
+          // 'category': doc['category'],
+          // 'author': doc['author'],
+          // 'createdAt': formattedCreated, // 표시용 문자열
+          // 'updatedAt': formattedUpdated, // 표시용 문자열
+          // 'createdAtTs': createdTimestamp, // ✅ 계산/필터용 Timestamp
+          // 'updatedAtTs': updatedTimestamp, // ✅ 계산/필터용 Timestamp
+          // 'status': doc['status'],
+          // 'viewpoint': doc['viewpoint'] ?? 0,
         };
       }).toList();
 
@@ -245,14 +296,37 @@ class AdminController extends GetxController {
   Future<void> fetchDonePosts({String? searchQuery}) async {
     try {
       final snapshot = await firestore
-          .collection('posts')
+          .collection('post')
           .where('status', isEqualTo: '발행')
-          .orderBy('createdAt', descending: true)
+          .orderBy('date', descending: true)
           .get();
 
       donePostList.value = snapshot.docs.map((doc) {
-        final createdTimestamp = doc['createdAt'] as Timestamp?;
-        final createdDate = createdTimestamp?.toDate() ?? DateTime.now();
+        final dynamic rawDate = doc['date'];
+
+        DateTime createdDate;
+        if (rawDate is String) {
+          DateTime? parsed;
+          print('rawDate string: $parsed');
+          try {
+            parsed = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').parse(rawDate);
+            print('parsed createdDate in try: $rawDate');
+          } catch (_) {
+            try {
+              parsed =
+                  DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR').parse(rawDate);
+            } catch (_) {}
+          }
+          createdDate = parsed ?? DateTime.now();
+          print('parsed createdDate: $createdDate');
+        } else {
+          createdDate = DateTime.now();
+        }
+        final titleDate = DateFormat('yy-MM-dd').format(createdDate);
+
+        // final createdTimestamp = doc['date'] as Timestamp?;
+        // final createdDate = createdTimestamp?.toDate() ?? DateTime.now();
+
         final formattedCreated =
             DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR').format(createdDate);
 
@@ -266,23 +340,31 @@ class AdminController extends GetxController {
 
         return {
           'id': doc.id,
-          'title': doc['title'],
-          'content': doc['content'],
-          'category': doc['category'],
-          'author': doc['author'],
-          'createdAt': formattedCreated, // 표시용 문자열
-          'updatedAt': formattedUpdated, // 표시용 문자열
-          'createdAtTs': createdTimestamp, // ✅ 계산/필터용 Timestamp
-          'updatedAtTs': updatedTimestamp, // ✅ 계산/필터용 Timestamp
+          'final_article': doc['final_article'],
+          'title': titleDate,
+          'editor': doc['editor'],
+          'date': formattedCreated, // 표시용 문자열
+          'viewpoint': doc['viewpoint'] ?? 0,
           'status': doc['status'],
-          'viewPoint': doc['viewPoint'] ?? 0,
+          'category': doc['category'],
+          // 'id': doc.id,
+          // 'title': doc['title'],
+          // 'content': doc['content'],
+          // 'category': doc['category'],
+          // 'author': doc['author'],
+          // 'createdAt': formattedCreated, // 표시용 문자열
+          // 'updatedAt': formattedUpdated, // 표시용 문자열
+          // 'createdAtTs': createdTimestamp, // ✅ 계산/필터용 Timestamp
+          // 'updatedAtTs': updatedTimestamp, // ✅ 계산/필터용 Timestamp
+          // 'status': doc['status'],
+          // 'viewpoint': doc['viewpoint'] ?? 0,
         };
       }).toList();
 
       originalDonePostList.value = donePostList.toList();
 
       print('게시글 불러오기 성공');
-      print('총 게시글 수: ${snapshot.docs.length}');
+      print('fetchDonePosts 총 게시글 수: ${snapshot.docs.length}');
     } catch (e) {
       print('🔥 게시글 불러오기 실패: $e');
     }
@@ -290,19 +372,19 @@ class AdminController extends GetxController {
 
   Future<void> fetchAllPostCounts() async {
     try {
-      final totalSnapshot = await firestore.collection('posts').get();
-      print('총 게시글 수: ${totalSnapshot.size}');
+      final totalSnapshot = await firestore.collection('post').get();
+      print('fetchAllPostCounts 총 게시글 수: ${totalSnapshot.size}');
       totalCount.value = totalSnapshot.size;
 
       final publishedSnapshot = await firestore
-          .collection('posts')
+          .collection('post')
           .where('status', isEqualTo: '발행')
           .get();
       publishedCount.value = publishedSnapshot.size;
       print('발행된 게시글 수: ${publishedCount.value}');
 
       final pendingSnapshot = await firestore
-          .collection('posts')
+          .collection('post')
           .where('status', isEqualTo: '미발행')
           .get();
       pendingCount.value = pendingSnapshot.size;
@@ -320,12 +402,11 @@ class AdminController extends GetxController {
 
   Future<void> incrementViewCount(String postId) async {
     try {
-      final postRef =
-          FirebaseFirestore.instance.collection('posts').doc(postId);
-      await postRef.update({'viewPoint': FieldValue.increment(1)});
+      final postRef = FirebaseFirestore.instance.collection('post').doc(postId);
+      await postRef.update({'viewpoint': FieldValue.increment(1)});
       final snap = await postRef.get();
-      final now = (snap.data()?['viewPoint'] ?? 0);
-      print('viewPoint now for $postId: $now');
+      final now = (snap.data()?['viewpoint'] ?? 0);
+      print('viewpoint now for $postId: $now');
     } catch (e) {
       debugPrint('increment 실패: $e');
     }
@@ -333,6 +414,7 @@ class AdminController extends GetxController {
 
   List<Map<String, dynamic>> topPostsLast7Days(int n) {
     final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7));
+    print('7일 전 날짜: $sevenDaysAgo');
 
     DateTime? toDate(dynamic v) {
       if (v == null) return null;
@@ -346,58 +428,73 @@ class AdminController extends GetxController {
       return null;
     }
 
+    print('탑 포스트 라스트 7데이즈 전체 게시물 수: ${postList.length}');
+
     // 스냅샷 고정 후 필터 + 정렬
-    final items = postList.toList().where((p) {
+    final items = postList.where((p) => p['status'] == '발행').where((p) {
+      // print('게시물 확인: $p');
       final u = toDate(p['updatedAtTs']);
       final c = toDate(p['createdAtTs']);
       final d = u ?? c;
       return d != null && d.isAfter(sevenDaysAgo);
     }).toList()
-      ..sort((a, b) => ((b['viewPoint'] ?? 0) as int)
-          .compareTo((a['viewPoint'] ?? 0) as int));
+      ..sort((a, b) => ((b['viewpoint'] ?? 0) as int)
+          .compareTo((a['viewpoint'] ?? 0) as int));
 
-    return items.take(n).toList();
+    print('탑 포스트 라스트 7데이즈 탑 $n: $items');
+    return postList.take(n).toList();
   }
 
-
   void _bindPosts() {
-  firestore
-      .collection('posts')
-      .orderBy('createdAt', descending: true)
-      .snapshots()
-      .listen((qs) {
-    final mapped = qs.docs.map((doc) {
-      final createdTs = doc['createdAt'] as Timestamp?;
-      final updatedTs = doc.data().containsKey('updatedAt')
-          ? doc['updatedAt'] as Timestamp?
-          : null;
-      return {
-        'id': doc.id,
-        'title': doc['title'],
-        'content': doc['content'],
-        'category': doc['category'],
-        'author': doc['author'],
-        'createdAt': DateFormat('yyyy-MM-dd HH:mm:ss','ko_KR')
-            .format((createdTs?.toDate() ?? DateTime.now())),
-        'updatedAt': updatedTs != null
-            ? DateFormat('yyyy-MM-dd HH:mm:ss','ko_KR').format(updatedTs.toDate())
-            : null,
-        'createdAtTs': createdTs,
-        'updatedAtTs': updatedTs,
-        'status': doc['status'],
-        'viewPoint': doc['viewPoint'] ?? 0,
-      };
-    }).toList();
+    firestore
+        .collection('post')
+        .where('status', isEqualTo: '발행')
+        .orderBy('date', descending: true)
+        .snapshots()
+        .listen((qs) {
+      final mapped = qs.docs.map((doc) {
+        final rawDateStr = doc['date'];
+        print('rawDateStr는?? : $rawDateStr');
+        final parsed = DateFormat('yy-MM-dd').parse(rawDateStr);
+        print('parsed는?? : $parsed');
+        final titleDate = DateFormat('yy-MM-dd').format(parsed);
+        print('titleDate는?? : $titleDate');
 
-    postList.value = mapped;                // ✅ RxList 갱신 → Obx 리빌드
-    originalPostList.value = mapped.toList();
-  });
-}
+        // final createdTs = doc['date'] as Timestamp?;
+        // print('createdTs는?? : $createdTs');
+        // final updatedTs = doc.data().containsKey('updatedAt')
+        //     ? doc['updatedAt'] as Timestamp?
+        //     : null;
+        // print('createdTs는?? : $createdTs');
+        return {
+          'id': doc.id,
+          'title': titleDate,
+          'content': doc['final_article'],
+          'category': doc['category'],
+          'author': doc['editor'],
+          'date': rawDateStr,
+          // 'date': DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR')
+          //     .format((createdTs?.toDate() ?? DateTime.now())),
+          // 'updatedAt': updatedTs != null
+          //     ? DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR')
+          //         .format(updatedTs.toDate())
+          //     : null,
+          // 'createdAtTs': createdTs,
+          // 'updatedAtTs': updatedTs,
+          'status': doc['status'],
+          'viewpoint': doc['viewpoint'] ?? 0,
+        };
+      }).toList();
+
+      postList.value = mapped; // ✅ RxList 갱신 → Obx 리빌드
+      originalPostList.value = mapped.toList();
+    });
+  }
 
   // Future fetchViewPoint(String postId) async {
-  //   final postRef = FirebaseFirestore.instance.collection('posts').doc(postId);
+  //   final postRef = FirebaseFirestore.instance.collection('post').doc(postId);
   //   final snap = await postRef.get();
-  //   final viewPoint = snap.data()?['viewPoint'] ?? 0;
-  //   return viewPoint;
+  //   final viewpoint = snap.data()?['viewpoint'] ?? 0;
+  //   return viewpoint;
   // }
 }

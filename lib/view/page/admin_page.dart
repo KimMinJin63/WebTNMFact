@@ -155,12 +155,13 @@ class AdminPage extends GetView<AdminController> {
                               return Padding(
                                 padding: EdgeInsets.symmetric(vertical: 8.h),
                                 child: AppPost(
-                                  title: post['title'] ?? '',
-                                  author: post['author'] ?? '',
-                                  category: post['category'] ?? '',
+                                  title: '[오늘의 교육 뉴스] ${post['title']}' ?? '',
+                                  author: '편집장 김병국',
+                                  // author: post['editor'] ?? '편집장 김병국',
+                                  category: post['category'] ?? '데일리 팩트',
                                   createdAt:
-                                      post['updatedAt'] ?? post['createdAt'],
-                                  status: post['status'] ?? '',
+                                      post['date'] ?? post['createdAt'],
+                                  status: post['status'] ?? '발행',
                                   textColor: post['status'] == '발행' ? AppColor.deepGreen : AppColor.black,
                                   color: post['status'] == '발행' ? AppColor.green.withOpacity(0.2) : AppColor.lightGrey,
                                   onContentTap: () {

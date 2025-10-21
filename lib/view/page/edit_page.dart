@@ -32,13 +32,13 @@ class EditPage extends GetView<EditController> {
       }
 
       // post 값이 확실히 있을 때만 컨트롤러 값 세팅
-      controller.titleController.text = post['title'] ?? '';
-      controller.contentController.text = post['content'] ?? '';
+      // controller.titleController.text = post['title'] ?? '';
+      controller.contentController.text = post['final_article'] ?? '';
       controller.selectedCategory.value = post['category'] ?? '';
       controller.selectedPublish.value = post['status'] ?? '';
 
       print('에딧 페이지 잘 받아오나?? : ${post['title']}');
-      print('에딧 페이지 잘 받아오나?? : ${post['content']}');
+      print('에딧 페이지 잘 받아오나?? : ${post['final_article']}');
       print('에딧 페이지 잘 받아오나?? : ${post['category']}');
       print('에딧 페이지 잘 받아오나?? : ${post['status']}');
       return Scaffold(

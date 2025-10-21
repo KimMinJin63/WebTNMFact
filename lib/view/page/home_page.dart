@@ -174,6 +174,9 @@ class HomePage extends GetView<HomeController> {
                       itemBuilder: (context, index) {
                         final timestamp = visibleList[index]['updatedAt'] ??
                             visibleList[index]['createdAt'];
+                        final rawDateStr = visibleList[index]['date'];
+                        final parsed = DateFormat('yy-MM-dd').parse(rawDateStr);
+                        final titleDate = DateFormat('yy-MM-dd').format(parsed);
 
                         String formattedDate = '';
                         if (timestamp != null && timestamp is Timestamp) {
@@ -182,14 +185,20 @@ class HomePage extends GetView<HomeController> {
                               DateFormat('yyyy-MM-dd HH:mm').format(date);
                         }
 
-                        print('지금 게시글 목록 ${visibleList[index]['title']}');
+                        final String displayDate = formattedDate.isNotEmpty
+                            ? formattedDate
+                            : (rawDateStr ?? '');
+
+                        print('지금 게시글 목록 ${visibleList[index]['date']}');
                         return GestureDetector(
                           onTap: () async {
                             print('onTap 눌림');
                             final user = FirebaseAuth.instance.currentUser;
+                            print('현재 유저 정보는?? : $user');
                             final post = visibleList[index];
                             final postId = post['id'];
                             if (user == null) {
+                              print('로그인 안 된 상태, 익명 로그인 처리');
                               // 로그인 안 되어 있으면 여기서 즉시 로그인 처리
                               final cred = await FirebaseAuth.instance
                                   .signInAnonymously();
@@ -286,14 +295,14 @@ class HomePage extends GetView<HomeController> {
                                               ),
                                             ),
                                             _buildFlexibleBox(
-                                              '${visibleList[index]['title']}',
+                                              '[오늘의 교육 뉴스] $titleDate',
                                               style:
                                                   AppTextStyle.koSemiBold18(),
                                               maxLines: 2,
                                               // flex: 2
                                             ),
                                             _buildFlexibleBox(
-                                              '${visibleList[index]['content']}',
+                                              '${visibleList[index]['final_article']}',
                                               style: AppTextStyle.koRegular14()
                                                   .copyWith(
                                                 color: AppColor.grey,
@@ -307,7 +316,7 @@ class HomePage extends GetView<HomeController> {
                                               // flex: 3
                                             ),
                                             const Spacer(),
-                                            _buildFlexibleBox('$formattedDate',
+                                            _buildFlexibleBox(displayDate,
                                                 style:
                                                     AppTextStyle.koRegular12()
                                                         .copyWith(

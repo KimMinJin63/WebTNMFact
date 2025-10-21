@@ -25,7 +25,7 @@ class EditController extends GetxController {
     print('컨트롤러에서는 잘 받아오나?? : ${post?['status']}');
 
     if (post != null) {
-      titleController.text = post['title'] ?? '';
+      titleController.text = '[오늘의 교육 뉴스] ${post['title']}' ?? '';
       contentController.text = post['content'] ?? '';
       selectedCategory.value = post['category'] ?? '';
       selectedPublish.value = post['status'] ?? '';
@@ -42,7 +42,7 @@ class EditController extends GetxController {
   }) async {
     try {
       Map<String, dynamic> updateData = {
-        'title': title,
+        'title': '[오늘의 교육 뉴스] $title',
         'content': content,
         'category': category,
         'author': author,

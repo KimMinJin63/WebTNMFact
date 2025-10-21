@@ -293,6 +293,7 @@ Widget _buildMenuItem(IconData icon, String label, int index,
     onTap: () async {
       final admin = Get.find<AdminController>();
       final currentTab = controller.menuSelectedIndex.value;
+      
 
       // 편집/작성 중이고, 다른 탭으로 이동하려 할 때만 다이얼로그
       if ((admin.isEditing.value || admin.isCreate.value) &&
@@ -314,6 +315,8 @@ Widget _buildMenuItem(IconData icon, String label, int index,
       }
 
       controller.menuSelectedIndex.value = index;
+      controller.selectedIndex.value = 0;
+      controller.fetchAllPosts();
     },
     child: Container(
       margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 12.w),
