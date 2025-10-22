@@ -200,18 +200,18 @@ class HomePage extends GetView<HomeController> {
                               if (rawDate is Timestamp) {
                                 final date = rawDate.toDate();
                                 formattedDate =
-                                    DateFormat('yy-MM-dd').format(date);
+                                    DateFormat('yy.MM.dd').format(date);
                               }
                               // ✅ 2. String 타입 처리 ("2025-10-22 15:19" 등)
                               else if (rawDate is String) {
                                 final parsed = DateTime.tryParse(rawDate);
                                 if (parsed != null) {
                                   formattedDate =
-                                      DateFormat('yy-MM-dd').format(parsed);
+                                      DateFormat('yy.MM.dd').format(parsed);
                                 } else {
                                   // 혹시 "2025-10-22 15:19" 같이 공백 구분이라면 수동 파싱
                                   try {
-                                    formattedDate = DateFormat('yy-MM-dd')
+                                    formattedDate = DateFormat('yy.MM.dd')
                                         .format(DateFormat('yyyy-MM-dd HH:mm')
                                             .parse(rawDate));
                                   } catch (_) {
