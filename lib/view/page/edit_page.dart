@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/controller/edit_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
@@ -23,6 +24,40 @@ class EditPage extends GetView<EditController> {
     // final post = Get.arguments;
     // final post = adminController.currentPost.value!;
 
+    String getDisplayTitle(Map<String, dynamic> post) {
+      final title = (post['title'] ?? '').toString().trim();
+      final rawDate = (post['date'] ?? '').toString().trim();
+      final category = (post['category'] ?? '').toString();
+
+      // 🔹 날짜 포맷 변환 ("2025-10-22 15:19" → "25-10-22")
+      String formattedDate = rawDate;
+      try {
+        final parsed = DateTime.tryParse(rawDate);
+        if (parsed != null) {
+          formattedDate = DateFormat('yy-MM-dd').format(parsed);
+        }
+      } catch (_) {
+        // 파싱 실패 시 원본 유지
+        formattedDate = rawDate;
+      }
+
+      // 🔹 데일리 팩트인 경우
+      if (category == '데일리 팩트') {
+        if (title.isEmpty || title == '[오늘의 교육 뉴스]' || title == '[오늘의 교육 뉴스]') {
+          return '[오늘의 교육 뉴스] $formattedDate';
+        }
+
+        if (title.startsWith('[오늘의 교육 뉴스]')) {
+          return title;
+        }
+
+        return '[오늘의 교육 뉴스] $title';
+      }
+
+      // 🔹 인사이트 팩트 등 다른 카테고리
+      return title.isEmpty ? formattedDate : title;
+    }
+
     return Obx(() {
       final post = adminController.currentPost.value;
       if (post == null) {
@@ -36,6 +71,7 @@ class EditPage extends GetView<EditController> {
       controller.contentController.text = post['final_article'] ?? '';
       controller.selectedCategory.value = post['category'] ?? '';
       controller.selectedPublish.value = post['status'] ?? '';
+      controller.titleController.text = getDisplayTitle(post);
 
       print('에딧 페이지 잘 받아오나?? : ${post['title']}');
       print('에딧 페이지 잘 받아오나?? : ${post['final_article']}');
@@ -78,10 +114,10 @@ class EditPage extends GetView<EditController> {
                 controller.editPost(
                   docId: post['id'],
                   title: controller.titleController.text,
-                  content: controller.contentController.text,
+                  final_article: controller.contentController.text,
                   category: controller.selectedCategory.value,
                   status: controller.selectedPublish.value,
-                  author: '김병국',
+                  editor: '김병국',
                 );
 
                 // final adminController = Get.find<AdminController>();
@@ -95,7 +131,9 @@ class EditPage extends GetView<EditController> {
 
                 adminController.isEditing.value = false; // 수정 완료 후 관리자 페이지로 이동
               },
-              child: Text('수정', style: AppTextStyle.koSemiBold16().copyWith(color: AppColor.black)),
+              child: Text('수정',
+                  style: AppTextStyle.koSemiBold16()
+                      .copyWith(color: AppColor.black)),
             ) // )
           ],
           backgroundColor: Colors.white,
@@ -177,7 +215,8 @@ class EditPage extends GetView<EditController> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text('설정',
-                              style: AppTextStyle.koBold20().copyWith(color: AppColor.black)),
+                              style: AppTextStyle.koBold20()
+                                  .copyWith(color: AppColor.black)),
                           SizedBox(height: 16.h),
                           Divider(),
                           SizedBox(height: 16.h),
@@ -214,7 +253,8 @@ class EditPage extends GetView<EditController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('발행여부',
-                                style: AppTextStyle.koBold20().copyWith(color: AppColor.black)),
+                                style: AppTextStyle.koBold20()
+                                    .copyWith(color: AppColor.black)),
                             SizedBox(height: 16.h),
                             AppCheckboxTile(
                               label: '발행',

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
+import 'package:tnm_fact/utils/app_title.dart';
 import 'package:tnm_fact/view/page/admin_page.dart';
 
 class CreateController extends GetxController {
@@ -16,7 +18,7 @@ class CreateController extends GetxController {
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-   @override
+  @override
   void onInit() {
     super.onInit();
     // 🔹 입력값 변화 감지
@@ -28,21 +30,26 @@ class CreateController extends GetxController {
 
   Future createPost({
     required String title,
-    required String content,
+    required String final_article,
     required String category,
-    required String author,
+    required String editor,
     required String status,
-    required int viewPoint,
+    required int viewpoint,
   }) async {
     try {
-      final docRef = await firestore.collection('posts').add({
-        'title': title,
-        'content': content,
+      // final now = DateTime.now();
+      final normalizedTitle = normalizeTitleForCategory(title, category);
+
+      final docRef = await firestore.collection('post').add({
+        // ✅ post로 통일
+        'title': normalizedTitle,
+        'final_article': final_article,
         'category': category,
-        'author': author,
-        'createdAt': FieldValue.serverTimestamp(),
+        'editor': editor,
+        'date': FieldValue.serverTimestamp(),
+        // 'createdAtTs': FieldValue.serverTimestamp(),
         'status': status,
-        'viewPoint': 0,
+        'viewpoint': 0,
       });
 
       final docId = docRef.id;

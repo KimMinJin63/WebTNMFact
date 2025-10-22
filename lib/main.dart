@@ -52,8 +52,8 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
           ),
           // home: const HomePage(),
-          // home: const AdminLayoutPage(),
-          home: const LoginPage(),
+          home: const AdminLayoutPage(),
+          // home: const LoginPage(),
           getPages: AppPages.pages,
           // home: const HomePage(),
           // initialRoute / getPages 조합을 쓰려면 아래처럼:

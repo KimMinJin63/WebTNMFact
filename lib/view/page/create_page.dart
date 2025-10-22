@@ -50,12 +50,13 @@ class CreatePage extends GetView<CreateController> {
                   ? () {
                       print('입력이 완료됨');
                       controller.createPost(
-                          title: controller.titleController.text,
-                          content: controller.contentController.text,
-                          category: controller.selectedCategory.value,
-                          status: controller.selectedPublish.value,
-                          author: '김병국',
-                          viewPoint: 0,);
+                        title: controller.titleController.text,
+                        final_article: controller.contentController.text,
+                        category: controller.selectedCategory.value,
+                        status: controller.selectedPublish.value,
+                        editor: '김병국',
+                        viewpoint: 0,
+                      );
                       Get.dialog(
                         AlertDialog(
                           title: const Text('게시글 작성 완료'),

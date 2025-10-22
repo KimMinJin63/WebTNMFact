@@ -44,20 +44,20 @@ class HomeController extends GetxController {
   }
 
   Future<Map<String, int>> fetchDailyVisits() async {
-  final snapshot = await FirebaseFirestore.instance.collection('visits').get();
-  Map<String, int> dailyCounts = {};
+    final snapshot =
+        await FirebaseFirestore.instance.collection('visits').get();
+    Map<String, int> dailyCounts = {};
 
-  for (var doc in snapshot.docs) {
-    final data = doc.data();
-    final date = data['date'] ?? '';
-    if (date.isNotEmpty) {
-      dailyCounts[date] = (dailyCounts[date] ?? 0) + 1;
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+      final date = data['date'] ?? '';
+      if (date.isNotEmpty) {
+        dailyCounts[date] = (dailyCounts[date] ?? 0) + 1;
+      }
     }
+
+    return dailyCounts;
   }
-
-  return dailyCounts;
-}
-
 
   void logVisit(String userId) {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -81,70 +81,58 @@ class HomeController extends GetxController {
   }
 
   Future loadAllPosts() async {
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('post')
-          .where('status', isEqualTo: '발행')
-          .orderBy('date', descending: true)
-          .get();
-
+    FirebaseFirestore.instance
+        .collection('post')
+        .where('status', isEqualTo: '발행')
+        .orderBy('date', descending: true)
+        .snapshots() // ✅ get() 대신 snapshots()
+        .listen((snapshot) {
       postList.value = snapshot.docs.map((doc) {
         return {
           'id': doc.id,
           ...doc.data() as Map<String, dynamic>,
         };
       }).toList();
-      print('게시글 불러오기 성공');
-      print('총 게시글 수: ${snapshot.docs.length}');
-      print('게시글 목록: ${postList[0]}');
-    } catch (e) {
-      print('🔥 모든 게시글 로딩 중 오류 발생: $e');
-    }
+
+      print('🔥 실시간 업데이트됨! 현재 총 게시글 수: ${postList.length}');
+    });
   }
 
-  Future loadDailyPosts() async {
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('post')
-          .where('category', isEqualTo: '데일리 팩트')
-          .where('status', isEqualTo: '발행')
-          .orderBy('date', descending: true)
-          .get();
+void loadDailyPosts() {
+  FirebaseFirestore.instance
+      .collection('post')
+      .where('category', isEqualTo: '데일리 팩트')
+      .where('status', isEqualTo: '발행')
+      .orderBy('date', descending: true)
+      .snapshots()
+      .listen((snapshot) {
+    dailyPostList.value = snapshot.docs.map((doc) {
+      return {
+        'id': doc.id,
+        ...doc.data() as Map<String, dynamic>,
+      };
+    }).toList();
 
-      dailyPostList.value = snapshot.docs.map((doc) {
-        return {
-          'id': doc.id,
-          ...doc.data() as Map<String, dynamic>,
-        };
-      }).toList();
-      print('게시글 불러오기 성공');
-      print('데일리 팩트 게시글 수: ${snapshot.docs.length}');
-      print('데일리 팩트 목록: ${dailyPostList[0]['date']}');
-    } catch (e) {
-      print('🔥 데일리 팩트 게시글 로딩 중 오류 발생: $e');
-    }
-  }
+    print('🔥 데일리 팩트 실시간 반영: ${dailyPostList.length}');
+  });
+}
 
-  Future loadInsightPosts() async {
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('post')
-          .where('category', isEqualTo: '인사이트 팩트')
-          .where('status', isEqualTo: '발행')
-          .orderBy('date', descending: true)
-          .get();
+void loadInsightPosts() {
+  FirebaseFirestore.instance
+      .collection('post')
+      .where('category', isEqualTo: '인사이트 팩트')
+      .where('status', isEqualTo: '발행')
+      .orderBy('date', descending: true)
+      .snapshots()
+      .listen((snapshot) {
+    insightPostList.value = snapshot.docs.map((doc) {
+      return {
+        'id': doc.id,
+        ...doc.data() as Map<String, dynamic>,
+      };
+    }).toList();
 
-      insightPostList.value = snapshot.docs.map((doc) {
-        return {
-          'id': doc.id,
-          ...doc.data() as Map<String, dynamic>,
-        };
-      }).toList();
-      print('게시글 불러오기 성공');
-      print('인사이트 팩트 게시글 수: ${snapshot.docs.length}');
-      print('인사이트 팩트 목록: ${insightPostList[0]}');
-    } catch (e) {
-      print('🔥 인사이트 팩트 게시글 로딩 중 오류 발생: $e');
-    }
-  }
+    print('🔥 인사이트 팩트 실시간 반영: ${insightPostList.length}');
+  });
+}
 }

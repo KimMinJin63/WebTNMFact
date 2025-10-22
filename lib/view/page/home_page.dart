@@ -172,11 +172,7 @@ class HomePage extends GetView<HomeController> {
                         childAspectRatio: 0.65,
                       ),
                       itemBuilder: (context, index) {
-                        final timestamp = visibleList[index]['updatedAt'] ??
-                            visibleList[index]['createdAt'];
-                        final rawDateStr = visibleList[index]['date'];
-                        final parsed = DateFormat('yy-MM-dd').parse(rawDateStr);
-                        final titleDate = DateFormat('yy-MM-dd').format(parsed);
+                        final timestamp = visibleList[index]['date'];
 
                         String formattedDate = '';
                         if (timestamp != null && timestamp is Timestamp) {
@@ -184,10 +180,61 @@ class HomePage extends GetView<HomeController> {
                           formattedDate =
                               DateFormat('yyyy-MM-dd HH:mm').format(date);
                         }
+                        print('formattedDate: $formattedDate');
+                        String getDisplayTitle(Map<String, dynamic> post) {
+                          final title = (post['title'] ?? '').toString().trim();
+                          final category = (post['category'] ?? '').toString();
+                          final rawDate =
+                              post['date']; // ✅ 타입 그대로 받기 (toString() ❌)
 
-                        final String displayDate = formattedDate.isNotEmpty
-                            ? formattedDate
-                            : (rawDateStr ?? '');
+                          // 🔹 날짜 포맷 변환 ("2025-10-22 15:19" → "25-10-22")
+                          String formattedDate = '';
+
+                          // ✅ 1. Timestamp 타입 처리
+                          if (rawDate is Timestamp) {
+                            final date = rawDate.toDate();
+                            formattedDate = DateFormat('yy-MM-dd').format(date);
+                          }
+                          // ✅ 2. String 타입 처리 ("2025-10-22 15:19" 등)
+                          else if (rawDate is String) {
+                            final parsed = DateTime.tryParse(rawDate);
+                            if (parsed != null) {
+                              formattedDate =
+                                  DateFormat('yy-MM-dd').format(parsed);
+                            } else {
+                              // 혹시 "2025-10-22 15:19" 같이 공백 구분이라면 수동 파싱
+                              try {
+                                formattedDate = DateFormat('yy-MM-dd').format(
+                                    DateFormat('yyyy-MM-dd HH:mm')
+                                        .parse(rawDate));
+                              } catch (_) {
+                                formattedDate = rawDate; // 그래도 안되면 원본 유지
+                              }
+                            }
+                          } else {
+                            formattedDate = ''; // 혹시 모를 null 대비
+                          }
+
+                          print('✅ formattedDate 최종 결과: $formattedDate');
+
+                          // 🔹 데일리 팩트 처리
+                          if (category == '데일리 팩트') {
+                            if (title.isEmpty ||
+                                title == '[오늘의 교육 뉴스]' ||
+                                title == '[오늘의 교육 뉴스]') {
+                              return '[오늘의 교육 뉴스] $formattedDate';
+                            }
+
+                            if (title.startsWith('[오늘의 교육 뉴스]')) {
+                              return title;
+                            }
+
+                            return '[오늘의 교육 뉴스] $title';
+                          }
+
+                          // 🔹 인사이트 팩트 등 다른 카테고리
+                          return title.isEmpty ? formattedDate : title;
+                        }
 
                         print('지금 게시글 목록 ${visibleList[index]['date']}');
                         return GestureDetector(
@@ -295,7 +342,8 @@ class HomePage extends GetView<HomeController> {
                                               ),
                                             ),
                                             _buildFlexibleBox(
-                                              '[오늘의 교육 뉴스] $titleDate',
+                                              getDisplayTitle(
+                                                  visibleList[index]),
                                               style:
                                                   AppTextStyle.koSemiBold18(),
                                               maxLines: 2,
@@ -316,7 +364,7 @@ class HomePage extends GetView<HomeController> {
                                               // flex: 3
                                             ),
                                             const Spacer(),
-                                            _buildFlexibleBox(displayDate,
+                                            _buildFlexibleBox('$formattedDate',
                                                 style:
                                                     AppTextStyle.koRegular12()
                                                         .copyWith(

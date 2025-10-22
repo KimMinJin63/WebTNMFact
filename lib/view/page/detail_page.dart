@@ -18,19 +18,25 @@ class DetailPage extends StatelessWidget {
     // print('잘 받아오나?? : ${post['final_article']}');
     print('잘 받아오나?? : ${post['category']}');
     print('잘 받아오나?? : ${post['status']}');
-    final timestamp = post['updatedAt'] ?? post['createdAt'];
-    final rawDateStr = post['date'];
-    final parsed = DateFormat('yy-MM-dd').parse(rawDateStr);
-    final titleDate = DateFormat('yy-MM-dd').format(parsed);
+    // final timestamp = post['updatedAt'] ?? post['createdAt'];
+    final rawDate = post['date']; // ✅ Timestamp 타입
+    String titleDate = '';
 
-    String formattedDate = '';
-    if (timestamp != null && timestamp is Timestamp) {
-      final date = timestamp.toDate();
-      formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(date);
+    if (rawDate is Timestamp) {
+      final date = rawDate.toDate(); // Timestamp → DateTime 변환
+      titleDate = DateFormat('yy-MM-dd').format(date); // 원하는 형식으로 변환
     }
 
-    final String displayDate =
-        formattedDate.isNotEmpty ? formattedDate : (rawDateStr ?? '');
+    print('🕒 변환된 날짜: $titleDate');
+
+    // String formattedDate = '';
+    // if (timestamp != null && timestamp is Timestamp) {
+    //   final date = timestamp.toDate();
+    //   formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(date);
+    // }
+
+    // final String displayDate =
+    //     formattedDate.isNotEmpty ? formattedDate : (rawDateStr ?? '');
 
     return Scaffold(
       backgroundColor: AppColor.white,
@@ -93,7 +99,7 @@ class DetailPage extends StatelessWidget {
                 height: 16.h,
               ),
               Text(
-                '작성자:${post['editor']}|$displayDate',
+                '작성자:${post['editor']}|$titleDate',
                 style:
                     AppTextStyle.koRegular14().copyWith(color: AppColor.black),
               ),

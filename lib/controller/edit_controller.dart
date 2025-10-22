@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
+import 'package:tnm_fact/utils/app_title.dart';
 
 class EditController extends GetxController {
   final AdminController adminController = Get.find<AdminController>();
@@ -12,6 +13,7 @@ class EditController extends GetxController {
   RxString selectedCategory = ''.obs;
   RxString selectedPublish = ''.obs;
   final box = GetStorage();
+  final kDailyPrefix = '[오늘의 교육 뉴스] ';
 
   @override
   void onInit() {
@@ -20,12 +22,12 @@ class EditController extends GetxController {
     // final post = Get.arguments;
     final post = adminController.currentPost.value;
     print('컨트롤러에서는 잘 받아오나?? : ${post?['title']}');
-    print('컨트롤러에서는 잘 받아오나?? : ${post?['content']}');
+    print('컨트롤러에서는 잘 받아오나?? : ${post?['final_article']}');
     print('컨트롤러에서는 잘 받아오나?? : ${post?['category']}');
     print('컨트롤러에서는 잘 받아오나?? : ${post?['status']}');
 
     if (post != null) {
-      titleController.text = '[오늘의 교육 뉴스] ${post['title']}' ?? '';
+      titleController.text = post['title'] ?? '';
       contentController.text = post['content'] ?? '';
       selectedCategory.value = post['category'] ?? '';
       selectedPublish.value = post['status'] ?? '';
@@ -33,31 +35,33 @@ class EditController extends GetxController {
   }
 
   Future<void> editPost({
-    required String title,
-    required String content,
+    required String? title,
+    required String final_article,
     required String category,
-    required String author,
+    required String editor,
     required String status,
     required String docId,
   }) async {
     try {
-      Map<String, dynamic> updateData = {
-        'title': '[오늘의 교육 뉴스] $title',
-        'content': content,
+      final normalizedTitle = normalizeTitleForCategory(title, category);
+      print('🔥 수정할 문서 ID: $normalizedTitle');
+
+      final updateData = {
+        'title': normalizedTitle,
+        'final_article': final_article,
         'category': category,
-        'author': author,
+        'editor': editor,
         'status': status,
-        'updatedAt': FieldValue.serverTimestamp(),
+        // 'date': FieldValue.serverTimestamp(),
       };
 
       await FirebaseFirestore.instance
-          .collection('posts')
+          .collection('post') // ✅ 통일
           .doc(docId)
           .update(updateData);
 
-      await adminController.fetchAllPosts(); // 또는 현재 탭에 맞는 함수
-
-      update(); // GetX 상태 갱신
+      await adminController.fetchAllPosts();
+      update();
     } catch (e) {
       print('🔥 게시글 수정 실패: $e');
     }

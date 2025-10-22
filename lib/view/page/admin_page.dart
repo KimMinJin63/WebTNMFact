@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
@@ -22,9 +23,46 @@ class AdminPage extends GetView<AdminController> {
     final double railWidth = isExtended ? 240.w : 72.w;
     final box = GetStorage();
 
+
+String getDisplayTitle(Map<String, dynamic> post) {
+  final title = (post['title'] ?? '').toString().trim();
+  final rawDate = (post['date'] ?? '').toString().trim();
+  final category = (post['category'] ?? '').toString();
+
+  // 🔹 날짜 포맷 변환 ("2025-10-22 15:19" → "25-10-22")
+  String formattedDate = rawDate;
+  try {
+    final parsed = DateTime.tryParse(rawDate);
+    if (parsed != null) {
+      formattedDate = DateFormat('yy-MM-dd').format(parsed);
+    }
+  } catch (_) {
+    // 파싱 실패 시 원본 유지
+    formattedDate = rawDate;
+  }
+
+  // 🔹 데일리 팩트인 경우
+  if (category == '데일리 팩트') {
+    if (title.isEmpty ||
+        title == '[오늘의 교육 뉴스]' ||
+        title == '[오늘의 교육 뉴스]') {
+      return '[오늘의 교육 뉴스] $formattedDate';
+    }
+
+    if (title.startsWith('[오늘의 교육 뉴스]')) {
+      return title;
+    }
+
+    return '[오늘의 교육 뉴스] $title';
+  }
+
+  // 🔹 인사이트 팩트 등 다른 카테고리
+  return title.isEmpty ? formattedDate : title;
+}
     return Scaffold(
       backgroundColor: AppColor.white,
       body:
+
           /// 우측 콘텐츠 영역
           Column(
         children: [
@@ -155,21 +193,24 @@ class AdminPage extends GetView<AdminController> {
                               return Padding(
                                 padding: EdgeInsets.symmetric(vertical: 8.h),
                                 child: AppPost(
-                                  title: '[오늘의 교육 뉴스] ${post['title']}' ?? '',
-                                  author: '편집장 김병국',
-                                  // author: post['editor'] ?? '편집장 김병국',
-                                  category: post['category'] ?? '데일리 팩트',
-                                  createdAt:
-                                      post['date'] ?? post['createdAt'],
+                                  title: getDisplayTitle(post),
+                                  // author: '편집장 김병국',
+                                  author: post['editor'] ?? '편집장 김병국',
+                                  category: post['category'],
+                                  createdAt: post['date'] ?? post['createdAt'],
                                   status: post['status'] ?? '발행',
-                                  textColor: post['status'] == '발행' ? AppColor.deepGreen : AppColor.black,
-                                  color: post['status'] == '발행' ? AppColor.green.withOpacity(0.2) : AppColor.lightGrey,
+                                  textColor: post['status'] == '발행'
+                                      ? AppColor.deepGreen
+                                      : AppColor.black,
+                                  color: post['status'] == '발행'
+                                      ? AppColor.green.withOpacity(0.2)
+                                      : AppColor.lightGrey,
                                   onContentTap: () {
                                     // box.write('post', post);
 
                                     controller.openEditPage(post);
                                     print(
-                                        '어드민 페이지 잘 받아오나?? : ${post['title']}');
+                                        '어드민 페이지 잘 받아오나?? : ${getDisplayTitle(post)}');
                                     print(
                                         '어드민 페이지 잘 받아오나?? : ${post['content']}');
                                     print(
@@ -206,7 +247,9 @@ class AdminPage extends GetView<AdminController> {
                                           ),
                                           TextButton(
                                             onPressed: () {
-                                              controller.deletePost(post['id']);
+                                              controller.deletePost(
+                                                post['id'],
+                                              );
                                               controller.fetchAllPosts();
                                               controller.fetchAllPostCounts();
                                               Get.back();
