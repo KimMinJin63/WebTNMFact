@@ -227,7 +227,7 @@ class DashBoardPage extends StatelessWidget {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  title,
+                                                  '[오늘의 교육 뉴스] $title',
                                                   maxLines: 1,
                                                   overflow:
                                                       TextOverflow.ellipsis,
