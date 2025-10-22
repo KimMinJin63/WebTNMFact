@@ -166,7 +166,7 @@ class AdminController extends GetxController {
         if (rawDate is String) {
           DateTime? parsed;
           print('rawDate string: $parsed');
-          try {
+          try { 
             parsed = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').parse(rawDate);
             print('parsed createdDate in try: $rawDate');
           } catch (_) {
@@ -175,6 +175,7 @@ class AdminController extends GetxController {
                   DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR').parse(rawDate);
             } catch (_) {}
           }
+          
           createdDate = parsed ?? DateTime.now();
           print('parsed createdDate: $createdDate');
         } else {
@@ -259,7 +260,7 @@ class AdminController extends GetxController {
             ? DateFormat('yyyy-MM-dd HH:mm:ss', 'ko_KR')
                 .format(updatedTimestamp.toDate())
             : null;
-
+ 
         return {
           'id': doc.id,
           'final_article': doc['final_article'],
