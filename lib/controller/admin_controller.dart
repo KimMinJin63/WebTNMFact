@@ -155,7 +155,7 @@ class AdminController extends GetxController {
       Get.dialog(
         AlertDialog(
           title: const Text('삭제 완료'),
-          content: const Text('게시글이 성공적으로 삭제되었습니다3.'),
+          content: const Text('게시글이 성공적으로 삭제되었습니다.'),
           actions: [
             TextButton(
               onPressed: () async {
@@ -185,7 +185,8 @@ Future<void> fetchAllPosts({String? searchQuery}) async {
       final created = ts.toDate();
       final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
       final baseTitle = (data['title'] as String?) ??
-          DateFormat('yy-MM-dd', 'ko_KR').format(created);
+          DateFormat('yy.MM.dd', 'ko_KR').format(created);
+        print('🔥🔥🔥🔥🔥🔥🔥🔥🔥기본 제목은 : $baseTitle');
       final normalizedTitle =
           normalizeTitleForCategory(baseTitle, data['category']);
       
@@ -223,7 +224,7 @@ Future<void> fetchAllPosts({String? searchQuery}) async {
         final created = ts.toDate();
         final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
         final baseTitle = (data['title'] as String?) ??
-            DateFormat('yy-MM-dd', 'ko_KR').format(created);
+            DateFormat('yy.MM.dd', 'ko_KR').format(created);
         final normalizedTitle =
             normalizeTitleForCategory(baseTitle, data['category']);
         return {
@@ -258,7 +259,7 @@ Future<void> fetchAllPosts({String? searchQuery}) async {
         final created = ts.toDate();
         final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
         final baseTitle = (data['title'] as String?) ??
-            DateFormat('yy-MM-dd', 'ko_KR').format(created);
+            DateFormat('yy.MM.dd', 'ko_KR').format(created);
         final normalizedTitle =
             normalizeTitleForCategory(baseTitle, data['category']);
         return {
@@ -360,7 +361,7 @@ void bindPosts() {
           ?? DateTime.fromMillisecondsSinceEpoch(0); // (레거시 fallback)
 
       final baseTitle = (data['title'] as String?)
-          ?? DateFormat('yy-MM-dd', 'ko_KR').format(created);
+          ?? DateFormat('yy.MM.dd', 'ko_KR').format(created);
       final normalizedTitle = normalizeTitleForCategory(baseTitle, data['category']);
       final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
 

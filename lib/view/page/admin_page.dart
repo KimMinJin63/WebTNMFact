@@ -34,7 +34,7 @@ String getDisplayTitle(Map<String, dynamic> post) {
   try {
     final parsed = DateTime.tryParse(rawDate);
     if (parsed != null) {
-      formattedDate = DateFormat('yy-MM-dd').format(parsed);
+      formattedDate = DateFormat('yy.MM.dd').format(parsed);
     }
   } catch (_) {
     // 파싱 실패 시 원본 유지

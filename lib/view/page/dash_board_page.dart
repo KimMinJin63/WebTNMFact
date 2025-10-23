@@ -228,7 +228,7 @@ class DashBoardPage extends StatelessWidget {
                                               DateTime.tryParse(rawDate);
                                           if (parsed != null) {
                                             formattedDate =
-                                                DateFormat('yy-MM-dd')
+                                                DateFormat('yy.MM.dd')
                                                     .format(parsed);
                                           }
                                         } catch (_) {}

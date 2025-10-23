@@ -24,7 +24,7 @@ class DetailPage extends StatelessWidget {
 
     if (rawDate is Timestamp) {
       final date = rawDate.toDate(); // Timestamp → DateTime 변환
-      titleDate = DateFormat('yy-MM-dd').format(date); // 원하는 형식으로 변환
+      titleDate = DateFormat('yy.MM.dd').format(date); // 원하는 형식으로 변환
     }
 
     print('🕒 변환된 날짜: $titleDate');
