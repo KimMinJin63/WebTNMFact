@@ -15,6 +15,9 @@ class HomeController extends GetxController {
   RxList<Map<String, dynamic>> insightPostList = <Map<String, dynamic>>[].obs;
   final isLoading = false.obs;
 
+  var currentPage = 'home'.obs; // ✅ 현재 페이지 상태
+  Map<String, dynamic>? selectedPost;
+
   void selectTab(int index) {
     selectedIndex.value = index;
   }
@@ -98,41 +101,41 @@ class HomeController extends GetxController {
     });
   }
 
-void loadDailyPosts() {
-  FirebaseFirestore.instance
-      .collection('post')
-      .where('category', isEqualTo: '데일리 팩트')
-      .where('status', isEqualTo: '발행')
-      .orderBy('date', descending: true)
-      .snapshots()
-      .listen((snapshot) {
-    dailyPostList.value = snapshot.docs.map((doc) {
-      return {
-        'id': doc.id,
-        ...doc.data() as Map<String, dynamic>,
-      };
-    }).toList();
+  void loadDailyPosts() {
+    FirebaseFirestore.instance
+        .collection('post')
+        .where('category', isEqualTo: '데일리 팩트')
+        .where('status', isEqualTo: '발행')
+        .orderBy('date', descending: true)
+        .snapshots()
+        .listen((snapshot) {
+      dailyPostList.value = snapshot.docs.map((doc) {
+        return {
+          'id': doc.id,
+          ...doc.data() as Map<String, dynamic>,
+        };
+      }).toList();
 
-    print('🔥 데일리 팩트 실시간 반영: ${dailyPostList.length}');
-  });
-}
+      print('🔥 데일리 팩트 실시간 반영: ${dailyPostList.length}');
+    });
+  }
 
-void loadInsightPosts() {
-  FirebaseFirestore.instance
-      .collection('post')
-      .where('category', isEqualTo: '인사이트 팩트')
-      .where('status', isEqualTo: '발행')
-      .orderBy('date', descending: true)
-      .snapshots()
-      .listen((snapshot) {
-    insightPostList.value = snapshot.docs.map((doc) {
-      return {
-        'id': doc.id,
-        ...doc.data() as Map<String, dynamic>,
-      };
-    }).toList();
+  void loadInsightPosts() {
+    FirebaseFirestore.instance
+        .collection('post')
+        .where('category', isEqualTo: '인사이트 팩트')
+        .where('status', isEqualTo: '발행')
+        .orderBy('date', descending: true)
+        .snapshots()
+        .listen((snapshot) {
+      insightPostList.value = snapshot.docs.map((doc) {
+        return {
+          'id': doc.id,
+          ...doc.data() as Map<String, dynamic>,
+        };
+      }).toList();
 
-    print('🔥 인사이트 팩트 실시간 반영: ${insightPostList.length}');
-  });
-}
+      print('🔥 인사이트 팩트 실시간 반영: ${insightPostList.length}');
+    });
+  }
 }
