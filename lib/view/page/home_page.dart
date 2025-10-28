@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -29,11 +30,17 @@ class HomePage extends GetView<HomeController> {
         leading: Padding(
           padding: EdgeInsets.only(left: 16.w),
           child: Center(
-            child: AutoSizeText(
-              'TNM FACT',
-              maxFontSize: 20,
-              minFontSize: 16,
-              style: AppTextStyle.koBold20(),
+            child: GestureDetector(
+              onTap: () {
+                controller.selectTab(0);
+                controller.currentPage.value = 'home';
+              },
+              child: AutoSizeText(
+                'TNM FACT',
+                maxFontSize: 20,
+                minFontSize: 16,
+                style: AppTextStyle.koBold20(),
+              ),
             ),
           ),
         ),
@@ -47,7 +54,10 @@ class HomePage extends GetView<HomeController> {
                   color: controller.selectedIndex.value == 0
                       ? AppColor.primary
                       : AppColor.black,
-                  onPressed: () => controller.selectTab(0),
+                  onPressed: () {
+                    controller.selectTab(0);
+                    controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                  },
                   title: '전체기사',
                 );
               }),
@@ -58,7 +68,10 @@ class HomePage extends GetView<HomeController> {
                   color: controller.selectedIndex.value == 1
                       ? AppColor.primary
                       : AppColor.black,
-                  onPressed: () => controller.selectTab(1),
+                  onPressed: () {
+                    controller.selectTab(1);
+                    controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                  },
                 );
               }),
               SizedBox(width: 16.w),
@@ -68,7 +81,10 @@ class HomePage extends GetView<HomeController> {
                   color: controller.selectedIndex.value == 2
                       ? AppColor.primary
                       : AppColor.black,
-                  onPressed: () => controller.selectTab(2),
+                  onPressed: () {
+                    controller.selectTab(2);
+                    controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                  },
                 );
               }),
             ],
@@ -98,6 +114,20 @@ class HomePage extends GetView<HomeController> {
                       color: AppColor.grey,
                       fontSize: hintFontSize,
                     ),
+                    onChanged: (value) {
+                      if (value.isEmpty) {
+                        if (controller.selectedIndex == 0) {
+                          controller.postList.value =
+                              controller.originalPostList.toList();
+                        } else if (controller.selectedIndex == 1) {
+                          controller.dailyPostList.value =
+                              controller.originalDailyPostList.toList();
+                        } else {
+                          controller.insightPostList.value =
+                              controller.originalInsightPostList.toList();
+                        }
+                      }
+                    },
                     onSubmitted: (_) => controller.clearFocus(),
                     decoration: InputDecoration(
                       isDense: true,
@@ -109,7 +139,25 @@ class HomePage extends GetView<HomeController> {
                               iconConstraints.maxHeight * 0.6;
                           return IconButton(
                             padding: EdgeInsets.zero,
-                            onPressed: () => controller.clearFocus(),
+                            onPressed: () async {
+                              print('검색 아이콘 클릭됨');
+                              if (controller.selectedIndex == 0) {
+                                print('전체기사 탭에서 검색 실행');
+                                controller.searchController.text.isNotEmpty
+                                    ? controller.findPost()
+                                    : controller.loadAllPosts();
+                              } else if (controller.selectedIndex == 1) {
+                                print('데일리팩트 탭에서 검색 실행');
+                                controller.searchController.text.isNotEmpty
+                                    ? controller.findPost()
+                                    : controller.loadDailyPosts();
+                              } else if (controller.selectedIndex == 2) {
+                                print('인사이트팩트 탭에서 검색 실행');
+                                controller.searchController.text.isNotEmpty
+                                    ? controller.findPost()
+                                    : controller.loadInsightPosts();
+                              }
+                            },
                             icon: Icon(Icons.search,
                                 size: iconSize, color: AppColor.grey),
                           );
@@ -268,7 +316,33 @@ class HomePage extends GetView<HomeController> {
                           }
 
                           return GestureDetector(
-                            onTap: () {
+                            onTap: () async {
+                              print('onTap 눌림');
+                              final user = FirebaseAuth.instance.currentUser;
+                              print('현재 유저 정보는?? : $user');
+                              final post = visibleList[index];
+                              final postId = post['id'];
+                              if (user == null) {
+                                print('로그인 안 된 상태, 익명 로그인 처리');
+                                // 로그인 안 되어 있으면 여기서 즉시 로그인 처리
+                                final cred = await FirebaseAuth.instance
+                                    .signInAnonymously();
+                                final userId = cred.user!.uid;
+                                await adminController
+                                    .incrementViewCount(postId);
+                                controller.logVisit(userId);
+                                controller.selectedPost = post;
+                                controller.currentPage.value = 'detail';
+                                // Get.toNamed(DetailPage.route, arguments: post);
+                              } else {
+                                final userId = user.uid;
+                                // Get.toNamed(DetailPage.route, arguments: post);
+                                controller.selectedPost = post;
+                                controller.currentPage.value = 'detail';
+                                await adminController
+                                    .incrementViewCount(postId);
+                                controller.logVisit(userId);
+                              }
                               controller.selectedPost = post;
                               controller.currentPage.value = 'detail';
                             },
@@ -304,7 +378,8 @@ class HomePage extends GetView<HomeController> {
                                     Align(
                                       alignment: Alignment.centerLeft,
                                       child: Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 0),
                                         child: Container(
                                           margin: const EdgeInsets.only(top: 8),
                                           padding: const EdgeInsets.symmetric(
@@ -323,9 +398,10 @@ class HomePage extends GetView<HomeController> {
                                             maxFontSize: 14,
                                             style: AppTextStyle.koSemiBold14()
                                                 .copyWith(
-                                              color: post['category'] == '데일리 팩트'
-                                                  ? AppColor.primary
-                                                  : AppColor.yellow,
+                                              color:
+                                                  post['category'] == '데일리 팩트'
+                                                      ? AppColor.primary
+                                                      : AppColor.yellow,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -370,16 +446,20 @@ class HomePage extends GetView<HomeController> {
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8, vertical: 0),
-                                        child: AutoSizeText(
-                                          formattedDate,
-                                          style: AppTextStyle.koRegular8()
-                                              .copyWith(color: AppColor.black),
-                                          maxLines: 1, // ✅ 최대 4줄까지만
-                                          minFontSize: 10, // ✅ 작아져도 이 이하로는 안감
-                                          maxFontSize: 16, // ✅ 여유 있으면 커짐
-                                          overflow: TextOverflow.ellipsis,
-                                          softWrap: true,
-                                          stepGranularity: 0.5,
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: AutoSizeText(
+                                            formattedDate,
+                                            style: AppTextStyle.koRegular8()
+                                                .copyWith(
+                                                    color: AppColor.black),
+                                            maxLines: 1, // ✅ 최대 4줄까지만
+                                            minFontSize: 10, // ✅ 작아져도 이 이하로는 안감
+                                            maxFontSize: 16, // ✅ 여유 있으면 커짐
+                                            overflow: TextOverflow.ellipsis,
+                                            softWrap: true,
+                                            stepGranularity: 0.5,
+                                          ),
                                         ),
                                       ),
                                       // child: _buildFlexibleBox(

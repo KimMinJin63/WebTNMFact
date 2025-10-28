@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:intl/intl.dart';
+import 'package:tnm_fact/utils/app_title.dart';
 
 class HomeController extends GetxController {
   RxInt selectedIndex = 0.obs;
@@ -13,13 +14,35 @@ class HomeController extends GetxController {
   RxList<Map<String, dynamic>> postList = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> dailyPostList = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> insightPostList = <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> originalPostList = <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> originalDailyPostList =
+      <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> originalInsightPostList =
+      <Map<String, dynamic>>[].obs;
+
   final isLoading = false.obs;
+  RxBool isSearching = false.obs;
+  RxBool isLoaded = false.obs;
 
   var currentPage = 'home'.obs; // ✅ 현재 페이지 상태
   Map<String, dynamic>? selectedPost;
 
   void selectTab(int index) {
     selectedIndex.value = index;
+
+    final hasKeyword = searchController.text.trim().isNotEmpty;
+
+    if (hasKeyword) {
+      findPost();
+    } else {
+      if (index == 0) {
+        loadAllPosts();
+      } else if (index == 1) {
+        loadDailyPosts();
+      } else {
+        loadInsightPosts();
+      }
+    }
   }
 
   void clearFocus() {
@@ -62,6 +85,36 @@ class HomeController extends GetxController {
     return dailyCounts;
   }
 
+  Future findPost() async {
+    final searchQuery = searchController.text.trim().toLowerCase();
+    final tabIndex = selectedIndex.value;
+
+    isSearching.value = searchQuery.isNotEmpty; // ✅ 검색 상태 반영
+
+    if (tabIndex == 0) {
+      print('전체기사 탭에서 검색 실행: $searchQuery');
+      postList.value = originalPostList
+          .where((p) =>
+              p['title']?.toString().toLowerCase().contains(searchQuery) ??
+              false)
+          .toList();
+    } else if (tabIndex == 1) {
+      print('데일리팩트 탭에서 검색 실행: $searchQuery');
+      dailyPostList.value = originalDailyPostList
+          .where((p) =>
+              p['title']?.toString().toLowerCase().contains(searchQuery) ??
+              false)
+          .toList();
+    } else {
+      print('인사이트팩트 탭에서 검색 실행: $searchQuery');
+      insightPostList.value = originalInsightPostList
+          .where((p) =>
+              p['title']?.toString().toLowerCase().contains(searchQuery) ??
+              false)
+          .toList();
+    }
+  }
+
   void logVisit(String userId) {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
@@ -90,12 +143,31 @@ class HomeController extends GetxController {
         .orderBy('date', descending: true)
         .snapshots() // ✅ get() 대신 snapshots()
         .listen((snapshot) {
+      
       postList.value = snapshot.docs.map((doc) {
+        final data = doc.data();
+        final ts = data['date'] as Timestamp;
+        final created = ts.toDate();
+        final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
+        final baseTitle = (data['title'] as String?) ??
+            DateFormat('yy.MM.dd', 'ko_KR').format(created);
+        // print('🔥🔥🔥🔥🔥🔥🔥🔥🔥기본 제목은 : $baseTitle');
+        final normalizedTitle =
+            normalizeTitleForCategory(baseTitle, data['category']);
+
         return {
           'id': doc.id,
-          ...doc.data() as Map<String, dynamic>,
+          'title': normalizedTitle,
+          'final_article': data['final_article'] ?? data['content'] ?? '',
+          'editor': data['editor'] ?? data['author'],
+          'date': display,
+          'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
+          'status': data['status'],
+          'category': data['category'],
+          'sortAt': created.millisecondsSinceEpoch, // ✅ 추가!
         };
       }).toList();
+      originalPostList.value = postList.toList();
 
       print('🔥 실시간 업데이트됨! 현재 총 게시글 수: ${postList.length}');
     });
@@ -110,11 +182,27 @@ class HomeController extends GetxController {
         .snapshots()
         .listen((snapshot) {
       dailyPostList.value = snapshot.docs.map((doc) {
+        final data = doc.data();
+        final ts = data['date'] as Timestamp; // ✅ Timestamp 가정
+        final created = ts.toDate();
+        final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
+        final baseTitle = (data['title'] as String?) ??
+            DateFormat('yy.MM.dd', 'ko_KR').format(created);
+        final normalizedTitle =
+            normalizeTitleForCategory(baseTitle, data['category']);
         return {
           'id': doc.id,
-          ...doc.data() as Map<String, dynamic>,
+          'title': normalizedTitle,
+          'final_article': data['final_article'] ?? data['content'] ?? '',
+          'editor': data['editor'] ?? data['author'],
+          'date': display,
+          'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
+          'status': data['status'],
+          'category': data['category'],
         };
       }).toList();
+
+      originalDailyPostList.value = dailyPostList.toList();
 
       print('🔥 데일리 팩트 실시간 반영: ${dailyPostList.length}');
     });
@@ -129,11 +217,26 @@ class HomeController extends GetxController {
         .snapshots()
         .listen((snapshot) {
       insightPostList.value = snapshot.docs.map((doc) {
+        final data = doc.data();
+        final ts = data['date'] as Timestamp; // ✅ Timestamp 가정
+        final created = ts.toDate();
+        final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
+        final baseTitle = (data['title'] as String?) ??
+            DateFormat('yy.MM.dd', 'ko_KR').format(created);
+        final normalizedTitle =
+            normalizeTitleForCategory(baseTitle, data['category']);
         return {
           'id': doc.id,
-          ...doc.data() as Map<String, dynamic>,
+          'title': normalizedTitle,
+          'final_article': data['final_article'] ?? data['content'] ?? '',
+          'editor': data['editor'] ?? data['author'],
+          'date': display,
+          'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
+          'status': data['status'],
+          'category': data['category'],
         };
       }).toList();
+      originalInsightPostList.value = insightPostList.toList();
 
       print('🔥 인사이트 팩트 실시간 반영: ${insightPostList.length}');
     });

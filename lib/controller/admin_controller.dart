@@ -93,12 +93,13 @@ class AdminController extends GetxController {
     if (hasKeyword) {
       findPost();
     } else {
-      if (index == 0)
+      if (index == 0) {
         fetchAllPosts();
-      else if (index == 1)
+      } else if (index == 1) {
         fetchDonePosts();
-      else
+      } else {
         fetchNotPosts();
+      }
     }
   }
 
@@ -172,43 +173,43 @@ class AdminController extends GetxController {
     }
   }
 
-Future<void> fetchAllPosts({String? searchQuery}) async {
-  try {
-    final snapshot = await firestore
-        .collection('post')
-        .orderBy('date', descending: true)
-        .get();
+  Future<void> fetchAllPosts({String? searchQuery}) async {
+    try {
+      final snapshot = await firestore
+          .collection('post')
+          .orderBy('date', descending: true)
+          .get();
 
-    postList.value = snapshot.docs.map((doc) {
-      final data = doc.data();
-      final ts = data['date'] as Timestamp; 
-      final created = ts.toDate();
-      final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
-      final baseTitle = (data['title'] as String?) ??
-          DateFormat('yy.MM.dd', 'ko_KR').format(created);
-        print('🔥🔥🔥🔥🔥🔥🔥🔥🔥기본 제목은 : $baseTitle');
-      final normalizedTitle =
-          normalizeTitleForCategory(baseTitle, data['category']);
-      
-      return {
-        'id': doc.id,
-        'title': normalizedTitle,
-        'final_article': data['final_article'] ?? data['content'] ?? '',
-        'editor': data['editor'] ?? data['author'],
-        'date': display,
-        'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
-        'status': data['status'],
-        'category': data['category'],
-        'sortAt': created.millisecondsSinceEpoch,  // ✅ 추가!
-      };
-    }).toList();
+      postList.value = snapshot.docs.map((doc) {
+        final data = doc.data();
+        final ts = data['date'] as Timestamp;
+        final created = ts.toDate();
+        final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
+        final baseTitle = (data['title'] as String?) ??
+            DateFormat('yy.MM.dd', 'ko_KR').format(created);
+        // print('🔥🔥🔥🔥🔥🔥🔥🔥🔥기본 제목은 : $baseTitle');
+        final normalizedTitle =
+            normalizeTitleForCategory(baseTitle, data['category']);
 
-    originalPostList.value = postList.toList();
-    print('!!!!!!!!!!!1총 게시글 수는 : ${postList.length}');
-  } catch (e) {
-    print('🔥 fetchAllPosts 게시글 불러오기 실패: $e');
+        return {
+          'id': doc.id,
+          'title': normalizedTitle,
+          'final_article': data['final_article'] ?? data['content'] ?? '',
+          'editor': data['editor'] ?? data['author'],
+          'date': display,
+          'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
+          'status': data['status'],
+          'category': data['category'],
+          'sortAt': created.millisecondsSinceEpoch, // ✅ 추가!
+        };
+      }).toList();
+
+      originalPostList.value = postList.toList();
+      print('!!!!!!!!!!!1총 게시글 수는 : ${postList.length}');
+    } catch (e) {
+      print('🔥 fetchAllPosts 게시글 불러오기 실패: $e');
+    }
   }
-}
 
   Future<void> fetchDonePosts() async {
     try {
@@ -322,69 +323,72 @@ Future<void> fetchAllPosts({String? searchQuery}) async {
     }
   }
 
-List<Map<String, dynamic>> topPostsLast7DaysByView(int n) {
-final now = DateTime.now();
-  final startOfMonth = DateTime(now.year, now.month, 1).millisecondsSinceEpoch;
+  List<Map<String, dynamic>> topPostsLast7DaysByView(int n) {
+    final now = DateTime.now();
+    final startOfMonth =
+        DateTime(now.year, now.month, 1).millisecondsSinceEpoch;
 
-  int toInt(dynamic v) {
-    if (v is int) return v;
-    if (v is num) return v.toInt();
-    return int.tryParse(v?.toString() ?? '') ?? 0;
+    int toInt(dynamic v) {
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      return int.tryParse(v?.toString() ?? '') ?? 0;
+    }
+
+    final items = postList
+        .where((p) => p['status'] == '발행')
+        .where((p) => (p['sortAt'] ?? 0) >= startOfMonth) // ✅ 7일 필터는 sortAt 기준
+        .toList()
+      ..sort((a, b) {
+        final av = toInt(a['viewpoint']);
+        final bv = toInt(b['viewpoint']);
+        return bv.compareTo(av); // ✅ 조회수 내림차순
+      });
+
+    return items.take(n).toList();
   }
 
-  final items = postList
-      .where((p) => p['status'] == '발행')
-      .where((p) => (p['sortAt'] ?? 0) >= startOfMonth) // ✅ 7일 필터는 sortAt 기준
-      .toList()
-    ..sort((a, b) {
-      final av = toInt(a['viewpoint']);
-      final bv = toInt(b['viewpoint']);
-      return bv.compareTo(av); // ✅ 조회수 내림차순
+  void bindPosts() {
+    firestore
+        .collection('post')
+        .where('status', isEqualTo: '발행')
+        .orderBy('date', descending: true) // ✅ date → date(Timestamp)
+        .snapshots()
+        .listen((qs) {
+      final mapped = qs.docs.map((doc) {
+        final data = doc.data();
+
+        // ✅ date는 Timestamp로 가정(레거시 대비 안전가드 포함)
+        final Timestamp? ts =
+            data['date'] is Timestamp ? data['date'] as Timestamp : null;
+        final created = ts?.toDate() ??
+            DateTime.fromMillisecondsSinceEpoch(0); // (레거시 fallback)
+
+        final baseTitle = (data['title'] as String?) ??
+            DateFormat('yy.MM.dd', 'ko_KR').format(created);
+        final normalizedTitle =
+            normalizeTitleForCategory(baseTitle, data['category']);
+        final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
+
+        return {
+          'id': doc.id,
+          'title': normalizedTitle,
+          'final_article': data['final_article'],
+          'category': data['category'],
+          'author': data['editor'] ?? data['author'],
+          'status': data['status'],
+          'viewpoint': data['viewpoint'] ?? 0,
+          'date': display, // UI용 문자열
+          'sortAt': created.millisecondsSinceEpoch, // ✅ 정렬/필터용
+        };
+      }).toList();
+
+      // 이미 서버에서 date desc로 받지만, 혹시 몰라 로컬도 보정 가능
+      mapped.sort((a, b) => (b['sortAt'] as int).compareTo(a['sortAt'] as int));
+
+      postList.value = mapped;
+      isLoaded.value = true;
+      originalPostList.value = mapped.toList();
+      print('실시간 바인딩된 게시물 수: ${postList.length}');
     });
-
-  return items.take(n).toList();
-}
-
-void bindPosts() {
-  firestore
-      .collection('post')
-      .where('status', isEqualTo: '발행')
-      .orderBy('date', descending: true) // ✅ date → date(Timestamp)
-      .snapshots()
-      .listen((qs) {
-    final mapped = qs.docs.map((doc) {
-      final data = doc.data();
-
-      // ✅ date는 Timestamp로 가정(레거시 대비 안전가드 포함)
-      final Timestamp? ts = data['date'] is Timestamp ? data['date'] as Timestamp : null;
-      final created = ts?.toDate()
-          ?? DateTime.fromMillisecondsSinceEpoch(0); // (레거시 fallback)
-
-      final baseTitle = (data['title'] as String?)
-          ?? DateFormat('yy.MM.dd', 'ko_KR').format(created);
-      final normalizedTitle = normalizeTitleForCategory(baseTitle, data['category']);
-      final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
-
-      return {
-        'id'           : doc.id,
-        'title'        : normalizedTitle,
-        'final_article': data['final_article'],
-        'category'     : data['category'],
-        'author'       : data['editor'] ?? data['author'],
-        'status'       : data['status'],
-        'viewpoint'    : data['viewpoint'] ?? 0,
-        'date'         : display,                           // UI용 문자열
-        'sortAt'       : created.millisecondsSinceEpoch,    // ✅ 정렬/필터용
-      };
-    }).toList();
-
-    // 이미 서버에서 date desc로 받지만, 혹시 몰라 로컬도 보정 가능
-    mapped.sort((a, b) => (b['sortAt'] as int).compareTo(a['sortAt'] as int));
-
-    postList.value = mapped;
-    isLoaded.value = true;
-    originalPostList.value = mapped.toList();
-    print('실시간 바인딩된 게시물 수: ${postList.length}');
-  });
-}
+  }
 }
