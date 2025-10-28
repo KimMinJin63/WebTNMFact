@@ -128,7 +128,21 @@ class HomePage extends GetView<HomeController> {
                         }
                       }
                     },
-                    onSubmitted: (_) => controller.clearFocus(),
+                    onSubmitted: (_) async {
+                      controller.clearFocus(); // ✅ 포커스 해제
+                      if (controller.searchController.text.trim().isNotEmpty) {
+                        await controller.findPost(); // ✅ 엔터 입력 시 검색 실행
+                      } else {
+                        // ✅ 검색어가 비어있으면 탭에 맞는 전체 목록 불러오기
+                        if (controller.selectedIndex.value == 0) {
+                          await controller.loadAllPosts();
+                        } else if (controller.selectedIndex.value == 1) {
+                          await controller.loadDailyPosts();
+                        } else {
+                          await controller.loadInsightPosts();
+                        }
+                      }
+                    },
                     decoration: InputDecoration(
                       isDense: true,
                       contentPadding:

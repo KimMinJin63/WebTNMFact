@@ -34,6 +34,7 @@ class AdminController extends GetxController {
   final box = GetStorage();
   var isEditing = false.obs; // 🔹 편집 모드 여부
   var isCreate = false.obs;
+  final FocusNode searchFocusNode = FocusNode();
 
   void openEditPage(Map<String, dynamic> post) {
     // final post = Get.arguments;
@@ -44,6 +45,12 @@ class AdminController extends GetxController {
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['content']}');
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['category']}');
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['status']}');
+  }
+
+  void clearFocus() {
+    if (searchFocusNode.hasFocus) {
+      searchFocusNode.unfocus();
+    }
   }
 
 //   @override
@@ -87,6 +94,10 @@ class AdminController extends GetxController {
 
   void selectTab(int index) {
     selectedIndex.value = index;
+    // searchController.clear();
+    // postList.assignAll(originalPostList);
+    // donePostList.assignAll(originalDonePostList);
+    // notPostList.assignAll(originalNotPostList);
 
     final hasKeyword = searchController.text.trim().isNotEmpty;
 

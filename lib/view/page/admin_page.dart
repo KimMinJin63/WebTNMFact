@@ -23,42 +23,40 @@ class AdminPage extends GetView<AdminController> {
     final double railWidth = isExtended ? 240.w : 72.w;
     final box = GetStorage();
 
+    String getDisplayTitle(Map<String, dynamic> post) {
+      final title = (post['title'] ?? '').toString().trim();
+      final rawDate = (post['date'] ?? '').toString().trim();
+      final category = (post['category'] ?? '').toString();
 
-String getDisplayTitle(Map<String, dynamic> post) {
-  final title = (post['title'] ?? '').toString().trim();
-  final rawDate = (post['date'] ?? '').toString().trim();
-  final category = (post['category'] ?? '').toString();
+      // 🔹 날짜 포맷 변환 ("2025-10-22 15:19" → "25-10-22")
+      String formattedDate = rawDate;
+      try {
+        final parsed = DateTime.tryParse(rawDate);
+        if (parsed != null) {
+          formattedDate = DateFormat('yy.MM.dd').format(parsed);
+        }
+      } catch (_) {
+        // 파싱 실패 시 원본 유지
+        formattedDate = rawDate;
+      }
 
-  // 🔹 날짜 포맷 변환 ("2025-10-22 15:19" → "25-10-22")
-  String formattedDate = rawDate;
-  try {
-    final parsed = DateTime.tryParse(rawDate);
-    if (parsed != null) {
-      formattedDate = DateFormat('yy.MM.dd').format(parsed);
+      // 🔹 데일리 팩트인 경우
+      if (category == '데일리 팩트') {
+        if (title.isEmpty || title == '[오늘의 교육 뉴스]' || title == '[오늘의 교육 뉴스]') {
+          return '[오늘의 교육 뉴스] $formattedDate';
+        }
+
+        if (title.startsWith('[오늘의 교육 뉴스]')) {
+          return title;
+        }
+
+        return '[오늘의 교육 뉴스] $title';
+      }
+
+      // 🔹 인사이트 팩트 등 다른 카테고리
+      return title.isEmpty ? formattedDate : title;
     }
-  } catch (_) {
-    // 파싱 실패 시 원본 유지
-    formattedDate = rawDate;
-  }
 
-  // 🔹 데일리 팩트인 경우
-  if (category == '데일리 팩트') {
-    if (title.isEmpty ||
-        title == '[오늘의 교육 뉴스]' ||
-        title == '[오늘의 교육 뉴스]') {
-      return '[오늘의 교육 뉴스] $formattedDate';
-    }
-
-    if (title.startsWith('[오늘의 교육 뉴스]')) {
-      return title;
-    }
-
-    return '[오늘의 교육 뉴스] $title';
-  }
-
-  // 🔹 인사이트 팩트 등 다른 카테고리
-  return title.isEmpty ? formattedDate : title;
-}
     return Scaffold(
       backgroundColor: AppColor.white,
       body:
@@ -142,6 +140,23 @@ String getDisplayTitle(Map<String, dynamic> post) {
                               controller.searchController.text.isNotEmpty
                                   ? controller.findPost()
                                   : controller.fetchNotPosts();
+                            }
+                          },
+                          onSubmitted: (_) async {
+                            controller.clearFocus(); // ✅ 포커스 해제
+                            if (controller.searchController.text
+                                .trim()
+                                .isNotEmpty) {
+                              await controller.findPost(); // ✅ 엔터 입력 시 검색 실행
+                            } else {
+                              // ✅ 검색어가 비어있으면 탭에 맞는 전체 목록 불러오기
+                              if (controller.selectedIndex.value == 0) {
+                                await controller.fetchAllPosts();
+                              } else if (controller.selectedIndex.value == 1) {
+                                await controller.fetchDonePosts();
+                              } else {
+                                await controller.fetchNotPosts();
+                              }
                             }
                           },
                           onChanged: (value) {

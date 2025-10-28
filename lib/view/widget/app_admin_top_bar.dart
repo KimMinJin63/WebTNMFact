@@ -18,6 +18,7 @@ class AppAdminTopBar extends StatelessWidget {
   final int selectedIndex;
   final Function()? onTap;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
 
   const AppAdminTopBar({
     super.key,
@@ -32,6 +33,7 @@ class AppAdminTopBar extends StatelessWidget {
     this.onTapPending,
     this.onTap,
     this.onChanged,
+    this.onSubmitted,
   });
 
   @override
@@ -64,6 +66,7 @@ class AppAdminTopBar extends StatelessWidget {
               // height: 36.h,
               child: TextField(
                 onChanged: onChanged,
+                onSubmitted: onSubmitted,
                 controller: searchController,
                 style: AppTextStyle.koRegular16(),
                 decoration: InputDecoration(

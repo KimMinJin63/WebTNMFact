@@ -29,6 +29,11 @@ class HomeController extends GetxController {
 
   void selectTab(int index) {
     selectedIndex.value = index;
+    clearFocus();
+    // searchController.clear();
+    // postList.assignAll(originalPostList);
+    // dailyPostList.assignAll(originalDailyPostList);
+    // insightPostList.assignAll(originalInsightPostList);
 
     final hasKeyword = searchController.text.trim().isNotEmpty;
 
@@ -143,7 +148,6 @@ class HomeController extends GetxController {
         .orderBy('date', descending: true)
         .snapshots() // ✅ get() 대신 snapshots()
         .listen((snapshot) {
-      
       postList.value = snapshot.docs.map((doc) {
         final data = doc.data();
         final ts = data['date'] as Timestamp;
@@ -173,7 +177,7 @@ class HomeController extends GetxController {
     });
   }
 
-  void loadDailyPosts() {
+  loadDailyPosts() {
     FirebaseFirestore.instance
         .collection('post')
         .where('category', isEqualTo: '데일리 팩트')
@@ -208,7 +212,7 @@ class HomeController extends GetxController {
     });
   }
 
-  void loadInsightPosts() {
+  loadInsightPosts() {
     FirebaseFirestore.instance
         .collection('post')
         .where('category', isEqualTo: '인사이트 팩트')

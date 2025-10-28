@@ -316,6 +316,7 @@ Widget _buildMenuItem(IconData icon, String label, int index,
 
       controller.menuSelectedIndex.value = index;
       controller.selectedIndex.value = 0;
+      controller.searchController.clear();
       controller.fetchAllPosts();
     },
     child: Container(
