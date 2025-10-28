@@ -282,10 +282,33 @@ class HomePage extends GetView<HomeController> {
                           final timestamp = post['date'];
                           String formattedDate = '';
 
-                          if (timestamp != null && timestamp is Timestamp) {
-                            final date = timestamp.toDate();
-                            formattedDate =
-                                DateFormat('yyyy-MM-dd').format(date);
+                          if (timestamp != null) {
+                            if (timestamp is Timestamp) {
+                              final date = timestamp.toDate();
+                              formattedDate =
+                                  DateFormat('yyyy-MM-dd').format(date);
+                            } else if (timestamp is String) {
+                              try {
+                                final parsed = DateTime.tryParse(timestamp);
+                                if (parsed != null) {
+                                  formattedDate =
+                                      DateFormat('yyyy-MM-dd').format(parsed);
+                                } else {
+                                  // 혹시 Firestore에 저장된 문자열이 "2025-10-28 18:04:00" 형식일 수도 있음
+                                  final manualParsed =
+                                      DateFormat('yyyy-MM-dd HH:mm:ss')
+                                          .parse(timestamp);
+                                  formattedDate = DateFormat('yyyy-MM-dd')
+                                      .format(manualParsed);
+                                }
+                              } catch (e) {
+                                formattedDate = ''; // 파싱 실패 시
+                                print('⚠️ 날짜 파싱 실패: $timestamp');
+                              }
+                            } else {
+                              print(
+                                  '⚠️ 알 수 없는 날짜 타입: ${timestamp.runtimeType}');
+                            }
                           }
 
                           String getDisplayTitle(Map<String, dynamic> post) {
@@ -293,28 +316,30 @@ class HomePage extends GetView<HomeController> {
                                 (post['title'] ?? '').toString().trim();
                             final category =
                                 (post['category'] ?? '').toString();
-                            final rawDate = post['date'];
-                            String formattedDate = '';
+                            // final rawDate = post['date'];
+                            // String formattedDate = '';
 
-                            if (rawDate is Timestamp) {
-                              final date = rawDate.toDate();
-                              formattedDate =
-                                  DateFormat('yy.MM.dd').format(date);
-                            } else if (rawDate is String) {
-                              final parsed = DateTime.tryParse(rawDate);
-                              if (parsed != null) {
-                                formattedDate =
-                                    DateFormat('yy.MM.dd').format(parsed);
-                              } else {
-                                try {
-                                  formattedDate = DateFormat('yy.MM.dd').format(
-                                      DateFormat('yyyy-MM-dd HH:mm')
-                                          .parse(rawDate));
-                                } catch (_) {
-                                  formattedDate = rawDate;
-                                }
-                              }
-                            }
+                            // if (rawDate is Timestamp) {
+                            //   final date = rawDate.toDate();
+                            //   formattedDate =
+                            //       DateFormat('yy.MM.dd').format(date);
+                            // } else if (rawDate is String) {
+                            //   final parsed = DateTime.tryParse(rawDate);
+                            //   if (parsed != null) {
+                            //     formattedDate =
+                            //         DateFormat('yy.MM.dd').format(parsed);
+                            //   } else {
+                            //     try {
+                            //       formattedDate = DateFormat('yy.MM.dd').format(
+                            //           DateFormat('yyyy-MM-dd HH:mm')
+                            //               .parse(rawDate));
+                            //     } catch (_) {
+                            //       formattedDate = rawDate;
+                            //     }
+                            //   }
+                            //   print(
+                            //       'formattedDate from String: $formattedDate');
+                            // }
 
                             if (category == '데일리 팩트') {
                               if (title.isEmpty || title == '[오늘의 교육 뉴스]') {
@@ -329,6 +354,7 @@ class HomePage extends GetView<HomeController> {
                             return title.isEmpty ? formattedDate : title;
                           }
 
+                          // print('formattedDate in Grid Item: $formattedDate');
                           return GestureDetector(
                             onTap: () async {
                               print('onTap 눌림');
