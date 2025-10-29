@@ -313,6 +313,7 @@ Widget _buildMenuItem(IconData icon, String label, int index,
         admin.isCreate.value = false;
         admin.currentPost.value = null;
       }
+      
 
       controller.menuSelectedIndex.value = index;
       controller.selectedIndex.value = 0;

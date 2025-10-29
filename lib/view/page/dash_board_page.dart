@@ -197,6 +197,19 @@ class DashBoardPage extends StatelessWidget {
                                     return const Center(
                                         child: Text('이번 달 인기 게시물이 없습니다.'));
                                   }
+                                  // List<Map<String, dynamic>> visibleList;
+                                  // switch (controller.selectedIndex.value) {
+                                  //   case 1:
+                                  //     visibleList = controller.donePostList;
+                                  //     break;
+                                  //   case 2:
+                                  //     visibleList = controller.notPostList;
+                                  //     break;
+                                  //   case 0:
+                                  //   default:
+                                  //     visibleList = controller.postList;
+                                  //     break;
+                                  // }
 
                                   return ListView.separated(
                                     itemCount: top5.length,
@@ -248,6 +261,8 @@ class DashBoardPage extends StatelessWidget {
                                             : title;
                                       }
 
+                                       final post = top5[index];
+
                                       return Row(
                                         children: [
                                           // 순위 뱃지
@@ -270,37 +285,61 @@ class DashBoardPage extends StatelessWidget {
                                           ),
                                           SizedBox(width: 20.w),
                                           Expanded(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  getDisplayTitle(p),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: AppTextStyle
-                                                      .koSemiBold16(),
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    const Icon(
-                                                      Icons.remove_red_eye,
-                                                      size: 16,
-                                                      color: AppColor.grey,
-                                                    ),
-                                                    SizedBox(width: 4.w),
-                                                    Text('$vp views',
-                                                        style: AppTextStyle
-                                                                .koRegular12()
-                                                            .copyWith(
-                                                                color: AppColor
-                                                                    .grey)),
-                                                  ],
-                                                ),
-                                              ],
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                print(
+                                                    '편집 페이지로 이동: ${post['title']}');
+
+                                                controller.openEditPage(post);
+                                                print(
+                                                    '어드민 페이지 잘 받아오나?? : ${getDisplayTitle(post)}');
+                                                print(
+                                                    '어드민 페이지 잘 받아오나?? : ${post['content']}');
+                                                print(
+                                                    '어드민 페이지 잘 받아오나?? : ${post['category']}');
+                                                print(
+                                                    '어드민 페이지 잘 받아오나?? : ${post['status']}');
+                                                 controller.originTabIndex!.value = controller.menuSelectedIndex.value; 
+                                                 print(
+                                                    'originTabIndex 값은?? : ${controller.originTabIndex!.value}');
+                                                controller.menuSelectedIndex
+                                                    .value = 1;
+                                                controller.isEditing.value =
+                                                    true;
+                                                controller.openEditPage(post);
+                                              },
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    getDisplayTitle(p),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: AppTextStyle
+                                                        .koSemiBold16(),
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.remove_red_eye,
+                                                        size: 16,
+                                                        color: AppColor.grey,
+                                                      ),
+                                                      SizedBox(width: 4.w),
+                                                      Text('$vp views',
+                                                          style: AppTextStyle
+                                                                  .koRegular12()
+                                                              .copyWith(
+                                                                  color: AppColor
+                                                                      .grey)),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                           // SizedBox(width: 12.w),

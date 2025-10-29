@@ -52,6 +52,7 @@ class EditController extends GetxController {
         'category': category,
         'editor': editor,
         'status': status,
+        // 'date': status == '발행' ? FieldValue.serverTimestamp() : '작성 중',
         // 'date': FieldValue.serverTimestamp(),
       };
 

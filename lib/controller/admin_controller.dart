@@ -35,6 +35,7 @@ class AdminController extends GetxController {
   var isEditing = false.obs; // 🔹 편집 모드 여부
   var isCreate = false.obs;
   final FocusNode searchFocusNode = FocusNode();
+  RxInt? originTabIndex = RxInt(0);
 
   void openEditPage(Map<String, dynamic> post) {
     // final post = Get.arguments;
@@ -252,6 +253,7 @@ class AdminController extends GetxController {
       }).toList();
 
       originalDonePostList.value = donePostList.toList();
+      print('!!!!!!!!!!!1발행된 총 게시글 수는 : ${originalDonePostList.length}');
     } catch (e) {
       print('🔥 fetchDonePosts 게시글 불러오기 실패: $e');
     }
@@ -269,6 +271,8 @@ class AdminController extends GetxController {
         final data = doc.data();
         final ts = data['date'] as Timestamp; // ✅ Timestamp 가정
         final created = ts.toDate();
+        // String display =
+        //     '';
         final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
         final baseTitle = (data['title'] as String?) ??
             DateFormat('yy.MM.dd', 'ko_KR').format(created);
@@ -291,6 +295,52 @@ class AdminController extends GetxController {
       print('🔥 미발행 게시글 불러오기 실패: $e');
     }
   }
+
+//   Future<void> fetchNotPosts() async {
+//   try {
+//     final snapshot = await firestore
+//         .collection('post')
+//         .where('status', isEqualTo: '미발행')
+//         // ⚠️ 주의: Firestore에서 null/문자열 포함된 필드는 orderBy로 정렬이 안 될 수 있음
+//         .get();
+
+//     notPostList.value = snapshot.docs.map((doc) {
+//       final data = doc.data();
+//       final dynamic ts = data['date']; // ✅ 타입을 dynamic으로 둡니다
+
+//       String display = ''; // 화면에 보여줄 날짜 문자열
+
+//       if (ts is Timestamp) {
+//         // ✅ Timestamp인 경우
+//         display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(ts.toDate());
+//       } else if (ts is String) {
+//         // ✅ "작성 중" 같은 문자열인 경우
+//         display = ts;
+//       } else {
+//         display = '';
+//       }
+
+//       final baseTitle = (data['title'] as String?) ?? '';
+//       final normalizedTitle =
+//           normalizeTitleForCategory(baseTitle, data['category']);
+
+//       return {
+//         'id': doc.id,
+//         'title': normalizedTitle,
+//         'final_article': data['final_article'] ?? data['content'] ?? '',
+//         'editor': data['editor'] ?? data['author'],
+//         'date': display,
+//         'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
+//         'status': data['status'],
+//         'category': data['category'],
+//       };
+//     }).toList();
+
+//     originalNotPostList.value = notPostList.toList();
+//   } catch (e) {
+//     print('🔥 미발행 게시글 불러오기 실패: $e');
+//   }
+// }
 
   Future<void> fetchAllPostCounts() async {
     try {

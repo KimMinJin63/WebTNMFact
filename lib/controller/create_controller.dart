@@ -39,6 +39,7 @@ class CreateController extends GetxController {
     try {
       // final now = DateTime.now();
       final normalizedTitle = normalizeTitleForCategory(title, category);
+      // final dateValue = status == '발행' ? FieldValue.serverTimestamp() : null;
 
       final docRef = await firestore.collection('post').add({
         // ✅ post로 통일
@@ -46,7 +47,9 @@ class CreateController extends GetxController {
         'final_article': final_article,
         'category': category,
         'editor': editor,
+        // 'date': status == '발행' ? FieldValue.serverTimestamp() : '작성 중',
         'date': FieldValue.serverTimestamp(),
+        // 'date': dateValue,
         // 'createdAtTs': FieldValue.serverTimestamp(),
         'status': status,
         'viewpoint': 0,

@@ -292,13 +292,13 @@ class HomePage extends GetView<HomeController> {
                                 final parsed = DateTime.tryParse(timestamp);
                                 if (parsed != null) {
                                   formattedDate =
-                                      DateFormat('yyyy-MM-dd').format(parsed);
+                                      DateFormat('yyyy.MM.dd').format(parsed);
                                 } else {
                                   // 혹시 Firestore에 저장된 문자열이 "2025-10-28 18:04:00" 형식일 수도 있음
                                   final manualParsed =
                                       DateFormat('yyyy-MM-dd HH:mm:ss')
                                           .parse(timestamp);
-                                  formattedDate = DateFormat('yyyy-MM-dd')
+                                  formattedDate = DateFormat('yyyy.MM.dd')
                                       .format(manualParsed);
                                 }
                               } catch (e) {
@@ -417,35 +417,31 @@ class HomePage extends GetView<HomeController> {
                                     ),
                                     Align(
                                       alignment: Alignment.centerLeft,
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 0),
-                                        child: Container(
-                                          margin: const EdgeInsets.only(top: 8),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: post['category'] == '데일리 팩트'
-                                                ? AppColor.primary
-                                                    .withOpacity(0.1)
-                                                : AppColor.yellow
-                                                    .withOpacity(0.2),
-                                            borderRadius:
-                                                BorderRadius.circular(80),
+                                      child: Container(
+                                        margin: const EdgeInsets.only(top: 8),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: post['category'] == '데일리 팩트'
+                                              ? AppColor.primary
+                                                  .withOpacity(0.1)
+                                              : AppColor.yellow
+                                                  .withOpacity(0.2),
+                                          borderRadius:
+                                              BorderRadius.circular(80),
+                                        ),
+                                        child: AutoSizeText(
+                                          '${post['category']}',
+                                          maxFontSize: 14,
+                                          style: AppTextStyle.koSemiBold14()
+                                              .copyWith(
+                                            color:
+                                                post['category'] == '데일리 팩트'
+                                                    ? AppColor.primary
+                                                    : AppColor.yellow,
                                           ),
-                                          child: AutoSizeText(
-                                            '${post['category']}',
-                                            maxFontSize: 14,
-                                            style: AppTextStyle.koSemiBold14()
-                                                .copyWith(
-                                              color:
-                                                  post['category'] == '데일리 팩트'
-                                                      ? AppColor.primary
-                                                      : AppColor.yellow,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ),
@@ -458,48 +454,54 @@ class HomePage extends GetView<HomeController> {
                                         maxLines: 2,
                                       ),
                                     ),
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8),
-                                        child: LayoutBuilder(
-                                          builder: (context, constraints) {
-                                            return AutoSizeText(
+                                    LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        return Align(
+                                          alignment: Alignment
+                                              .centerLeft, // ✅ 왼쪽 기준으로 고정
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              maxWidth: constraints
+                                                  .maxWidth, // ✅ 화면 폭에 맞게 자동
+                                            ),
+                                            child: AutoSizeText(
                                               '${post['final_article']}',
-                                              style: AppTextStyle.koRegular15()
+                                              style: AppTextStyle
+                                                      .koRegular15()
                                                   .copyWith(
-                                                      color: AppColor.grey),
-                                              maxLines: 4, // ✅ 최대 4줄까지만
+                                                      color:
+                                                          AppColor.grey),
+                                              textAlign: TextAlign.left,
+                                              maxLines: 4,
                                               minFontSize:
-                                                  14, // ✅ 작아져도 이 이하로는 안감
-                                              maxFontSize: 16, // ✅ 여유 있으면 커짐
-                                              overflow: TextOverflow.ellipsis,
-                                              softWrap: true,
-                                              stepGranularity: 0.5,
-                                            );
-                                          },
-                                        ),
-                                      ),
+                                                  14, // ✅ 화면이 좁을 때 최소 폰트
+                                              maxFontSize:
+                                                  18, // ✅ 화면이 넓을 때 최대 폰트
+                                              overflow:
+                                                  TextOverflow.ellipsis,
+                                              wrapWords: false,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
+                                        Spacer(),
                                     SizedBox(
                                       // height: 20,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 0),
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: AutoSizeText(
-                                            formattedDate,
-                                            style: AppTextStyle.koRegular8()
-                                                .copyWith(
-                                                    color: AppColor.black),
-                                            maxLines: 1, // ✅ 최대 4줄까지만
-                                            minFontSize: 10, // ✅ 작아져도 이 이하로는 안감
-                                            maxFontSize: 16, // ✅ 여유 있으면 커짐
-                                            overflow: TextOverflow.ellipsis,
-                                            softWrap: true,
-                                            stepGranularity: 0.5,
-                                          ),
+                                      child:  Align(
+                                        alignment: Alignment.bottomLeft,
+                                        child: AutoSizeText(
+                                          formattedDate,
+                                          textAlign: TextAlign.left,
+                                          style: AppTextStyle.koRegular8()
+                                              .copyWith(
+                                                  color: AppColor.black),
+                                          maxLines: 1, // ✅ 최대 4줄까지만
+                                          minFontSize: 10, // ✅ 작아져도 이 이하로는 안감
+                                          maxFontSize: 16, // ✅ 여유 있으면 커짐
+                                          overflow: TextOverflow.ellipsis,
+                                          softWrap: true,
+                                          stepGranularity: 0.5,
                                         ),
                                       ),
                                       // child: _buildFlexibleBox(
@@ -606,7 +608,7 @@ Widget _buildFlexibleBox(
   TextStyle? style,
 }) {
   return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
     child: Align(
       alignment: Alignment.centerLeft,
       child: AutoSizeText(

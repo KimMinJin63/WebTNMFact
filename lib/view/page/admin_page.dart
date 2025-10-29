@@ -234,7 +234,7 @@ class AdminPage extends GetView<AdminController> {
                                         '어드민 페이지 잘 받아오나?? : ${post['status']}');
                                     controller.isEditing.value =
                                         true; // 🔹 편집 모드 ON
-
+ controller.originTabIndex!.value = controller.menuSelectedIndex.value;
                                     // print(
                                     //     '잘 받아오나?? : ${box.read('post')['title']}');
                                     // print(

@@ -95,7 +95,17 @@ class EditPage extends GetView<EditController> {
               ),
               onPressed: () {
                 final adminController = Get.find<AdminController>();
+
+                // ✅ 현재 탭이 어디서 왔는지 확인
+                final origin = adminController.originTabIndex?.value ?? 1;
+
+                // ✅ 편집 모드 종료
                 adminController.isEditing.value = false;
+                adminController.currentPost.value = null;
+
+                // ✅ 원래 탭으로 돌아가기
+                adminController.menuSelectedIndex.value = origin;
+
                 // adminController.menuSelectedIndex.value = 1; // 콘텐츠 관리 탭으로 돌아가기
               },
             ),
@@ -120,16 +130,57 @@ class EditPage extends GetView<EditController> {
                   editor: '김병국',
                 );
 
-                // final adminController = Get.find<AdminController>();
-                adminController.fetchAllPosts();
-                adminController.fetchAllPostCounts();
-                adminController.fetchDonePosts(); // ✅ 발행 글 갱신
-                adminController.fetchNotPosts();
-                adminController.selectTab(
-                  controller.selectedPublish.value == '발행' ? 1 : 2,
+                Get.dialog(
+                  AlertDialog(
+                    title: const Text('게시글 수정 완료'),
+                    content: const Text('게시글이 성공적으로 수정되었습니다.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Get.back(); // 다이얼로그 닫기
+
+                          final adminController = Get.find<AdminController>();
+
+                          // ✅ 데이터 새로고침
+                          adminController.fetchAllPosts();
+                          adminController.fetchAllPostCounts();
+                          adminController.fetchDonePosts();
+                          adminController.fetchNotPosts();
+
+                          // ✅ 이동 탭 설정
+                          final targetTab =
+                              controller.selectedPublish.value == '발행' ? 1 : 2;
+                          adminController.selectTab(targetTab);
+                          print('🔥 수정 후 이동할 탭 인덱스: $targetTab');
+                          // adminController.menuSelectedIndex.value =
+                          //     targetTab; // 🔥 명시적 탭 갱신
+                          adminController.isEditing.value = false; // 🔥 편집모드 종료
+                          adminController.update();
+
+                          // ✅ 입력값 초기화
+                          controller.titleController.clear();
+                          controller.contentController.clear();
+                          controller.selectedCategory.value = '';
+                          controller.selectedPublish.value = '';
+                        },
+                        child: const Text('확인'),
+                      ),
+                    ],
+                  ),
                 );
 
-                adminController.isEditing.value = false; // 수정 완료 후 관리자 페이지로 이동
+                // final adminController = Get.find<AdminController>();
+                // adminController.fetchAllPosts();
+                // adminController.fetchAllPostCounts();
+                // adminController.fetchDonePosts(); // ✅ 발행 글 갱신
+                // adminController.fetchNotPosts();
+                // adminController.selectTab(
+                //   controller.selectedPublish.value == '발행' ? 1 : 2,
+                // );
+
+                // adminController.selectedIndex.canUpdate;
+                // // adminController.update();
+                // // adminController.isCreate.value = false;
               },
               child: Text('수정',
                   style: AppTextStyle.koSemiBold16()
