@@ -46,7 +46,8 @@ class EditController extends GetxController {
       final normalizedTitle = normalizeTitleForCategory(title, category);
       print('🔥 수정할 문서 ID: $normalizedTitle');
 
-      final updateData = {
+     final Map<String, dynamic> updateData = {
+
         'title': normalizedTitle,
         'final_article': final_article,
         'category': category,
@@ -55,6 +56,13 @@ class EditController extends GetxController {
         // 'date': status == '발행' ? FieldValue.serverTimestamp() : '작성 중',
         // 'date': FieldValue.serverTimestamp(),
       };
+
+      final currentPost = adminController.currentPost.value;
+
+      // ✅ 미발행 → 발행 으로 바뀔 때만 날짜 갱신
+      if (status == '발행' && (currentPost?['status'] != '발행')) {
+        updateData['date'] = FieldValue.serverTimestamp();
+      }
 
       await FirebaseFirestore.instance
           .collection('post') // ✅ 통일

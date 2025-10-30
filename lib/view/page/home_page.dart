@@ -316,30 +316,6 @@ class HomePage extends GetView<HomeController> {
                                 (post['title'] ?? '').toString().trim();
                             final category =
                                 (post['category'] ?? '').toString();
-                            // final rawDate = post['date'];
-                            // String formattedDate = '';
-
-                            // if (rawDate is Timestamp) {
-                            //   final date = rawDate.toDate();
-                            //   formattedDate =
-                            //       DateFormat('yy.MM.dd').format(date);
-                            // } else if (rawDate is String) {
-                            //   final parsed = DateTime.tryParse(rawDate);
-                            //   if (parsed != null) {
-                            //     formattedDate =
-                            //         DateFormat('yy.MM.dd').format(parsed);
-                            //   } else {
-                            //     try {
-                            //       formattedDate = DateFormat('yy.MM.dd').format(
-                            //           DateFormat('yyyy-MM-dd HH:mm')
-                            //               .parse(rawDate));
-                            //     } catch (_) {
-                            //       formattedDate = rawDate;
-                            //     }
-                            //   }
-                            //   print(
-                            //       'formattedDate from String: $formattedDate');
-                            // }
 
                             if (category == '데일리 팩트') {
                               if (title.isEmpty || title == '[오늘의 교육 뉴스]') {
@@ -435,10 +411,9 @@ class HomePage extends GetView<HomeController> {
                                           maxFontSize: 14,
                                           style: AppTextStyle.koSemiBold14()
                                               .copyWith(
-                                            color:
-                                                post['category'] == '데일리 팩트'
-                                                    ? AppColor.primary
-                                                    : AppColor.yellow,
+                                            color: post['category'] == '데일리 팩트'
+                                                ? AppColor.primary
+                                                : AppColor.yellow,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -466,36 +441,32 @@ class HomePage extends GetView<HomeController> {
                                             ),
                                             child: AutoSizeText(
                                               '${post['final_article']}',
-                                              style: AppTextStyle
-                                                      .koRegular15()
+                                              style: AppTextStyle.koRegular15()
                                                   .copyWith(
-                                                      color:
-                                                          AppColor.grey),
+                                                      color: AppColor.grey),
                                               textAlign: TextAlign.left,
                                               maxLines: 4,
                                               minFontSize:
                                                   14, // ✅ 화면이 좁을 때 최소 폰트
                                               maxFontSize:
                                                   18, // ✅ 화면이 넓을 때 최대 폰트
-                                              overflow:
-                                                  TextOverflow.ellipsis,
+                                              overflow: TextOverflow.ellipsis,
                                               wrapWords: false,
                                             ),
                                           ),
                                         );
                                       },
                                     ),
-                                        Spacer(),
+                                    Spacer(),
                                     SizedBox(
                                       // height: 20,
-                                      child:  Align(
+                                      child: Align(
                                         alignment: Alignment.bottomLeft,
                                         child: AutoSizeText(
                                           formattedDate,
                                           textAlign: TextAlign.left,
                                           style: AppTextStyle.koRegular8()
-                                              .copyWith(
-                                                  color: AppColor.black),
+                                              .copyWith(color: AppColor.black),
                                           maxLines: 1, // ✅ 최대 4줄까지만
                                           minFontSize: 10, // ✅ 작아져도 이 이하로는 안감
                                           maxFontSize: 16, // ✅ 여유 있으면 커짐
@@ -542,9 +513,22 @@ class DetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     final rawDate = post['date'];
     String titleDate = '';
+
     if (rawDate is Timestamp) {
       titleDate = DateFormat('yy.MM.dd').format(rawDate.toDate());
+    } else if (rawDate is String) {
+      try {
+        final parsedDate = DateTime.parse(rawDate);
+        if (parsedDate != null) {
+          titleDate = DateFormat('yy.MM.dd').format(parsedDate);
+        }
+      } catch (e) {
+        print('⚠️ 날짜 파싱 실패: $rawDate');
+      }
     }
+
+    print('post date: ${post['date']}');
+    print('titleDate: $titleDate');
 
     return SingleChildScrollView(
       child: Padding(
