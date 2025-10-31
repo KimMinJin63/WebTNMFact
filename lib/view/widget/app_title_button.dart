@@ -14,7 +14,7 @@ class AppTitleButton extends StatelessWidget {
     return TextButton(
         onPressed: onPressed,
         child: AutoSizeText(title,
-            maxFontSize: 13,
+            maxFontSize: 18,
             minFontSize: 10, // 너무 작게 줄이지 않게 제한
 
             style: AppTextStyle.koBold13().copyWith(

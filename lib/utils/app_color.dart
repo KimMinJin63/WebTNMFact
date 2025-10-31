@@ -12,4 +12,7 @@ class AppColor {
   static const Color green = Color(0xff4CAF50);
   static const Color red = Color(0xFFF44336);
   static const Color deepGreen = Color(0xFF2E7D32);
+  static const Color background = Color(0xFFF8F9FB); // 배경
+  static const Color border =  Color(0xFFE5E7EB); // 카드 경계
+  static Color shadow = Color(0xff000000).withOpacity(0.05); // 그림자
 }
