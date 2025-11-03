@@ -57,6 +57,7 @@ class AppVisitChart extends StatelessWidget {
             height: 250.h,
             child: LineChart(
               LineChartData(
+                minY: 0,
                 gridData: FlGridData(show: false),
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
@@ -89,7 +90,7 @@ class AppVisitChart extends StatelessWidget {
                           padding: EdgeInsets.only(right: 6.w), // 숫자와 축 사이 간격
                           child: Text(
                             value.toInt().toString(),
-                            style: TextStyle(fontSize: 12.sp),
+                            style: TextStyle(fontSize: 12),
                           ),
                         );
                       },

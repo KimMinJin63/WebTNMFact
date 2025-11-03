@@ -25,7 +25,7 @@ class DashBoardPage extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
             child: SizedBox(
               width: double.infinity,
-              height: 70.h,
+              height: 75.h,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -50,60 +50,22 @@ class DashBoardPage extends StatelessWidget {
                     // 첫 번째 카드
                     Expanded(
                         child: AppContainer(
-                      height: 150.h,
-                      content: Row(
-                        children: [
-                          Container(
-                            width: 48.w,
-                            height: 48.w,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color:
-                                  AppColor.primary.withOpacity(0.2), // 옅은 보라 배경
-                            ),
-                            child: Icon(
-                              Icons.newspaper,
-                              color: AppColor.primary, // 메인 컬러 아이콘
-                              size: 28.w,
-                            ),
-                          ),
-                          SizedBox(width: 16.w),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '총 게시물',
-                                style: AppTextStyle.koSemiBold16(),
-                              ),
-                              // SizedBox(height: 4.h),
-                              Obx(() => Text(
-                                    '${controller.originalDonePostList.length}',
-                                    style: AppTextStyle.koBold28()
-                                        .copyWith(color: AppColor.navy),
-                                  )),
-                            ],
-                          ),
-                        ],
-                      ),
-                    )),
-                    Expanded(
-                      child: AppContainer(
-                        height: 150.h,
-                        content: Row(
+                      // height: 150.h,
+                      content: IntrinsicHeight(
+                        child: Row(
                           children: [
                             Container(
-                              width: 48.w,
-                              height: 48.w,
+                              width: 48,
+                              height: 48,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color:
-                                    AppColor.green.withOpacity(0.2), // 옅은 보라 배경
+                                    AppColor.primary.withOpacity(0.2), // 옅은 보라 배경
                               ),
                               child: Icon(
-                                Icons.remove_red_eye,
-                                color: AppColor.green, // 메인 컬러 아이콘
-                                size: 28.w,
+                                Icons.newspaper,
+                                color: AppColor.primary, // 메인 컬러 아이콘
+                                size: 28,
                               ),
                             ),
                             SizedBox(width: 16.w),
@@ -112,30 +74,72 @@ class DashBoardPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '총 방문자 수',
+                                  '총 게시물',
                                   style: AppTextStyle.koSemiBold16(),
                                 ),
                                 // SizedBox(height: 4.h),
-                                FutureBuilder<int>(
-                                  future: controller
-                                      .fetchTotalVisits(), // ✅ Firestore에서 불러오기
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return const Text(
-                                        '-',
-                                        style: TextStyle(color: Colors.grey),
-                                      );
-                                    }
-                                    return Text(
-                                      '${snapshot.data}',
+                                Obx(() => Text(
+                                      '${controller.originalDonePostList.length}',
                                       style: AppTextStyle.koBold28()
-                                          .copyWith(color: AppColor.green),
-                                    );
-                                  },
-                                ),
+                                          .copyWith(color: AppColor.navy),
+                                    )),
                               ],
                             ),
                           ],
+                        ),
+                      ),
+                    )),
+                    Expanded(
+                      child: IntrinsicHeight(
+                        child: AppContainer(
+                          // height: 150.h,
+                          content: Row(
+                            children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color:
+                                      AppColor.green.withOpacity(0.2), // 옅은 보라 배경
+                                ),
+                                child: Icon(
+                                  Icons.remove_red_eye,
+                                  color: AppColor.green, // 메인 컬러 아이콘
+                                  size: 28,
+                                ),
+                              ),
+                              SizedBox(width: 16.w),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '총 방문자 수',
+                                    style: AppTextStyle.koSemiBold16(),
+                                  ),
+                                  // SizedBox(height: 4.h),
+                                  FutureBuilder<int>(
+                                    future: controller
+                                        .fetchTotalVisits(), // ✅ Firestore에서 불러오기
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return const Text(
+                                          '-',
+                                          style: TextStyle(color: Colors.grey),
+                                        );
+                                      }
+                                      return Text(
+                                        '${snapshot.data}',
+                                        style: AppTextStyle.koBold28()
+                                            .copyWith(color: AppColor.green),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -157,11 +161,11 @@ class DashBoardPage extends StatelessWidget {
                             children: [
                               Text(
                                 '일일 방문자 수',
-                                style: AppTextStyle.koBold20()
+                                style: AppTextStyle.koBold18()
                                     .copyWith(color: AppColor.black),
                               ),
                               SizedBox(height: 48.h),
-                              AppVisitChart(),
+                              Expanded(child: AppVisitChart()),
                             ],
                           ),
                         ),
@@ -179,7 +183,7 @@ class DashBoardPage extends StatelessWidget {
                                     .copyWith(color: AppColor.black),
                               ),
                               SizedBox(height: 16.h),
-                              Expanded(
+                              Flexible(
                                 child: Obx(() {
                                   final posts = controller.postList;
                                   final top5 =
@@ -267,8 +271,8 @@ class DashBoardPage extends StatelessWidget {
                                         children: [
                                           // 순위 뱃지
                                           Container(
-                                            width: 28.w,
-                                            height: 28.w,
+                                            width: 28,
+                                            height: 28,
                                             alignment: Alignment.center,
                                             decoration: BoxDecoration(
                                               color: AppColor.primary

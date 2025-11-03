@@ -69,7 +69,7 @@ class AdminPage extends GetView<AdminController> {
             padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
             child: SizedBox(
               width: double.infinity,
-              height: 70.h,
+              height: 75.h,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

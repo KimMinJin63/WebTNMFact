@@ -329,6 +329,7 @@ class HomePage extends GetView<HomeController> {
 
                             return title.isEmpty ? formattedDate : title;
                           }
+                          // print();
 
                           // print('formattedDate in Grid Item: $formattedDate');
                           return GestureDetector(
@@ -570,7 +571,7 @@ class DetailView extends StatelessWidget {
               ),
             ),
             SizedBox(height: 12.h),
-            Text('[오늘의 교육 뉴스] $titleDate', style: AppTextStyle.koBold35()),
+            Text(post['title'] ?? '[오늘의 교육 뉴스] $titleDate', style: AppTextStyle.koBold35()),
             SizedBox(height: 8.h),
             Text('작성자: ${post['editor']} | $titleDate',
                 style: AppTextStyle.koRegular14()),
