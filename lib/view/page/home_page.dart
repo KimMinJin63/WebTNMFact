@@ -600,7 +600,7 @@ class DetailView extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 12.h),
-                  Text('[오늘의 교육 뉴스] $titleDate',
+                  Text(post['title'] ?? '[오늘의 교육 뉴스] $titleDate',
                       style: TextStyle(
                           fontFamily: 'PretendardBold',
                           fontSize: 30,

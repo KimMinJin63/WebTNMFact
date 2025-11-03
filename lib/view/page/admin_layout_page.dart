@@ -258,8 +258,8 @@ Widget _buildMenuItem(IconData icon, String label, int index,
       controller.fetchAllPosts();
     },
     child: Container(
-margin: EdgeInsets.symmetric(vertical: 2.h, horizontal: 8.w),
-padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
+padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: isSelected ? AppColor.primary : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
@@ -288,8 +288,8 @@ padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
               child: Text(
                 label,
                 style: isSelected
-                    ? AppTextStyle.koSemiBold16().copyWith(color: Colors.white)
-                    : AppTextStyle.koRegular14().copyWith(color: Colors.white70),
+                    ? AppTextStyle.koSemiBold15().copyWith(color: Colors.white)
+                    : AppTextStyle.koRegular13().copyWith(color: Colors.white70),
               ),
             ),
           ]
