@@ -94,7 +94,9 @@ class AppAdminTopBar extends StatelessWidget {
                       EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
                 ),
                 onPressed: onTap,
-                child: Text('글 검색', style: AppTextStyle.koRegular18().copyWith(color: AppColor.primary),),
+                child: Text('글 검색', style: AppTextStyle.koSemiBold16().copyWith(color: AppColor.primary),
+                
+                overflow: TextOverflow.ellipsis,),
               ),
             ),
           ],
@@ -111,7 +113,7 @@ class AppAdminTopBar extends StatelessWidget {
       child: Text(
         '$label ($count)',
         style: TextStyle(
-          fontSize: 14.sp,
+          fontSize: 14,
           color: selectedIndex == index ? AppColor.black : AppColor.primary,
           fontWeight:
               selectedIndex == index ? FontWeight.bold : FontWeight.normal,

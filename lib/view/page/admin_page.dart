@@ -89,7 +89,7 @@ class AdminPage extends GetView<AdminController> {
                     child: Align(
                       alignment: Alignment.bottomLeft,
                       child: TextButton(
-                        child: Text('기사 작성', style: AppTextStyle.koBold13()),
+                        child: Text('기사 작성', style: AppTextStyle.koSemiBold16().copyWith(color: AppColor.primary),),
                         onPressed: () {
                           controller.isCreate.value = true;
                           // Get.toNamed(CreatePage.route); // 글 작성 페이지로 이동

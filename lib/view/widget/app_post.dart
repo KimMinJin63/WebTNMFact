@@ -42,7 +42,7 @@ class AppPost extends StatelessWidget {
                 onTap: onContentTap,
                 child: Text(
                   title,
-                  style: AppTextStyle.koSemiBold16()
+                  style: AppTextStyle.koSemiBold14()
                       .copyWith(color: AppColor.black),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -53,7 +53,7 @@ class AppPost extends StatelessWidget {
               child: Center(
                 child: Text(
                   author,
-                  style: TextStyle(fontSize: 16.sp),
+                  style: TextStyle(fontSize: 14),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -63,7 +63,7 @@ class AppPost extends StatelessWidget {
               child: Center(
                 child: Text(
                   category,
-                  style: TextStyle(fontSize: 16.sp),
+                  style: TextStyle(fontSize: 14),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -73,7 +73,7 @@ class AppPost extends StatelessWidget {
               child: Center(
                 child: Text(
                   createdAt,
-                  style: TextStyle(fontSize: 16.sp),
+                  style: TextStyle(fontSize: 14),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -90,7 +90,7 @@ class AppPost extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Text(
                     status,
-                    style: AppTextStyle.koSemiBold16().copyWith(color: textColor),
+                    style: AppTextStyle.koSemiBold14().copyWith(color: textColor),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -101,18 +101,22 @@ class AppPost extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(),
-                    icon: Icon(Icons.edit, size: 30.w, color: AppColor.primary),
-                    onPressed: onTap,
-                  ),
-                  SizedBox(width: 16.w),
-                  IconButton(
+                  Expanded(
+                    child: IconButton(
                       padding: EdgeInsets.zero,
                       constraints: BoxConstraints(),
-                      icon: Icon(Icons.delete, size: 30.w, color: AppColor.red),
-                      onPressed: onDeleteTap),
+                      icon: Icon(Icons.edit, size: 25, color: AppColor.primary),
+                      onPressed: onTap,
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
+                        icon: Icon(Icons.delete, size: 25, color: AppColor.red),
+                        onPressed: onDeleteTap),
+                  ),
                 ],
               ),
             )

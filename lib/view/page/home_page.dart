@@ -1,6 +1,7 @@
+import 'dart:math';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -118,6 +119,9 @@ class HomePage extends GetView<HomeController> {
                     ),
                     onChanged: (value) {
                       if (value.isEmpty) {
+                        controller.isSearching.value = false;
+                      }
+                      if (value.isEmpty) {
                         if (controller.selectedIndex == 0) {
                           controller.postList.value =
                               controller.originalPostList.toList();
@@ -228,290 +232,91 @@ class HomePage extends GetView<HomeController> {
                         style: AppTextStyle.koBold35(),
                       ),
                       const SizedBox(height: 48),
-                      LayoutBuilder(builder: (context, constraints) {
-                        final double width = constraints.maxWidth;
-                        int crossCount;
-                        double aspectRatio;
-
-                        if (width >= 1200) {
-                          crossCount = 4;
-                          aspectRatio = 0.7;
-                        } else if (width >= 800) {
-                          crossCount = 3;
-                          aspectRatio = 0.75;
-                        } else if (width >= 600) {
-                          crossCount = 2;
-                          aspectRatio = 0.8;
-                        } else {
-                          crossCount = 1;
-                          aspectRatio = 1.1;
-                        }
-
-                        return Obx(() {
-                          List<Map<String, dynamic>> visibleList;
-                          switch (controller.selectedIndex.value) {
-                            case 1:
-                              visibleList = controller.dailyPostList;
-                              break;
-                            case 2:
-                              visibleList = controller.insightPostList;
-                              break;
-                            default:
-                              visibleList = controller.postList;
-                          }
-
-                          if (controller.isLoading.value) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
-
-                          if (visibleList.isEmpty) {
-                            return Center(
-                              child: Text('게시글이 없습니다.',
-                                  style: AppTextStyle.koRegular18()),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final double width = constraints.maxWidth;
+                          final int crossCount = width <= 680
+                              ? 2
+                              : width <= 1000
+                                  ? 3
+                                  : 4;
+                          const double aspectRatio = 1.4; // ✅ 카드 비율 고정
+                          Widget buildGrid({
+                            required List<Map<String, dynamic>> posts,
+                            int? maxRows,
+                          }) {
+                            final maxItems = maxRows == null
+                                ? null
+                                : crossCount * maxRows;
+                            return _buildPostGrid(
+                              posts: posts,
+                              controller: controller,
+                              crossAxisCount: crossCount,
+                              aspectRatio: aspectRatio,
+                              maxItems: maxItems,
                             );
                           }
 
-                          return GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: visibleList.length,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: crossCount,
-                              crossAxisSpacing: 32,
-                              mainAxisSpacing: 32,
-                              childAspectRatio: aspectRatio,
-                            ),
-                            itemBuilder: (context, index) {
-                              final post = visibleList[index];
-                              final timestamp = post['date'];
-                              String formattedDate = '';
+                          return Obx(() {
+                            List<Map<String, dynamic>> visibleList;
+                            switch (controller.selectedIndex.value) {
+                              case 1:
+                                visibleList = controller.dailyPostList;
+                                break;
+                              case 2:
+                                visibleList = controller.insightPostList;
+                                break;
+                              default:
+                                visibleList = controller.postList;
+                            }
 
-                              if (timestamp != null) {
-                                if (timestamp is Timestamp) {
-                                  final date = timestamp.toDate();
-                                  formattedDate =
-                                      DateFormat('yyyy-MM-dd').format(date);
-                                } else if (timestamp is String) {
-                                  try {
-                                    final parsed = DateTime.tryParse(timestamp);
-                                    if (parsed != null) {
-                                      formattedDate = DateFormat('yyyy.MM.dd')
-                                          .format(parsed);
-                                    } else {
-                                      // 혹시 Firestore에 저장된 문자열이 "2025-10-28 18:04:00" 형식일 수도 있음
-                                      final manualParsed =
-                                          DateFormat('yyyy-MM-dd HH:mm:ss')
-                                              .parse(timestamp);
-                                      formattedDate = DateFormat('yyyy.MM.dd')
-                                          .format(manualParsed);
-                                    }
-                                  } catch (e) {
-                                    formattedDate = ''; // 파싱 실패 시
-                                    print('⚠️ 날짜 파싱 실패: $timestamp');
-                                  }
-                                } else {
-                                  print(
-                                      '⚠️ 알 수 없는 날짜 타입: ${timestamp.runtimeType}');
-                                }
-                              }
+                            if (controller.isLoading.value) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
 
-                              String getDisplayTitle(
-                                  Map<String, dynamic> post) {
-                                final title =
-                                    (post['title'] ?? '').toString().trim();
-                                final category =
-                                    (post['category'] ?? '').toString();
-
-                                if (category == '데일리 팩트') {
-                                  if (title.isEmpty || title == '[오늘의 교육 뉴스]') {
-                                    return '[오늘의 교육 뉴스] $formattedDate';
-                                  }
-                                  if (title.startsWith('[오늘의 교육 뉴스]')) {
-                                    return title;
-                                  }
-                                  return '[오늘의 교육 뉴스] $title';
-                                }
-
-                                return title.isEmpty ? formattedDate : title;
-                              }
-
-                              // print('formattedDate in Grid Item: $formattedDate');
-                              return GestureDetector(
-                                onTap: () async {
-                                  print('onTap 눌림');
-                                  final user =
-                                      FirebaseAuth.instance.currentUser;
-                                  print('현재 유저 정보는?? : $user');
-                                  final post = visibleList[index];
-                                  final postId = post['id'];
-                                  if (user == null) {
-                                    print('로그인 안 된 상태, 익명 로그인 처리');
-                                    // 로그인 안 되어 있으면 여기서 즉시 로그인 처리
-                                    final cred = await FirebaseAuth.instance
-                                        .signInAnonymously();
-                                    final userId = cred.user!.uid;
-                                    await adminController
-                                        .incrementViewCount(postId);
-                                    controller.logVisit(userId);
-                                    controller.selectedPost = post;
-                                    controller.currentPage.value = 'detail';
-                                    // Get.toNamed(DetailPage.route, arguments: post);
-                                  } else {
-                                    final userId = user.uid;
-                                    // Get.toNamed(DetailPage.route, arguments: post);
-                                    controller.selectedPost = post;
-                                    controller.currentPage.value = 'detail';
-                                    await adminController
-                                        .incrementViewCount(postId);
-                                    controller.logVisit(userId);
-                                  }
-                                  controller.selectedPost = post;
-                                  controller.currentPage.value = 'detail';
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: AppColor
-                                        .white, // 카드 배경 (예: const Color(0xFFFFFFFF))
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColor.shadow, // TNM 보라색을 살짝 섞은 그림자
-                                        blurRadius: 5,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                    border: Border.all(
-                                      color: AppColor.border, // 보라톤의 은은한 테두리
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(16.w),
-                                    child: Column(
-                                      children: [
-                                        // 상단 이미지 영역
-                                        AspectRatio(
-                                          aspectRatio: 5 / 3,
-                                          child: Container(
-                                            width: double.infinity,
-                                            color: AppColor.grey,
-                                            child: Center(
-                                              child: Text('이미지 $index',
-                                                  style: AppTextStyle
-                                                      .koRegular18()),
-                                            ),
-                                          ),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Container(
-                                            margin:
-                                                const EdgeInsets.only(top: 8),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  post['category'] == '데일리 팩트'
-                                                      ? AppColor.primary
-                                                          .withOpacity(0.1)
-                                                      : AppColor.yellow
-                                                          .withOpacity(0.2),
-                                              borderRadius:
-                                                  BorderRadius.circular(80),
-                                            ),
-                                            child: AutoSizeText(
-                                              '${post['category']}',
-                                              maxFontSize: 14,
-                                              style: AppTextStyle.koSemiBold14()
-                                                  .copyWith(
-                                                color:
-                                                    post['category'] == '데일리 팩트'
-                                                        ? AppColor.primary
-                                                        : AppColor.yellow,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          // height: 40,
-                                          // color: Colors.yellow,
-                                          child: _buildFlexibleBox(
-                                            getDisplayTitle(post),
-                                            style: AppTextStyle.koSemiBold18(),
-                                            maxLines: 2,
-                                          ),
-                                        ),
-                                        LayoutBuilder(
-                                          builder: (context, constraints) {
-                                            return Align(
-                                              alignment: Alignment
-                                                  .centerLeft, // ✅ 왼쪽 기준으로 고정
-                                              child: ConstrainedBox(
-                                                constraints: BoxConstraints(
-                                                  maxWidth: constraints
-                                                      .maxWidth, // ✅ 화면 폭에 맞게 자동
-                                                ),
-                                                child: AutoSizeText(
-                                                  '${post['final_article']}',
-                                                  style:
-                                                      AppTextStyle.koRegular15()
-                                                          .copyWith(
-                                                              color: AppColor
-                                                                  .grey),
-                                                  textAlign: TextAlign.left,
-                                                  maxLines: 4,
-                                                  minFontSize:
-                                                      14, // ✅ 화면이 좁을 때 최소 폰트
-                                                  maxFontSize:
-                                                      18, // ✅ 화면이 넓을 때 최대 폰트
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  wrapWords: false,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                        Spacer(),
-                                        SizedBox(
-                                          // height: 20,
-                                          child: Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: AutoSizeText(
-                                              formattedDate,
-                                              textAlign: TextAlign.left,
-                                              style: AppTextStyle.koRegular8()
-                                                  .copyWith(
-                                                      color: AppColor.black),
-                                              maxLines: 1, // ✅ 최대 4줄까지만
-                                              minFontSize:
-                                                  10, // ✅ 작아져도 이 이하로는 안감
-                                              maxFontSize: 16, // ✅ 여유 있으면 커짐
-                                              overflow: TextOverflow.ellipsis,
-                                              softWrap: true,
-                                              stepGranularity: 0.5,
-                                            ),
-                                          ),
-                                          // child: _buildFlexibleBox(
-                                          //   formattedDate,
-                                          //   style: AppTextStyle.koRegular8()
-                                          //       .copyWith(color: AppColor.black),
-                                          //   maxLines: 1,
-                                          // ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                            if (visibleList.isEmpty) {
+                              return Center(
+                                child: Text('게시글이 없습니다.',
+                                    style: AppTextStyle.koRegular18()),
                               );
-                            },
-                          );
-                        });
-                      }),
+                            }
+
+                            if (controller.selectedIndex.value == 0 &&
+                                !controller.isSearching.value) {
+                              return Column(
+                                children: [
+                                  _buildSectionGrid(
+                                    title: '데일리 팩트',
+                                    posts: controller.dailyPostList,
+                                    accentColor: AppColor.primary,
+                                    controller: controller,
+                                    crossAxisCount: crossCount,
+                                    aspectRatio: aspectRatio,
+                                    maxRows: 2,
+                                    onMore: () => controller.selectTab(1),
+                                  ),
+                                  const SizedBox(height: 40),
+                                  Divider(),
+                                  const SizedBox(height: 40),
+                                  _buildSectionGrid(
+                                    title: '인사이트 팩트',
+                                    accentColor: AppColor.yellow,
+                                    posts: controller.insightPostList,
+                                    controller: controller,
+                                    crossAxisCount: crossCount,
+                                    aspectRatio: aspectRatio,
+                                    maxRows: 1,
+                                    onMore: () => controller.selectTab(2),
+                                  ),
+                                ],
+                              );
+                            }
+
+                            return buildGrid(posts: visibleList);
+                          });
+                        },
+                      ),
                       const SizedBox(height: 60),
                       // const SizedBox(height: 40),
                     ],
@@ -525,6 +330,193 @@ class HomePage extends GetView<HomeController> {
       ),
     );
   }
+}
+
+Widget _buildSectionGrid({
+  required String title,
+  required List<Map<String, dynamic>> posts,
+  required HomeController controller,
+  required int crossAxisCount,
+  required double aspectRatio,
+  required int maxRows,
+  required VoidCallback onMore,
+  required Color accentColor,
+}) {
+  final int maxItems = crossAxisCount * maxRows;
+  final bool showMore = posts.length > maxItems;
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: AppTextStyle.koBold20().copyWith(color: accentColor)),
+          if (showMore)
+            TextButton(
+              onPressed: onMore,
+              child: Text(
+                '>> 더보기',
+                style: AppTextStyle.koSemiBold14()
+                    .copyWith(color: accentColor)
+              ),
+            ),
+        ],
+      ),
+      const SizedBox(height: 16),
+      posts.isEmpty
+          ? Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Text('게시글이 없습니다.',
+                  style: AppTextStyle.koRegular18()
+                      .copyWith(color: AppColor.grey)),
+            )
+          : _buildPostGrid(
+              posts: posts,
+              controller: controller,
+              crossAxisCount: crossAxisCount,
+              aspectRatio: aspectRatio,
+              maxItems: maxItems,
+            ),
+    ],
+  );
+}
+
+Widget _buildPostGrid({
+  required List<Map<String, dynamic>> posts,
+  required HomeController controller,
+  required int crossAxisCount,
+  required double aspectRatio,
+  int? maxItems,
+}) {
+  if (posts.isEmpty) {
+    return Center(
+      child:
+          Text('게시글이 없습니다.', style: AppTextStyle.koRegular18()),
+    );
+  }
+
+  final int itemCount =
+      maxItems == null ? posts.length : min(posts.length, maxItems);
+
+  return GridView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: itemCount,
+    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: crossAxisCount,
+      crossAxisSpacing: 32,
+      mainAxisSpacing: 32,
+      childAspectRatio: aspectRatio,
+    ),
+    itemBuilder: (context, index) {
+      final post = posts[index];
+      return _buildPostCard(controller: controller, post: post);
+    },
+  );
+}
+
+Widget _buildPostCard({
+  required HomeController controller,
+  required Map<String, dynamic> post,
+}) {
+  final timestamp = post['date'];
+  String formattedDate = '';
+
+  if (timestamp != null) {
+    if (timestamp is Timestamp) {
+      formattedDate = DateFormat('yyyy-MM-dd').format(timestamp.toDate());
+    } else if (timestamp is String) {
+      final parsed = DateTime.tryParse(timestamp);
+      if (parsed != null) {
+        formattedDate = DateFormat('yyyy.MM.dd').format(parsed);
+      } else {
+        formattedDate = timestamp;
+      }
+    }
+  }
+
+  final title = (post['title'] ?? '').toString();
+  final category = (post['category'] ?? '').toString();
+
+  return GestureDetector(
+    onTap: () {
+      controller.selectedPost = post;
+      controller.currentPage.value = 'detail';
+    },
+    child: Container(
+      decoration: BoxDecoration(
+        color: AppColor.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColor.shadow,
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(
+          color: AppColor.border,
+          width: 1,
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: category == '데일리 팩트'
+                  ? AppColor.primary.withOpacity(0.1)
+                  : AppColor.yellow.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(80),
+            ),
+            child: Text(
+              category,
+              style: AppTextStyle.koSemiBold14().copyWith(
+                color: category == '데일리 팩트'
+                    ? AppColor.primary
+                    : AppColor.yellow,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title.isNotEmpty ? title : '[오늘의 교육 뉴스] $formattedDate',
+            style: AppTextStyle.koSemiBold18(),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 6),
+          Expanded(
+            child: Text(
+              (post['final_article'] ?? '').toString(),
+              style:
+                  AppTextStyle.koRegular15().copyWith(color: AppColor.grey),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Text(
+              formattedDate,
+              style: AppTextStyle.koRegular12()
+                  .copyWith(color: AppColor.black),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 // ✅ 내부 전환용 DetailView
@@ -542,9 +534,7 @@ class DetailView extends StatelessWidget {
     } else if (rawDate is String) {
       try {
         final parsedDate = DateTime.parse(rawDate);
-        if (parsedDate != null) {
-          titleDate = DateFormat('yy.MM.dd').format(parsedDate);
-        }
+        titleDate = DateFormat('yy.MM.dd').format(parsedDate);
       } catch (e) {
         print('⚠️ 날짜 파싱 실패: $rawDate');
       }
@@ -620,30 +610,6 @@ class DetailView extends StatelessWidget {
       ),
     );
   }
-}
-
-// ✅ 공통 박스 빌더
-Widget _buildFlexibleBox(
-  String text, {
-  required int maxLines,
-  TextStyle? style,
-}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
-    child: Align(
-      alignment: Alignment.centerLeft,
-      child: AutoSizeText(
-        text,
-        style: style,
-        textAlign: TextAlign.left,
-        maxLines: maxLines,
-        overflow: TextOverflow.ellipsis,
-        maxFontSize: 20,
-        minFontSize: 16,
-        stepGranularity: 1,
-      ),
-    ),
-  );
 }
 
 // ✅ 하단 푸터
