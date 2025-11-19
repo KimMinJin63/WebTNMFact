@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
@@ -32,19 +33,21 @@ class HomePage extends GetView<HomeController> {
         titleSpacing: 0,
         leading: Padding(
           padding: EdgeInsets.only(left: 16.w),
-          child: Center(
-            child: GestureDetector(
-              onTap: () {
-                controller.selectTab(0);
-                controller.currentPage.value = 'home';
-              },
-              child: AutoSizeText(
-                'TNM FACT',
-                maxFontSize: 25,
-                minFontSize: 16,
-                style: AppTextStyle.koBold20(),
-              ),
+          child: GestureDetector(
+            onTap: () {
+              controller.selectTab(0);
+              controller.currentPage.value = 'home';
+            },
+            child: SvgPicture.asset(
+              'assets/images/logo.svg',
+              height: 32.h,
+              fit: BoxFit.contain,
             ),
+            // child: Image.asset(
+            //   'assets/images/logo.png',
+            //   height: 32.h,
+            //   fit: BoxFit.contain,
+            // ),
           ),
         ),
         title: Center(
@@ -101,97 +104,125 @@ class HomePage extends GetView<HomeController> {
                 final double width = constraints.maxWidth;
                 double hintFontSize = width > 1000 ? 14 : 10;
 
-                return Container(
-                  decoration: BoxDecoration(
-                    color: AppColor.white,
-                    border: Border.all(color: AppColor.grey, width: 1.w),
-                    borderRadius: BorderRadius.circular(100.r),
-                  ),
-                  width: ScreenUtil().screenWidth / 4.5,
-                  alignment: Alignment.center,
-                  child: TextField(
-                    focusNode: controller.searchFocusNode,
-                    controller: controller.searchController,
-                    textAlignVertical: TextAlignVertical.center,
-                    style: AppTextStyle.koRegular15().copyWith(
-                      color: AppColor.grey,
-                      fontSize: hintFontSize,
+                if (ScreenUtil().screenWidth > 1000) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: AppColor.white,
+                      border: Border.all(color: AppColor.grey, width: 1.w),
+                      borderRadius: BorderRadius.circular(100.r),
                     ),
-                    onChanged: (value) {
-                      if (value.isEmpty) {
-                        controller.isSearching.value = false;
-                      }
-                      if (value.isEmpty) {
-                        if (controller.selectedIndex == 0) {
-                          controller.postList.value =
-                              controller.originalPostList.toList();
-                        } else if (controller.selectedIndex == 1) {
-                          controller.dailyPostList.value =
-                              controller.originalDailyPostList.toList();
-                        } else {
-                          controller.insightPostList.value =
-                              controller.originalInsightPostList.toList();
-                        }
-                      }
-                    },
-                    onSubmitted: (_) async {
-                      controller.clearFocus(); // ✅ 포커스 해제
-                      if (controller.searchController.text.trim().isNotEmpty) {
-                        await controller.findPost(); // ✅ 엔터 입력 시 검색 실행
-                      } else {
-                        // ✅ 검색어가 비어있으면 탭에 맞는 전체 목록 불러오기
-                        if (controller.selectedIndex.value == 0) {
-                          await controller.loadAllPosts();
-                        } else if (controller.selectedIndex.value == 1) {
-                          await controller.loadDailyPosts();
-                        } else {
-                          await controller.loadInsightPosts();
-                        }
-                      }
-                    },
-                    decoration: InputDecoration(
-                      isDense: true,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      suffixIcon: LayoutBuilder(
-                        builder: (context, iconConstraints) {
-                          final double iconSize =
-                              iconConstraints.maxHeight * 0.6;
-                          return IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () async {
-                              print('검색 아이콘 클릭됨');
-                              if (controller.selectedIndex == 0) {
-                                print('전체기사 탭에서 검색 실행');
-                                controller.searchController.text.isNotEmpty
-                                    ? controller.findPost()
-                                    : controller.loadAllPosts();
-                              } else if (controller.selectedIndex == 1) {
-                                print('데일리팩트 탭에서 검색 실행');
-                                controller.searchController.text.isNotEmpty
-                                    ? controller.findPost()
-                                    : controller.loadDailyPosts();
-                              } else if (controller.selectedIndex == 2) {
-                                print('인사이트팩트 탭에서 검색 실행');
-                                controller.searchController.text.isNotEmpty
-                                    ? controller.findPost()
-                                    : controller.loadInsightPosts();
-                              }
-                            },
-                            icon: Icon(Icons.search,
-                                size: iconSize, color: AppColor.grey),
-                          );
-                        },
-                      ),
-                      hintText: "관심있는 교육 키워드를 검색하세요",
-                      hintStyle: AppTextStyle.koRegular14().copyWith(
+                    width: ScreenUtil().screenWidth / 4.5,
+                    alignment: Alignment.center,
+                    child: TextField(
+                      focusNode: controller.searchFocusNode,
+                      controller: controller.searchController,
+                      textAlignVertical: TextAlignVertical.center,
+                      style: AppTextStyle.koRegular15().copyWith(
                         color: AppColor.grey,
-                        fontSize: hintFontSize,
+                        // fontSize: hintFontSize,
                       ),
-                      border: InputBorder.none,
+                      onChanged: (value) {
+                        if (value.isEmpty) {
+                          controller.isSearching.value = false;
+                        }
+                        if (value.isEmpty) {
+                          if (controller.selectedIndex == 0) {
+                            controller.postList.value =
+                                controller.originalPostList.toList();
+                          } else if (controller.selectedIndex == 1) {
+                            controller.dailyPostList.value =
+                                controller.originalDailyPostList.toList();
+                          } else {
+                            controller.insightPostList.value =
+                                controller.originalInsightPostList.toList();
+                          }
+                        }
+                      },
+                      onSubmitted: (_) async {
+                        controller.clearFocus(); // ✅ 포커스 해제
+                        if (controller.searchController.text
+                            .trim()
+                            .isNotEmpty) {
+                          await controller.findPost(); // ✅ 엔터 입력 시 검색 실행
+                        } else {
+                          // ✅ 검색어가 비어있으면 탭에 맞는 전체 목록 불러오기
+                          if (controller.selectedIndex.value == 0) {
+                            await controller.loadAllPosts();
+                          } else if (controller.selectedIndex.value == 1) {
+                            await controller.loadDailyPosts();
+                          } else {
+                            await controller.loadInsightPosts();
+                          }
+                        }
+                      },
+                      decoration: InputDecoration(
+                        isDense: true,
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        suffixIcon: LayoutBuilder(
+                          builder: (context, iconConstraints) {
+                            final double iconSize =
+                                iconConstraints.maxHeight * 0.6;
+                            return IconButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () async {
+                                print('검색 아이콘 클릭됨');
+                                if (controller.selectedIndex == 0) {
+                                  print('전체기사 탭에서 검색 실행');
+                                  controller.searchController.text.isNotEmpty
+                                      ? controller.findPost()
+                                      : controller.loadAllPosts();
+                                } else if (controller.selectedIndex == 1) {
+                                  print('데일리팩트 탭에서 검색 실행');
+                                  controller.searchController.text.isNotEmpty
+                                      ? controller.findPost()
+                                      : controller.loadDailyPosts();
+                                } else if (controller.selectedIndex == 2) {
+                                  print('인사이트팩트 탭에서 검색 실행');
+                                  controller.searchController.text.isNotEmpty
+                                      ? controller.findPost()
+                                      : controller.loadInsightPosts();
+                                }
+                              },
+                              icon: Icon(Icons.search,
+                                  size: iconSize, color: AppColor.grey),
+                            );
+                          },
+                        ),
+                        hintText: "관심있는 교육 키워드를 검색하세요",
+                        hintStyle: AppTextStyle.koRegular14().copyWith(
+                          color: AppColor.grey,
+                          fontSize: hintFontSize,
+                        ),
+                        border: InputBorder.none,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                } else {
+                  return IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () async {
+                      print('검색 아이콘 클릭됨');
+                      if (controller.selectedIndex == 0) {
+                        print('전체기사 탭에서 검색 실행');
+                        controller.searchController.text.isNotEmpty
+                            ? controller.findPost()
+                            : controller.loadAllPosts();
+                      } else if (controller.selectedIndex == 1) {
+                        print('데일리팩트 탭에서 검색 실행');
+                        controller.searchController.text.isNotEmpty
+                            ? controller.findPost()
+                            : controller.loadDailyPosts();
+                      } else if (controller.selectedIndex == 2) {
+                        print('인사이트팩트 탭에서 검색 실행');
+                        controller.searchController.text.isNotEmpty
+                            ? controller.findPost()
+                            : controller.loadInsightPosts();
+                      }
+                    },
+                    icon: Icon(Icons.search, size: 25, color: AppColor.grey),
+                  );
+                }
               },
             ),
           ),
@@ -245,9 +276,8 @@ class HomePage extends GetView<HomeController> {
                             required List<Map<String, dynamic>> posts,
                             int? maxRows,
                           }) {
-                            final maxItems = maxRows == null
-                                ? null
-                                : crossCount * maxRows;
+                            final maxItems =
+                                maxRows == null ? null : crossCount * maxRows;
                             return _buildPostGrid(
                               posts: posts,
                               controller: controller,
@@ -351,15 +381,14 @@ Widget _buildSectionGrid({
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: AppTextStyle.koBold20().copyWith(color: accentColor)),
+          Text(title,
+              style: AppTextStyle.koBold20().copyWith(color: accentColor)),
           if (showMore)
             TextButton(
               onPressed: onMore,
-              child: Text(
-                '>> 더보기',
-                style: AppTextStyle.koSemiBold14()
-                    .copyWith(color: accentColor)
-              ),
+              child: Text('>> 더보기',
+                  style:
+                      AppTextStyle.koSemiBold14().copyWith(color: accentColor)),
             ),
         ],
       ),
@@ -392,8 +421,7 @@ Widget _buildPostGrid({
 }) {
   if (posts.isEmpty) {
     return Center(
-      child:
-          Text('게시글이 없습니다.', style: AppTextStyle.koRegular18()),
+      child: Text('게시글이 없습니다.', style: AppTextStyle.koRegular18()),
     );
   }
 
@@ -478,9 +506,8 @@ Widget _buildPostCard({
             child: Text(
               category,
               style: AppTextStyle.koSemiBold14().copyWith(
-                color: category == '데일리 팩트'
-                    ? AppColor.primary
-                    : AppColor.yellow,
+                color:
+                    category == '데일리 팩트' ? AppColor.primary : AppColor.yellow,
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -497,8 +524,7 @@ Widget _buildPostCard({
           Expanded(
             child: Text(
               (post['final_article'] ?? '').toString(),
-              style:
-                  AppTextStyle.koRegular15().copyWith(color: AppColor.grey),
+              style: AppTextStyle.koRegular15().copyWith(color: AppColor.grey),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
@@ -508,8 +534,7 @@ Widget _buildPostCard({
             alignment: Alignment.bottomLeft,
             child: Text(
               formattedDate,
-              style: AppTextStyle.koRegular12()
-                  .copyWith(color: AppColor.black),
+              style: AppTextStyle.koRegular12().copyWith(color: AppColor.black),
               overflow: TextOverflow.ellipsis,
             ),
           ),

@@ -13,11 +13,12 @@ class AppTitleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
         onPressed: onPressed,
-        child: AutoSizeText(title,
-            maxFontSize: 18,
-            minFontSize: 10, // 너무 작게 줄이지 않게 제한
+        child: Text(title,
 
-            style: AppTextStyle.koBold13().copyWith(
+            // maxFontSize: 18,
+            // minFontSize: 10, // 너무 작게 줄이지 않게 제한
+
+            style: AppTextStyle.koBold16().copyWith(
               color: color,
             )));
   }
