@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -201,24 +202,8 @@ class HomePage extends GetView<HomeController> {
                 } else {
                   return IconButton(
                     padding: EdgeInsets.zero,
-                    onPressed: () async {
-                      print('검색 아이콘 클릭됨');
-                      if (controller.selectedIndex == 0) {
-                        print('전체기사 탭에서 검색 실행');
-                        controller.searchController.text.isNotEmpty
-                            ? controller.findPost()
-                            : controller.loadAllPosts();
-                      } else if (controller.selectedIndex == 1) {
-                        print('데일리팩트 탭에서 검색 실행');
-                        controller.searchController.text.isNotEmpty
-                            ? controller.findPost()
-                            : controller.loadDailyPosts();
-                      } else if (controller.selectedIndex == 2) {
-                        print('인사이트팩트 탭에서 검색 실행');
-                        controller.searchController.text.isNotEmpty
-                            ? controller.findPost()
-                            : controller.loadInsightPosts();
-                      }
+                    onPressed: () {
+                      _showSearchOverlay(context, controller);
                     },
                     icon: Icon(Icons.search, size: 25, color: AppColor.grey),
                   );
@@ -360,6 +345,124 @@ class HomePage extends GetView<HomeController> {
       ),
     );
   }
+
+  void _showSearchOverlay(BuildContext context, HomeController controller) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: '검색',
+      barrierColor: Colors.black26,
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16.w, 56.h, 16.w, 0),
+            child: Material(
+              borderRadius: BorderRadius.circular(16.r),
+              color: AppColor.white,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h)
+                    .copyWith(
+                        bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        autofocus: true,
+                        controller: controller.searchController,
+                        style: AppTextStyle.koRegular15()
+                            .copyWith(color: AppColor.black),
+                        decoration: InputDecoration(
+                          hintText: "관심있는 교육 키워드를 검색하세요",
+                          hintStyle: AppTextStyle.koRegular14()
+                              .copyWith(color: AppColor.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                            borderSide: BorderSide(color: AppColor.grey),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                            borderSide: BorderSide(color: AppColor.grey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                            borderSide: BorderSide(
+                                color: AppColor.primary, width: 2.w),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 12.h,
+                          ),
+                        ),
+                        onChanged: (value) {
+                          if (value.isEmpty) {
+                            controller.isSearching.value = false;
+                          }
+                        },
+                        onSubmitted: (_) async {
+                          Navigator.of(context).pop();
+                          await _performSearch(controller);
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    IconButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        await _performSearch(controller);
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        color: AppColor.primary,
+                        size: 28
+                        ,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, -0.1),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOut,
+          )),
+          child: FadeTransition(
+            opacity: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOut,
+            ),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _performSearch(HomeController controller) async {
+    controller.clearFocus();
+    if (controller.searchController.text.trim().isNotEmpty) {
+      controller.isSearching.value = true;
+      await controller.findPost();
+    } else {
+      controller.isSearching.value = false;
+      if (controller.selectedIndex.value == 0) {
+        await controller.loadAllPosts();
+      } else if (controller.selectedIndex.value == 1) {
+        await controller.loadDailyPosts();
+      } else {
+        await controller.loadInsightPosts();
+      }
+    }
+  }
 }
 
 Widget _buildSectionGrid({
@@ -448,6 +551,7 @@ Widget _buildPostGrid({
 Widget _buildPostCard({
   required HomeController controller,
   required Map<String, dynamic> post,
+  
 }) {
   final timestamp = post['date'];
   String formattedDate = '';
@@ -469,10 +573,30 @@ Widget _buildPostCard({
   final category = (post['category'] ?? '').toString();
 
   return GestureDetector(
-    onTap: () {
-      controller.selectedPost = post;
-      controller.currentPage.value = 'detail';
-    },
+onTap: () async {
+  print('onTap 눌림');
+  final user = FirebaseAuth.instance.currentUser;
+  final postId = post['id'];
+  final AdminController adminController = Get.find<AdminController>();
+  if (postId.isNotEmpty) {
+  await adminController.incrementViewCount(postId);
+}
+
+  if (user == null) {
+    print('로그인 안 된 상태, 익명 로그인 처리');
+    final cred = await FirebaseAuth.instance.signInAnonymously();
+    final userId = cred.user!.uid;
+    await adminController.incrementViewCount(postId);
+    controller.logVisit(userId);
+  } else {
+    final userId = user.uid;
+    await adminController.incrementViewCount(postId);
+    controller.logVisit(userId);
+  }
+
+  controller.selectedPost = post;
+  controller.currentPage.value = 'detail';
+},
     child: Container(
       decoration: BoxDecoration(
         color: AppColor.white,
