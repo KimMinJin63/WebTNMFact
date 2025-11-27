@@ -21,6 +21,38 @@ class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
   static const route = '/homepage';
 
+  // 카테고리별 색상 반환 함수
+  static Color getCategoryColor(String category) {
+    switch (category) {
+      case '데일리 팩트':
+        return AppColor.primary;
+      case '인사이트 팩트':
+        return AppColor.yellow;
+      case '포커스 팩트':
+        return AppColor.focusFact;
+      case '피플&뷰':
+        return AppColor.peopleView;
+      default:
+        return AppColor.grey;
+    }
+  }
+
+  // 카테고리별 배경색 반환 함수
+  static Color getCategoryBackgroundColor(String category) {
+    switch (category) {
+      case '데일리 팩트':
+        return AppColor.primary.withOpacity(0.1);
+      case '인사이트 팩트':
+        return AppColor.yellow.withOpacity(0.2);
+      case '포커스 팩트':
+        return AppColor.focusFact.withOpacity(0.1);
+      case '피플&뷰':
+        return AppColor.peopleView.withOpacity(0.2);
+      default:
+        return AppColor.grey.withOpacity(0.1);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final AdminController adminController = Get.find<AdminController>();
@@ -52,10 +84,14 @@ class HomePage extends GetView<HomeController> {
           ),
         ),
         title: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
               Obx(() {
                 return AppTitleButton(
                   color: controller.selectedIndex.value == 0
@@ -84,7 +120,7 @@ class HomePage extends GetView<HomeController> {
               SizedBox(width: 16.w),
               Obx(() {
                 return AppTitleButton(
-                  title: '인사이트팩트',
+                  title: '포커스 팩트',
                   color: controller.selectedIndex.value == 2
                       ? AppColor.primary
                       : AppColor.black,
@@ -94,7 +130,34 @@ class HomePage extends GetView<HomeController> {
                   },
                 );
               }),
-            ],
+              SizedBox(width: 16.w),
+              Obx(() {
+                return AppTitleButton(
+                  title: '인사이트팩트',
+                  color: controller.selectedIndex.value == 3
+                      ? AppColor.primary
+                      : AppColor.black,
+                  onPressed: () {
+                    controller.selectTab(3);
+                    controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                  },
+                );
+              }),
+              SizedBox(width: 16.w),
+              Obx(() {
+                return AppTitleButton(
+                  title: '피플&뷰',
+                  color: controller.selectedIndex.value == 4
+                      ? AppColor.primary
+                      : AppColor.black,
+                  onPressed: () {
+                    controller.selectTab(4);
+                    controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                  },
+                );
+              }),
+              ],
+            ),
           ),
         ),
         actions: [
@@ -125,18 +188,10 @@ class HomePage extends GetView<HomeController> {
                       onChanged: (value) {
                         if (value.isEmpty) {
                           controller.isSearching.value = false;
-                        }
-                        if (value.isEmpty) {
-                          if (controller.selectedIndex == 0) {
-                            controller.postList.value =
-                                controller.originalPostList.toList();
-                          } else if (controller.selectedIndex == 1) {
-                            controller.dailyPostList.value =
-                                controller.originalDailyPostList.toList();
-                          } else {
-                            controller.insightPostList.value =
-                                controller.originalInsightPostList.toList();
-                          }
+                          _resetListForTab(
+                            controller,
+                            controller.selectedIndex.value,
+                          );
                         }
                       },
                       onSubmitted: (_) async {
@@ -147,13 +202,8 @@ class HomePage extends GetView<HomeController> {
                           await controller.findPost(); // ✅ 엔터 입력 시 검색 실행
                         } else {
                           // ✅ 검색어가 비어있으면 탭에 맞는 전체 목록 불러오기
-                          if (controller.selectedIndex.value == 0) {
-                            await controller.loadAllPosts();
-                          } else if (controller.selectedIndex.value == 1) {
-                            await controller.loadDailyPosts();
-                          } else {
-                            await controller.loadInsightPosts();
-                          }
+                          await _reloadTabData(
+                              controller, controller.selectedIndex.value);
                         }
                       },
                       decoration: InputDecoration(
@@ -168,21 +218,12 @@ class HomePage extends GetView<HomeController> {
                               padding: EdgeInsets.zero,
                               onPressed: () async {
                                 print('검색 아이콘 클릭됨');
-                                if (controller.selectedIndex == 0) {
-                                  print('전체기사 탭에서 검색 실행');
-                                  controller.searchController.text.isNotEmpty
-                                      ? controller.findPost()
-                                      : controller.loadAllPosts();
-                                } else if (controller.selectedIndex == 1) {
-                                  print('데일리팩트 탭에서 검색 실행');
-                                  controller.searchController.text.isNotEmpty
-                                      ? controller.findPost()
-                                      : controller.loadDailyPosts();
-                                } else if (controller.selectedIndex == 2) {
-                                  print('인사이트팩트 탭에서 검색 실행');
-                                  controller.searchController.text.isNotEmpty
-                                      ? controller.findPost()
-                                      : controller.loadInsightPosts();
+                                if (controller.searchController.text
+                                    .isNotEmpty) {
+                                  await controller.findPost();
+                                } else {
+                                  await _reloadTabData(
+                                      controller, controller.selectedIndex.value);
                                 }
                               },
                               icon: Icon(Icons.search,
@@ -279,7 +320,13 @@ class HomePage extends GetView<HomeController> {
                                 visibleList = controller.dailyPostList;
                                 break;
                               case 2:
+                                visibleList = controller.focusPostList;
+                                break;
+                              case 3:
                                 visibleList = controller.insightPostList;
+                                break;
+                              case 4:
+                                visibleList = controller.peoplePostList;
                                 break;
                               default:
                                 visibleList = controller.postList;
@@ -299,31 +346,57 @@ class HomePage extends GetView<HomeController> {
 
                             if (controller.selectedIndex.value == 0 &&
                                 !controller.isSearching.value) {
+                              final sections = [
+                                (
+                                  title: '데일리 팩트',
+                                  posts: controller.dailyPostList,
+                                  accent: AppColor.primary,
+                                  maxRows: 2,
+                                  tabIndex: 1,
+                                ),
+                                (
+                                  title: '포커스 팩트',
+                                  posts: controller.focusPostList,
+                                  accent: AppColor.focusFact,
+                                  maxRows: 1,
+                                  tabIndex: 2,
+                                ),
+                                (
+                                  title: '인사이트 팩트',
+                                  posts: controller.insightPostList,
+                                  accent: AppColor.yellow,
+                                  maxRows: 1,
+                                  tabIndex: 3,
+                                ),
+                                (
+                                  title: '피플&뷰',
+                                  posts: controller.peoplePostList,
+                                  accent: AppColor.peopleView,
+                                  maxRows: 1,
+                                  tabIndex: 4,
+                                ),
+                              ];
+
                               return Column(
                                 children: [
-                                  _buildSectionGrid(
-                                    title: '데일리 팩트',
-                                    posts: controller.dailyPostList,
-                                    accentColor: AppColor.primary,
-                                    controller: controller,
-                                    crossAxisCount: crossCount,
-                                    aspectRatio: aspectRatio,
-                                    maxRows: 2,
-                                    onMore: () => controller.selectTab(1),
-                                  ),
-                                  const SizedBox(height: 40),
-                                  Divider(),
-                                  const SizedBox(height: 40),
-                                  _buildSectionGrid(
-                                    title: '인사이트 팩트',
-                                    accentColor: AppColor.yellow,
-                                    posts: controller.insightPostList,
-                                    controller: controller,
-                                    crossAxisCount: crossCount,
-                                    aspectRatio: aspectRatio,
-                                    maxRows: 1,
-                                    onMore: () => controller.selectTab(2),
-                                  ),
+                                  for (int i = 0; i < sections.length; i++) ...[
+                                    _buildSectionGrid(
+                                      title: sections[i].title,
+                                      posts: sections[i].posts,
+                                      accentColor: sections[i].accent,
+                                      controller: controller,
+                                      crossAxisCount: crossCount,
+                                      aspectRatio: aspectRatio,
+                                      maxRows: sections[i].maxRows,
+                                      onMore: () =>
+                                          controller.selectTab(sections[i].tabIndex),
+                                    ),
+                                    if (i != sections.length - 1) ...[
+                                      const SizedBox(height: 40),
+                                      Divider(),
+                                      const SizedBox(height: 40),
+                                    ],
+                                  ],
                                 ],
                               );
                             }
@@ -344,6 +417,53 @@ class HomePage extends GetView<HomeController> {
         ),
       ),
     );
+  }
+
+  void _resetListForTab(HomeController controller, int tabIndex) {
+    switch (tabIndex) {
+      case 0:
+        controller.postList.value = controller.originalPostList.toList();
+        break;
+      case 1:
+        controller.dailyPostList.value =
+            controller.originalDailyPostList.toList();
+        break;
+      case 2:
+        controller.focusPostList.value =
+            controller.originalFocusPostList.toList();
+        break;
+      case 3:
+        controller.insightPostList.value =
+            controller.originalInsightPostList.toList();
+        break;
+      case 4:
+        controller.peoplePostList.value =
+            controller.originalPeoplePostList.toList();
+        break;
+    }
+  }
+
+  Future<void> _reloadTabData(
+      HomeController controller, int tabIndex) async {
+    switch (tabIndex) {
+      case 0:
+        await controller.loadAllPosts();
+        break;
+      case 1:
+        await controller.loadDailyPosts();
+        break;
+      case 2:
+        await controller.loadFocusPosts();
+        break;
+      case 3:
+        await controller.loadInsightPosts();
+        break;
+      case 4:
+        await controller.loadPeoplePosts();
+        break;
+      default:
+        await controller.loadAllPosts();
+    }
   }
 
   void _showSearchOverlay(BuildContext context, HomeController controller) {
@@ -454,13 +574,7 @@ class HomePage extends GetView<HomeController> {
       await controller.findPost();
     } else {
       controller.isSearching.value = false;
-      if (controller.selectedIndex.value == 0) {
-        await controller.loadAllPosts();
-      } else if (controller.selectedIndex.value == 1) {
-        await controller.loadDailyPosts();
-      } else {
-        await controller.loadInsightPosts();
-      }
+      await _reloadTabData(controller, controller.selectedIndex.value);
     }
   }
 }
@@ -622,29 +736,26 @@ onTap: () async {
             margin: const EdgeInsets.only(top: 8),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: category == '데일리 팩트'
-                  ? AppColor.primary.withOpacity(0.1)
-                  : AppColor.yellow.withOpacity(0.2),
+              color: HomePage.getCategoryBackgroundColor(category),
               borderRadius: BorderRadius.circular(80),
             ),
             child: Text(
               category,
               style: AppTextStyle.koSemiBold14().copyWith(
-                color:
-                    category == '데일리 팩트' ? AppColor.primary : AppColor.yellow,
+                color: HomePage.getCategoryColor(category),
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
             title.isNotEmpty ? title : '[오늘의 교육 뉴스] $formattedDate',
             style: AppTextStyle.koSemiBold18(),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 2),
           Expanded(
             child: Text(
               (post['final_article'] ?? '').toString(),
@@ -653,7 +764,7 @@ onTap: () async {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 5),
           Align(
             alignment: Alignment.bottomLeft,
             child: Text(
@@ -724,17 +835,14 @@ class DetailView extends StatelessWidget {
                     padding:
                         EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
                     decoration: BoxDecoration(
-                      color: post['category'] == '데일리 팩트'
-                          ? AppColor.primary.withOpacity(0.1)
-                          : AppColor.yellow.withOpacity(0.2),
+                      color: HomePage.getCategoryBackgroundColor(
+                          post['category'] ?? ''),
                       borderRadius: BorderRadius.circular(80.r),
                     ),
                     child: Text(
-                      post['category'],
+                      post['category'] ?? '',
                       style: AppTextStyle.koSemiBold14().copyWith(
-                        color: post['category'] == '데일리 팩트'
-                            ? AppColor.primary
-                            : AppColor.yellow,
+                        color: HomePage.getCategoryColor(post['category'] ?? ''),
                       ),
                     ),
                   ),

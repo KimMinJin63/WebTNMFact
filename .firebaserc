@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "webtnmfact"
-  }
+  },
+  "targets": {
+    "webtnmfact": {
+      "hosting": {
+        "production": [
+          "webtnmfact"
+        ],
+        "staging": [
+          "webtnmfact-staging"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

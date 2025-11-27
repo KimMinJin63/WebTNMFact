@@ -54,6 +54,8 @@ class CreatePage extends GetView<CreateController> {
                         final_article: controller.contentController.text,
                         category: controller.selectedCategory.value,
                         status: controller.selectedPublish.value,
+                        // focus: controller.selectedFocus.value,
+                        // people: controller.selectedPeople.value,
                         editor: '김병국',
                         viewpoint: 0,
                       );
@@ -84,6 +86,8 @@ class CreatePage extends GetView<CreateController> {
                                 controller.contentController.clear();
                                 controller.selectedCategory.value = '';
                                 controller.selectedPublish.value = '';
+                                // controller.selectedFocus.value = '';
+                                // controller.selectedPeople.value = '';
                               },
                               child: const Text('확인'),
                             ),
@@ -202,11 +206,25 @@ class CreatePage extends GetView<CreateController> {
                           },
                         ),
                         AppCheckboxTile(
+                          label: '포커스 팩트',
+                          value: controller.selectedCategory.value == '포커스 팩트',
+                          onChanged: (v) {
+                            controller.selectedCategory.value = v! ? '포커스 팩트' : '';
+                          },
+                        ),
+                        AppCheckboxTile(
                           label: '인사이트 팩트',
                           value: controller.selectedCategory.value == '인사이트 팩트',
                           onChanged: (v) {
                             controller.selectedCategory.value =
                                 v! ? '인사이트 팩트' : '';
+                          },
+                        ),
+                        AppCheckboxTile(
+                          label: '피플&뷰',
+                          value: controller.selectedCategory.value == '피플&뷰',
+                          onChanged: (v) {
+                            controller.selectedCategory.value = v! ? '피플&뷰' : '';
                           },
                         ),
                       ],

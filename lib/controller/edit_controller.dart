@@ -12,6 +12,8 @@ class EditController extends GetxController {
   final TextEditingController contentController = TextEditingController();
   RxString selectedCategory = ''.obs;
   RxString selectedPublish = ''.obs;
+  // RxString selectedFocus = ''.obs;
+  // RxString selectedPeople = ''.obs;
   final box = GetStorage();
   final kDailyPrefix = '[오늘의 교육 뉴스] ';
 
@@ -31,6 +33,8 @@ class EditController extends GetxController {
       contentController.text = post['content'] ?? '';
       selectedCategory.value = post['category'] ?? '';
       selectedPublish.value = post['status'] ?? '';
+      // selectedFocus.value = post['focus'] ?? '';
+      // selectedPeople.value = post['people'] ?? '';
     }
   }
 
@@ -40,6 +44,8 @@ class EditController extends GetxController {
     required String category,
     required String editor,
     required String status,
+    // required String focus,
+    // required String people,
     required String docId,
   }) async {
     try {
@@ -53,6 +59,8 @@ class EditController extends GetxController {
         'category': category,
         'editor': editor,
         'status': status,
+        // 'focus': focus,
+        // 'people': people,
         // 'date': status == '발행' ? FieldValue.serverTimestamp() : '작성 중',
         // 'date': FieldValue.serverTimestamp(),
       };

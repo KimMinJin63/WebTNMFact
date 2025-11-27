@@ -11,6 +11,8 @@ import 'package:tnm_fact/view/page/admin_page.dart';
 class CreateController extends GetxController {
   RxString selectedCategory = ''.obs;
   RxString selectedPublish = ''.obs;
+  // RxString selectedFocus = ''.obs;
+  // RxString selectedPeople = ''.obs;
   TextEditingController titleController = TextEditingController();
   TextEditingController contentController = TextEditingController();
   final AdminController adminController = Get.find<AdminController>();
@@ -34,6 +36,8 @@ class CreateController extends GetxController {
     required String category,
     required String editor,
     required String status,
+    // required String focus,
+    // required String people,
     required int viewpoint,
   }) async {
     try {
@@ -52,6 +56,8 @@ class CreateController extends GetxController {
         // 'date': dateValue,
         // 'createdAtTs': FieldValue.serverTimestamp(),
         'status': status,
+        // 'focus': focus,
+        // 'people': people,
         'viewpoint': 0,
       });
 
@@ -65,7 +71,10 @@ class CreateController extends GetxController {
     if (titleController.text.isNotEmpty &&
         contentController.text.isNotEmpty &&
         selectedCategory.value.isNotEmpty &&
-        selectedPublish.value.isNotEmpty) {
+        selectedPublish.value.isNotEmpty
+        // selectedFocus.value.isNotEmpty ||
+        // selectedPeople.value.isNotEmpty
+        ) {
       print('입력이 완료됨');
 
       isButtonActivate.value = true;

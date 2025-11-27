@@ -15,4 +15,9 @@ class AppColor {
   static const Color background = Color(0xFFF8F9FB); // 배경
   static const Color border =  Color(0xFFE5E7EB); // 카드 경계
   static Color shadow = Color(0xff000000).withOpacity(0.05); // 그림자
+  
+  // 카테고리별 색상
+  static const Color focusFact =
+      Color(0xFF14B8A6); // 포커스 팩트 (청록계열로 톤 다운)
+  static const Color peopleView = Color(0xFFF59E0B); // 피플&뷰 (주황색)
 }
