@@ -870,6 +870,7 @@ class DetailView extends StatelessWidget {
 }
 
 // ✅ 하단 푸터
+// ✅ 하단 푸터
 Widget _buildFooter() {
   return Container(
     width: double.infinity,
@@ -883,19 +884,53 @@ Widget _buildFooter() {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('TNM FACT', style: AppTextStyle.koBold18()),
+              // --- 로고 & 제호 ---
+              Text(
+                'TNM FACT',
+                style: AppTextStyle.koBold18(),
+              ),
               const SizedBox(height: 8),
-              Text('진실을 전달하는 미디어, 티엔엠팩트',
-                  style: AppTextStyle.koRegular14()
-                      .copyWith(color: AppColor.grey)),
-              const SizedBox(height: 8),
-              Text('문의: contact@tnmfact.com',
-                  style: AppTextStyle.koRegular14()
-                      .copyWith(color: AppColor.grey)),
+
+              // --- 발행 정보 ---
+              Text(
+                '제호: TNM 팩트 (TNM Fact)',
+                style: AppTextStyle.koRegular14()
+                    .copyWith(color: AppColor.grey),
+              ),
+              Text(
+                '발행인: 김민진 | 편집인: 김병국',
+                style: AppTextStyle.koRegular14()
+                    .copyWith(color: AppColor.grey),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '등록번호: (등록 후 기재 예정) | 등록일: (등록 후 기재 예정)',
+                style: AppTextStyle.koRegular14()
+                    .copyWith(color: AppColor.grey),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '발행소: 서울시 금천구 벚꽃로 73',
+                style: AppTextStyle.koRegular14()
+                    .copyWith(color: AppColor.grey),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '연락처: tnmfact@gmail.com',
+                style: AppTextStyle.koRegular14()
+                    .copyWith(color: AppColor.grey),
+              ),
+
+              // --- 구분선 ---
+              const SizedBox(height: 16),
               Divider(height: 32, color: AppColor.lightGrey),
-              Text('© 2025 TNM FACT. All rights reserved.',
-                  style: AppTextStyle.koRegular12()
-                      .copyWith(color: AppColor.grey)),
+
+              // --- 저작권 문구 ---
+              Text(
+                '© 2025 TNM Fact. All rights reserved.',
+                style: AppTextStyle.koRegular12()
+                    .copyWith(color: AppColor.grey),
+              ),
             ],
           ),
         ),
