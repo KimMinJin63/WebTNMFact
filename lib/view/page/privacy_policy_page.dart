@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
+import 'package:tnm_fact/utils/app_text_style.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
@@ -9,10 +12,32 @@ class PrivacyPolicyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.white,
-      body: SafeArea(child: Padding(
-        padding: const EdgeInsets.all(60.0),
-        child: Text('''TNM 팩트 개인정보처리방침
-        
+      body: SafeArea(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Padding(
+                    padding: const EdgeInsets.all(60.0),
+                    child: Column(
+            children: [
+                  GestureDetector(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.arrow_back, color: AppColor.primary),
+                        SizedBox(width: 4),
+                        Text('돌아가기',
+                            style: AppTextStyle.koSemiBold14()
+                                .copyWith(color: AppColor.primary)),
+                      ],
+                    ),
+                  ),
+              SizedBox(height: 16,),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text('''TNM 팩트 개인정보처리방침
+
 TNM 팩트(이하 "회사")는 이용자의 개인정보를 중요시하며, 「개인정보보호법」 등 관련 법령을 준수하고 있습니다. 본 방침은 회사가 어떤 정보를 수집하고, 어떻게 이용하는지 알려드립니다.
 
 제1조 (수집하는 개인정보의 항목 및 수집방법)
@@ -58,7 +83,11 @@ Google AdSense를 통한 맞춤형 광고 제공
 
 제6조 (개인정보처리방침의 변경)
 이 개인정보처리방침은 2025년 1월 1일부터 적용됩니다.'''),
-      )),
+              ),
+            ],
+                    ),
+                  ),
+          )),
     );
   }
 }

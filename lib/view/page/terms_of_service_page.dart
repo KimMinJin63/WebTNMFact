@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:tnm_fact/utils/app_color.dart';
+import 'package:tnm_fact/utils/app_text_style.dart';
 
 class TermsOfServicePage extends StatelessWidget {
   const TermsOfServicePage({super.key});
@@ -9,10 +11,32 @@ class TermsOfServicePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.white,
-      body: SafeArea(child: Padding(
-        padding: const EdgeInsets.all(60.0),
-        child: Text('''TNM 팩트 서비스 이용약관
-        
+      body: SafeArea(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Padding(
+                    padding: const EdgeInsets.all(60.0),
+                    child: Column(
+            children: [
+                  GestureDetector(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.arrow_back, color: AppColor.primary),
+                        SizedBox(width: 4),
+                        Text('돌아가기',
+                            style: AppTextStyle.koSemiBold14()
+                                .copyWith(color: AppColor.primary)),
+                      ],
+                    ),
+                  ),
+              SizedBox(height: 16,),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text('''TNM 팩트 서비스 이용약관
+                
 제1조 (목적)
 본 약관은 TNM 팩트(이하 "회사"라 함)가 제공하는 웹사이트 및 제반 서비스(이하 "서비스"라 함)의 이용과 관련하여 회사와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
 
@@ -53,6 +77,10 @@ class TermsOfServicePage extends StatelessWidget {
 서비스 이용과 관련하여 발생한 분쟁에 대한 소송은 민사소송법상의 관할 법원에 제기합니다.
 
 부칙 본 약관은 2025년 1월 1일부터 시행합니다.'''),
+              ),
+            ],
+          ),
+        ),
       )),
     );
   }
