@@ -14,7 +14,7 @@ import 'package:tnm_fact/view/widget/app_post_title.dart';
 
 class AdminPage extends GetView<AdminController> {
   const AdminPage({super.key});
-  static const String route = '/admin';
+  // static const String route = '/adminHome';
 
   @override
   Widget build(BuildContext context) {

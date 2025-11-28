@@ -7,7 +7,7 @@ import 'package:tnm_fact/utils/app_color.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({super.key});
-  static const route = '/login';
+  static const route = '/admin';
 
   @override
   Widget build(BuildContext context) {

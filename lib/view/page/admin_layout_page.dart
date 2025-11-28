@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -13,10 +14,18 @@ import 'package:tnm_fact/view/page/home_page.dart';
 
 class AdminLayoutPage extends StatelessWidget {
   const AdminLayoutPage({super.key});
-  static const String route = '/layout';
+  static const String route = '/admin/home';
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
+  if (user == null) {
+    // 화면 그리기 전에 즉시 리다이렉트
+    Future.microtask(() => Get.offAllNamed('/admin'));
+    return const SizedBox.shrink(); // 아무것도 렌더링하지 않음
+  }
+
     final AdminController controller = Get.find<AdminController>();
     final screenWidth = ScreenUtil().screenWidth;
     final bool isExtended = screenWidth > 600; // 기준 너비

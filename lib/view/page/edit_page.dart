@@ -14,7 +14,7 @@ import 'package:tnm_fact/view/widget/%08app_checkbox.dart';
 
 class EditPage extends GetView<EditController> {
   const EditPage({super.key});
-  static const String route = '/edit';
+  // static const String route = '/edit';
 
   @override
   Widget build(BuildContext context) {

@@ -11,7 +11,10 @@ import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
+import 'package:tnm_fact/utils/app_routes.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
+import 'package:tnm_fact/view/page/privacy_policy_page.dart';
+import 'package:tnm_fact/view/page/terms_of_service_page.dart';
 import 'package:tnm_fact/view/widget/app_title_button.dart';
 
 // ✅ 내부 상세 페이지 위젯 import 제거됨
@@ -19,7 +22,7 @@ import 'package:tnm_fact/view/widget/app_title_button.dart';
 
 class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
-  static const route = '/homepage';
+  static const route = '/';
 
   // 카테고리별 색상 반환 함수
   static Color getCategoryColor(String category) {
@@ -92,70 +95,70 @@ class HomePage extends GetView<HomeController> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-              Obx(() {
-                return AppTitleButton(
-                  color: controller.selectedIndex.value == 0
-                      ? AppColor.primary
-                      : AppColor.black,
-                  onPressed: () {
-                    controller.selectTab(0);
-                    controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                  },
-                  title: '전체기사',
-                );
-              }),
-              SizedBox(width: 16.w),
-              Obx(() {
-                return AppTitleButton(
-                  title: '데일리팩트',
-                  color: controller.selectedIndex.value == 1
-                      ? AppColor.primary
-                      : AppColor.black,
-                  onPressed: () {
-                    controller.selectTab(1);
-                    controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                  },
-                );
-              }),
-              SizedBox(width: 16.w),
-              Obx(() {
-                return AppTitleButton(
-                  title: '포커스 팩트',
-                  color: controller.selectedIndex.value == 2
-                      ? AppColor.primary
-                      : AppColor.black,
-                  onPressed: () {
-                    controller.selectTab(2);
-                    controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                  },
-                );
-              }),
-              SizedBox(width: 16.w),
-              Obx(() {
-                return AppTitleButton(
-                  title: '인사이트팩트',
-                  color: controller.selectedIndex.value == 3
-                      ? AppColor.primary
-                      : AppColor.black,
-                  onPressed: () {
-                    controller.selectTab(3);
-                    controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                  },
-                );
-              }),
-              SizedBox(width: 16.w),
-              Obx(() {
-                return AppTitleButton(
-                  title: '피플&뷰',
-                  color: controller.selectedIndex.value == 4
-                      ? AppColor.primary
-                      : AppColor.black,
-                  onPressed: () {
-                    controller.selectTab(4);
-                    controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                  },
-                );
-              }),
+                Obx(() {
+                  return AppTitleButton(
+                    color: controller.selectedIndex.value == 0
+                        ? AppColor.primary
+                        : AppColor.black,
+                    onPressed: () {
+                      controller.selectTab(0);
+                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                    },
+                    title: '전체기사',
+                  );
+                }),
+                SizedBox(width: 16.w),
+                Obx(() {
+                  return AppTitleButton(
+                    title: '데일리팩트',
+                    color: controller.selectedIndex.value == 1
+                        ? AppColor.primary
+                        : AppColor.black,
+                    onPressed: () {
+                      controller.selectTab(1);
+                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                    },
+                  );
+                }),
+                SizedBox(width: 16.w),
+                Obx(() {
+                  return AppTitleButton(
+                    title: '포커스 팩트',
+                    color: controller.selectedIndex.value == 2
+                        ? AppColor.primary
+                        : AppColor.black,
+                    onPressed: () {
+                      controller.selectTab(2);
+                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                    },
+                  );
+                }),
+                SizedBox(width: 16.w),
+                Obx(() {
+                  return AppTitleButton(
+                    title: '인사이트팩트',
+                    color: controller.selectedIndex.value == 3
+                        ? AppColor.primary
+                        : AppColor.black,
+                    onPressed: () {
+                      controller.selectTab(3);
+                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                    },
+                  );
+                }),
+                SizedBox(width: 16.w),
+                Obx(() {
+                  return AppTitleButton(
+                    title: '피플&뷰',
+                    color: controller.selectedIndex.value == 4
+                        ? AppColor.primary
+                        : AppColor.black,
+                    onPressed: () {
+                      controller.selectTab(4);
+                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                    },
+                  );
+                }),
               ],
             ),
           ),
@@ -218,12 +221,12 @@ class HomePage extends GetView<HomeController> {
                               padding: EdgeInsets.zero,
                               onPressed: () async {
                                 print('검색 아이콘 클릭됨');
-                                if (controller.searchController.text
-                                    .isNotEmpty) {
+                                if (controller
+                                    .searchController.text.isNotEmpty) {
                                   await controller.findPost();
                                 } else {
-                                  await _reloadTabData(
-                                      controller, controller.selectedIndex.value);
+                                  await _reloadTabData(controller,
+                                      controller.selectedIndex.value);
                                 }
                               },
                               icon: Icon(Icons.search,
@@ -388,8 +391,8 @@ class HomePage extends GetView<HomeController> {
                                       crossAxisCount: crossCount,
                                       aspectRatio: aspectRatio,
                                       maxRows: sections[i].maxRows,
-                                      onMore: () =>
-                                          controller.selectTab(sections[i].tabIndex),
+                                      onMore: () => controller
+                                          .selectTab(sections[i].tabIndex),
                                     ),
                                     if (i != sections.length - 1) ...[
                                       const SizedBox(height: 40),
@@ -443,8 +446,7 @@ class HomePage extends GetView<HomeController> {
     }
   }
 
-  Future<void> _reloadTabData(
-      HomeController controller, int tabIndex) async {
+  Future<void> _reloadTabData(HomeController controller, int tabIndex) async {
     switch (tabIndex) {
       case 0:
         await controller.loadAllPosts();
@@ -507,8 +509,8 @@ class HomePage extends GetView<HomeController> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide(
-                                color: AppColor.primary, width: 2.w),
+                            borderSide:
+                                BorderSide(color: AppColor.primary, width: 2.w),
                           ),
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16.w,
@@ -535,8 +537,7 @@ class HomePage extends GetView<HomeController> {
                       icon: Icon(
                         Icons.search,
                         color: AppColor.primary,
-                        size: 28
-                        ,
+                        size: 28,
                       ),
                     ),
                   ],
@@ -665,7 +666,6 @@ Widget _buildPostGrid({
 Widget _buildPostCard({
   required HomeController controller,
   required Map<String, dynamic> post,
-  
 }) {
   final timestamp = post['date'];
   String formattedDate = '';
@@ -687,30 +687,30 @@ Widget _buildPostCard({
   final category = (post['category'] ?? '').toString();
 
   return GestureDetector(
-onTap: () async {
-  print('onTap 눌림');
-  final user = FirebaseAuth.instance.currentUser;
-  final postId = post['id'];
-  final AdminController adminController = Get.find<AdminController>();
-  if (postId.isNotEmpty) {
-  await adminController.incrementViewCount(postId);
-}
+    onTap: () async {
+      print('onTap 눌림');
+      final user = FirebaseAuth.instance.currentUser;
+      final postId = post['id'];
+      final AdminController adminController = Get.find<AdminController>();
+      if (postId.isNotEmpty) {
+        await adminController.incrementViewCount(postId);
+      }
 
-  if (user == null) {
-    print('로그인 안 된 상태, 익명 로그인 처리');
-    final cred = await FirebaseAuth.instance.signInAnonymously();
-    final userId = cred.user!.uid;
-    await adminController.incrementViewCount(postId);
-    controller.logVisit(userId);
-  } else {
-    final userId = user.uid;
-    await adminController.incrementViewCount(postId);
-    controller.logVisit(userId);
-  }
+      if (user == null) {
+        print('로그인 안 된 상태, 익명 로그인 처리');
+        final cred = await FirebaseAuth.instance.signInAnonymously();
+        final userId = cred.user!.uid;
+        await adminController.incrementViewCount(postId);
+        controller.logVisit(userId);
+      } else {
+        final userId = user.uid;
+        await adminController.incrementViewCount(postId);
+        controller.logVisit(userId);
+      }
 
-  controller.selectedPost = post;
-  controller.currentPage.value = 'detail';
-},
+      controller.selectedPost = post;
+      controller.currentPage.value = 'detail';
+    },
     child: Container(
       decoration: BoxDecoration(
         color: AppColor.white,
@@ -842,7 +842,8 @@ class DetailView extends StatelessWidget {
                     child: Text(
                       post['category'] ?? '',
                       style: AppTextStyle.koSemiBold14().copyWith(
-                        color: HomePage.getCategoryColor(post['category'] ?? ''),
+                        color:
+                            HomePage.getCategoryColor(post['category'] ?? ''),
                       ),
                     ),
                   ),
@@ -894,42 +895,77 @@ Widget _buildFooter() {
               // --- 발행 정보 ---
               Text(
                 '제호: TNM 팩트 (TNM Fact)',
-                style: AppTextStyle.koRegular14()
-                    .copyWith(color: AppColor.grey),
+                style:
+                    AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
               ),
               Text(
                 '발행인: 김민진 | 편집인: 김병국',
-                style: AppTextStyle.koRegular14()
-                    .copyWith(color: AppColor.grey),
+                style:
+                    AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
               ),
               const SizedBox(height: 4),
               Text(
                 '등록번호: (등록 후 기재 예정) | 등록일: (등록 후 기재 예정)',
-                style: AppTextStyle.koRegular14()
-                    .copyWith(color: AppColor.grey),
+                style:
+                    AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
               ),
               const SizedBox(height: 4),
               Text(
                 '발행소: 서울시 금천구 벚꽃로 73',
-                style: AppTextStyle.koRegular14()
-                    .copyWith(color: AppColor.grey),
+                style:
+                    AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
               ),
               const SizedBox(height: 4),
               Text(
                 '연락처: tnmfact@gmail.com',
-                style: AppTextStyle.koRegular14()
-                    .copyWith(color: AppColor.grey),
+                style:
+                    AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
+              ),
+                            const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  TextButton(
+                      style: TextButton.styleFrom(
+    padding: EdgeInsets.zero,       // 내부 패딩 제거
+    minimumSize: Size.zero,         // 최소 터치 영역 제거
+    tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 높이 축소
+  ),
+                    onPressed: () => Get.toNamed(AppRoutes.service),
+                    child: Text(
+                      '이용약관',
+                      style: AppTextStyle.koRegular14()
+                          .copyWith(color: AppColor.black),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 16,
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero, // 내부 패딩 제거
+                      minimumSize: Size.zero, // 최소 터치 영역 제거
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 높이 축소
+                    ),
+                    onPressed: () => Get.toNamed(AppRoutes.privacy),
+                    child: Text(
+                      '개인정보처리방침',
+                      style: AppTextStyle.koRegular14()
+                          .copyWith(color: AppColor.black),
+                    ),
+                  ),
+                ],
               ),
 
               // --- 구분선 ---
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Divider(height: 32, color: AppColor.lightGrey),
 
               // --- 저작권 문구 ---
               Text(
                 '© 2025 TNM Fact. All rights reserved.',
-                style: AppTextStyle.koRegular12()
-                    .copyWith(color: AppColor.grey),
+                style:
+                    AppTextStyle.koRegular12().copyWith(color: AppColor.grey),
               ),
             ],
           ),

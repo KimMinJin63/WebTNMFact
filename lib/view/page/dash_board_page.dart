@@ -10,7 +10,7 @@ import 'package:tnm_fact/view/widget/app_visit_table.dart';
 
 class DashBoardPage extends StatelessWidget {
   const DashBoardPage({super.key});
-  static const route = '/dash';
+  // static const route = '/dash';
 
   @override
   Widget build(BuildContext context) {

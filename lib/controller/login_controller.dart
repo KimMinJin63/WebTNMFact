@@ -33,7 +33,7 @@ class LoginController extends GetxController {
       adminController.isCreate.value = false;
       adminController.isEditing.value = false;
       // Get.offAllNamed(AdminPage.route);
-      Get.offAllNamed(AdminLayoutPage.route);
+      Get.offAllNamed('/admin/home');
     } on FirebaseAuthException catch (e) {
       print("FirebaseAuthException: ${e.code} / ${e.message}");
     } catch (e) {

@@ -15,8 +15,10 @@ import 'package:tnm_fact/view/page/home_page.dart';
 import 'package:tnm_fact/view/page/login_page.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 void main() async {
+  setUrlStrategy(PathUrlStrategy());
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -51,8 +53,13 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             useMaterial3: true,
           ),
-          home: const HomePage(),
-          // home: const AdminLayoutPage(),
+          initialRoute: '/',
+          // getPages: [
+          //   GetPage(name: '/', page: () => const HomePage()),
+          //   GetPage(name: '/admin', page: () => const LoginPage()),
+          //   GetPage(name: '/admin/home', page: () => const AdminLayoutPage()),
+          // ],
+           // home: const AdminLayoutPage(),
           // home: const LoginPage(),
           getPages: AppPages.pages,
           // home: const HomePage(),
@@ -66,4 +73,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

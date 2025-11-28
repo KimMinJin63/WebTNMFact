@@ -11,7 +11,7 @@ import 'package:tnm_fact/view/widget/%08app_checkbox.dart';
 
 class CreatePage extends GetView<CreateController> {
   const CreatePage({super.key});
-  static const String route = '/create';
+  // static const String route = '/create';
 
   @override
   Widget build(BuildContext context) {

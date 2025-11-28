@@ -44,13 +44,41 @@
       "target": "production",
       "public": "build/web",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-      "rewrites": [{ "source": "**", "destination": "/index.html" }]
+      "rewrites": [{ "source": "**", "destination": "/index.html" }],
+      "headers": [
+        {
+          "source": "/admin",
+          "headers": [
+            { "key": "X-Robots-Tag", "value": "noindex" }
+          ]
+        },
+        {
+          "source": "/admin/**",
+          "headers": [
+            { "key": "X-Robots-Tag", "value": "noindex" }
+          ]
+        }
+      ]
     },
     {
       "target": "staging",
       "public": "build/web",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-      "rewrites": [{ "source": "**", "destination": "/index.html" }]
+      "rewrites": [{ "source": "**", "destination": "/index.html" }],
+      "headers": [
+        {
+          "source": "/admin",
+          "headers": [
+            { "key": "X-Robots-Tag", "value": "noindex" }
+          ]
+        },
+        {
+          "source": "/admin/**",
+          "headers": [
+            { "key": "X-Robots-Tag", "value": "noindex" }
+          ]
+        }
+      ]
     }
   ]
 }
