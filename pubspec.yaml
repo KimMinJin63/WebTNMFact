@@ -88,18 +88,16 @@ flutter:
   #   - family: Schyler
   # example:
   fonts:
-    - family: PretendardBold
-      fonts:
-        - asset: assets/fonts/Pretendard-Bold.otf
-    - family: PretendardRegular
+    - family: Pretendand  # 👉 중요한 포인트: family 하나만!
       fonts:
         - asset: assets/fonts/Pretendard-Regular.otf
-    - family: PretendardSemiBold
-      fonts:
-        - asset: assets/fonts/Pretendard-SemiBold.otf
-    - family: PretendardMedium
-      fonts:
+          weight: 400
         - asset: assets/fonts/Pretendard-Medium.otf
-  #
+          weight: 500
+        - asset: assets/fonts/Pretendard-SemiBold.otf
+          weight: 600
+        - asset: assets/fonts/Pretendard-Bold.otf
+          weight: 700
+            #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

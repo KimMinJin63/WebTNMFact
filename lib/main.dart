@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
@@ -20,6 +21,12 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 void main() async {
   setUrlStrategy(PathUrlStrategy());
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+    await Future.wait([
+    rootBundle.load('assets/fonts/Pretendard-Regular.otf'),
+    rootBundle.load('assets/fonts/Pretendard-Medium.otf'),
+    rootBundle.load('assets/fonts/Pretendard-SemiBold.otf'),
+    rootBundle.load('assets/fonts/Pretendard-Bold.otf'),
+  ]);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
