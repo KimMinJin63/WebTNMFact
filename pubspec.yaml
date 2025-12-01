@@ -45,6 +45,7 @@ dependencies:
   fl_chart: ^0.65.0
   auto_size_text: ^3.0.0
   flutter_svg: ^2.1.0
+  skeletons: ^0.0.3
 
   
 dev_dependencies:

@@ -13,8 +13,6 @@ import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_routes.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
-import 'package:tnm_fact/view/page/privacy_policy_page.dart';
-import 'package:tnm_fact/view/page/terms_of_service_page.dart';
 import 'package:tnm_fact/view/widget/app_title_button.dart';
 
 // ✅ 내부 상세 페이지 위젯 import 제거됨
@@ -79,11 +77,6 @@ class HomePage extends GetView<HomeController> {
               height: 32.h,
               fit: BoxFit.contain,
             ),
-            // child: Image.asset(
-            //   'assets/images/logo.png',
-            //   height: 32.h,
-            //   fit: BoxFit.contain,
-            // ),
           ),
         ),
         title: Center(
@@ -259,22 +252,58 @@ class HomePage extends GetView<HomeController> {
       ),
 
       // ✅ BODY 분기
-      body: Obx(() {
-        if (controller.currentPage.value == 'detail' &&
-            controller.selectedPost != null) {
-          return DetailView(post: controller.selectedPost!);
-        } else {
-          return _buildHomeContent(controller, adminController);
-        }
-      }),
+body: PopScope(
+  canPop: false,
+  onPopInvoked: (didPop) {
+    final controller = Get.find<HomeController>();
+
+    if (!didPop) {
+      // 1️⃣ 상세보기 → 홈 복귀
+      if (controller.currentPage.value == 'detail') {
+        controller.currentPage.value = 'home';
+        return;
+      }
+
+      // 2️⃣ 검색 결과 상태 → 검색 해제 + 원본 복구
+      if (controller.isSearching.value) {
+        controller.isSearching.value = false;
+        controller.searchController.clear();
+        _resetListForTab(controller, controller.selectedIndex.value);
+        return;
+      }
+
+      // 3️⃣ 다른 탭 → 전체기사 탭으로 복귀
+      if (controller.selectedIndex.value != 0) {
+        controller.selectTab(0);
+        controller.currentPage.value = 'home';
+        return;
+      }
+
+      // 4️⃣ 홈 상태 → 앱 종료
+      Get.back();
+    }
+  },
+  child: Obx(() {
+    if (controller.currentPage.value == 'detail' &&
+        controller.selectedPost != null) {
+      return DetailView(post: controller.selectedPost!);
+    } else {
+      return _buildHomeContent(controller, adminController);
+    }
+  }),
+
+
+      ),
     );
   }
+}
 
   // ✅ 기존 홈 콘텐츠 (Grid 포함)
   Widget _buildHomeContent(
       HomeController controller, AdminController adminController) {
     return SafeArea(
       child: SingleChildScrollView(
+        controller: controller.scrollController,
         child: Column(
           children: [
             Center(
@@ -295,12 +324,14 @@ class HomePage extends GetView<HomeController> {
                       LayoutBuilder(
                         builder: (context, constraints) {
                           final double width = constraints.maxWidth;
+                          final bool isMobileLayout = width <= 600;
                           final int crossCount = width <= 680
                               ? 2
                               : width <= 1000
                                   ? 3
                                   : 4;
                           const double aspectRatio = 1.4; // ✅ 카드 비율 고정
+
                           Widget buildGrid({
                             required List<Map<String, dynamic>> posts,
                             int? maxRows,
@@ -312,6 +343,17 @@ class HomePage extends GetView<HomeController> {
                               controller: controller,
                               crossAxisCount: crossCount,
                               aspectRatio: aspectRatio,
+                              maxItems: maxItems,
+                            );
+                          }
+
+                          Widget buildList({
+                            required List<Map<String, dynamic>> posts,
+                            int? maxItems,
+                          }) {
+                            return _buildPostList(
+                              posts: posts,
+                              controller: controller,
                               maxItems: maxItems,
                             );
                           }
@@ -355,6 +397,7 @@ class HomePage extends GetView<HomeController> {
                                   posts: controller.dailyPostList,
                                   accent: AppColor.primary,
                                   maxRows: 2,
+                                  maxItems: isMobileLayout ? 5 : null,
                                   tabIndex: 1,
                                 ),
                                 (
@@ -362,6 +405,7 @@ class HomePage extends GetView<HomeController> {
                                   posts: controller.focusPostList,
                                   accent: AppColor.focusFact,
                                   maxRows: 1,
+                                  maxItems: isMobileLayout ? 3 : null,
                                   tabIndex: 2,
                                 ),
                                 (
@@ -369,6 +413,7 @@ class HomePage extends GetView<HomeController> {
                                   posts: controller.insightPostList,
                                   accent: AppColor.yellow,
                                   maxRows: 1,
+                                  maxItems: isMobileLayout ? 3 : null,
                                   tabIndex: 3,
                                 ),
                                 (
@@ -376,6 +421,7 @@ class HomePage extends GetView<HomeController> {
                                   posts: controller.peoplePostList,
                                   accent: AppColor.peopleView,
                                   maxRows: 1,
+                                  maxItems: isMobileLayout ? 3 : null,
                                   tabIndex: 4,
                                 ),
                               ];
@@ -383,28 +429,42 @@ class HomePage extends GetView<HomeController> {
                               return Column(
                                 children: [
                                   for (int i = 0; i < sections.length; i++) ...[
-                                    _buildSectionGrid(
-                                      title: sections[i].title,
-                                      posts: sections[i].posts,
-                                      accentColor: sections[i].accent,
-                                      controller: controller,
-                                      crossAxisCount: crossCount,
-                                      aspectRatio: aspectRatio,
-                                      maxRows: sections[i].maxRows,
-                                      onMore: () => controller
-                                          .selectTab(sections[i].tabIndex),
-                                    ),
+                                    isMobileLayout
+                                        ? _buildSectionList(
+                                            title: sections[i].title,
+                                            posts: sections[i].posts,
+                                            accentColor: sections[i].accent,
+                                            controller: controller,
+                                            maxItems: sections[i].maxItems,
+                                            onMore: () => controller.selectTab(
+                                                sections[i].tabIndex),
+                                          )
+                                        : _buildSectionGrid(
+                                            title: sections[i].title,
+                                            posts: sections[i].posts,
+                                            accentColor: sections[i].accent,
+                                            controller: controller,
+                                            crossAxisCount: crossCount,
+                                            aspectRatio: aspectRatio,
+                                            maxRows: sections[i].maxRows,
+                                            onMore: () => controller.selectTab(
+                                                sections[i].tabIndex),
+                                          ),
                                     if (i != sections.length - 1) ...[
-                                      const SizedBox(height: 40),
+                                      SizedBox(
+                                          height: isMobileLayout ? 24 : 40),
                                       Divider(),
-                                      const SizedBox(height: 40),
+                                      SizedBox(
+                                          height: isMobileLayout ? 24 : 40),
                                     ],
                                   ],
                                 ],
                               );
                             }
 
-                            return buildGrid(posts: visibleList);
+                            return isMobileLayout
+                                ? buildList(posts: visibleList)
+                                : buildGrid(posts: visibleList);
                           });
                         },
                       ),
@@ -468,14 +528,17 @@ class HomePage extends GetView<HomeController> {
     }
   }
 
-  void _showSearchOverlay(BuildContext context, HomeController controller) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: '검색',
-      barrierColor: Colors.black26,
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return Align(
+void _showSearchOverlay(BuildContext context, HomeController controller) {
+  showGeneralDialog(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: '검색',
+    barrierColor: Colors.black26,
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return MediaQuery(
+        // ✅ 키보드 인셋을 무시하도록 복제
+        data: MediaQuery.of(context).removeViewInsets(removeBottom: true),
+        child: Align(
           alignment: Alignment.topCenter,
           child: Padding(
             padding: EdgeInsets.fromLTRB(16.w, 56.h, 16.w, 0),
@@ -483,9 +546,7 @@ class HomePage extends GetView<HomeController> {
               borderRadius: BorderRadius.circular(16.r),
               color: AppColor.white,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h)
-                    .copyWith(
-                        bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -503,10 +564,6 @@ class HomePage extends GetView<HomeController> {
                             borderRadius: BorderRadius.circular(12.r),
                             borderSide: BorderSide(color: AppColor.grey),
                           ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide(color: AppColor.grey),
-                          ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.r),
                             borderSide:
@@ -517,13 +574,9 @@ class HomePage extends GetView<HomeController> {
                             vertical: 12.h,
                           ),
                         ),
-                        onChanged: (value) {
-                          if (value.isEmpty) {
-                            controller.isSearching.value = false;
-                          }
-                        },
                         onSubmitted: (_) async {
                           Navigator.of(context).pop();
+                            await Future.delayed(const Duration(milliseconds: 100));
                           await _performSearch(controller);
                         },
                       ),
@@ -534,51 +587,60 @@ class HomePage extends GetView<HomeController> {
                         Navigator.of(context).pop();
                         await _performSearch(controller);
                       },
-                      icon: Icon(
-                        Icons.search,
-                        color: AppColor.primary,
-                        size: 28,
-                      ),
+                      icon: Icon(Icons.search,
+                          color: AppColor.primary, size: 28),
                     ),
                   ],
                 ),
               ),
             ),
           ),
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0, -0.1),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(
+        ),
+      );
+    },
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, -0.1),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOut,
+        )),
+        child: FadeTransition(
+          opacity: CurvedAnimation(
             parent: animation,
             curve: Curves.easeOut,
-          )),
-          child: FadeTransition(
-            opacity: CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOut,
-            ),
-            child: child,
           ),
-        );
-      },
-    );
-  }
+          child: child,
+        ),
+      );
+    },
+  );
+}
 
-  Future<void> _performSearch(HomeController controller) async {
-    controller.clearFocus();
-    if (controller.searchController.text.trim().isNotEmpty) {
-      controller.isSearching.value = true;
-      await controller.findPost();
-    } else {
-      controller.isSearching.value = false;
-      await _reloadTabData(controller, controller.selectedIndex.value);
-    }
+ Future<void> _performSearch(HomeController controller) async {
+  controller.clearFocus();
+  final query = controller.searchController.text.trim();
+
+  if (query.isNotEmpty) {
+    // ✅ 검색 모드 진입
+    controller.isSearching.value = true;
+
+    // ✅ 기존 리스트 유지 → 검색결과로 덮기
+    await controller.findPost();
+
+    // ✅ 검색 후 항상 최상단으로 이동
+    controller.scrollController.jumpTo(0);
+  } else {
+    // ✅ 검색어 없으면 원래 탭 복구
+    controller.isSearching.value = false;
+    controller.searchController.clear();
+    _resetListForTab(controller, controller.selectedIndex.value);
   }
 }
+
+
 
 Widget _buildSectionGrid({
   required String title,
@@ -603,7 +665,11 @@ Widget _buildSectionGrid({
               style: AppTextStyle.koBold20().copyWith(color: accentColor)),
           if (showMore)
             TextButton(
-              onPressed: onMore,
+              onPressed: () {
+                onMore();
+                // ✅ 부드러운 스크롤 대신 즉시 최상단으로 이동
+                controller.scrollController.jumpTo(0);
+              },
               child: Text('>> 더보기',
                   style:
                       AppTextStyle.koSemiBold14().copyWith(color: accentColor)),
@@ -779,7 +845,209 @@ Widget _buildPostCard({
   );
 }
 
-// ✅ 내부 전환용 DetailView
+// ✅ 모바일용 리스트뷰
+Widget _buildPostList({
+  required List<Map<String, dynamic>> posts,
+  required HomeController controller,
+  int? maxItems,
+}) {
+  if (posts.isEmpty) {
+    return Center(
+      child: Text('게시글이 없습니다.', style: AppTextStyle.koRegular18()),
+    );
+  }
+
+  final int itemCount =
+      maxItems == null ? posts.length : min(posts.length, maxItems);
+
+  return ListView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: itemCount,
+    itemBuilder: (context, index) {
+      final post = posts[index];
+      return _buildPostListTile(controller: controller, post: post);
+    },
+  );
+}
+
+// ✅ 모바일용 리스트 타일 (제목만 표시)
+Widget _buildPostListTile({
+  required HomeController controller,
+  required Map<String, dynamic> post,
+}) {
+  final timestamp = post['date'];
+  String formattedDate = '';
+
+  if (timestamp != null) {
+    if (timestamp is Timestamp) {
+      formattedDate = DateFormat('yyyy.MM.dd').format(timestamp.toDate());
+    } else if (timestamp is String) {
+      final parsed = DateTime.tryParse(timestamp);
+      if (parsed != null) {
+        formattedDate = DateFormat('yyyy.MM.dd').format(parsed);
+      } else {
+        formattedDate = timestamp;
+      }
+    }
+  }
+
+  final title = (post['title'] ?? '').toString();
+  final category = (post['category'] ?? '').toString();
+
+  return GestureDetector(
+    onTap: () async {
+      print('onTap 눌림');
+      final user = FirebaseAuth.instance.currentUser;
+      final postId = post['id'];
+      final AdminController adminController = Get.find<AdminController>();
+      if (postId.isNotEmpty) {
+        await adminController.incrementViewCount(postId);
+      }
+
+      if (user == null) {
+        print('로그인 안 된 상태, 익명 로그인 처리');
+        final cred = await FirebaseAuth.instance.signInAnonymously();
+        final userId = cred.user!.uid;
+        await adminController.incrementViewCount(postId);
+        controller.logVisit(userId);
+      } else {
+        final userId = user.uid;
+        await adminController.incrementViewCount(postId);
+        controller.logVisit(userId);
+      }
+
+      controller.selectedPost = post;
+      controller.currentPage.value = 'detail';
+    },
+    child: Container(
+      decoration: BoxDecoration(
+        color: AppColor.white,
+        border: Border(
+          bottom: BorderSide(
+            color: AppColor.border.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 카테고리 배지
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: HomePage.getCategoryBackgroundColor(category),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              category,
+              style: AppTextStyle.koSemiBold12().copyWith(
+                color: HomePage.getCategoryColor(category),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // 제목과 날짜
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title.isNotEmpty ? title : '[오늘의 교육 뉴스] $formattedDate',
+                  style: AppTextStyle.koSemiBold16(),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  formattedDate,
+                  style:
+                      AppTextStyle.koRegular12().copyWith(color: AppColor.grey),
+                ),
+              ],
+            ),
+          ),
+          // 화살표 아이콘
+          Icon(
+            Icons.chevron_right,
+            color: AppColor.grey,
+            size: 20,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+// ✅ 모바일용 섹션 리스트
+Widget _buildSectionList({
+  required String title,
+  required List<Map<String, dynamic>> posts,
+  required HomeController controller,
+  required Color accentColor,
+  int? maxItems,
+  required VoidCallback onMore,
+}) {
+  final int displayMaxItems = maxItems ?? 10;
+  final bool showMore = posts.length > displayMaxItems;
+  final int itemCount = min(posts.length, displayMaxItems);
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: AppTextStyle.koBold18().copyWith(color: accentColor),
+          ),
+          if (showMore)
+            TextButton(
+              onPressed: () {
+                onMore();
+                // ✅ 부드러운 스크롤 대신 즉시 최상단으로 이동
+                controller.scrollController.jumpTo(0);
+              },
+              child: Text(
+                '>> 더보기',
+                style: AppTextStyle.koSemiBold14().copyWith(
+                  color: accentColor,
+                ),
+              ),
+            ),
+        ],
+      ),
+      const SizedBox(height: 8),
+      posts.isEmpty
+          ? Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Text(
+                '게시글이 없습니다.',
+                style:
+                    AppTextStyle.koRegular18().copyWith(color: AppColor.grey),
+              ),
+            )
+          : ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: itemCount,
+              itemBuilder: (context, index) {
+                final post = posts[index];
+                return _buildPostListTile(
+                  controller: controller,
+                  post: post,
+                );
+              },
+            ),
+    ],
+  );
+}
+
+// ✅ 내부 전환용 DetailView  
 class DetailView extends StatelessWidget {
   final Map<String, dynamic> post;
   const DetailView({super.key, required this.post});
@@ -871,12 +1139,11 @@ class DetailView extends StatelessWidget {
 }
 
 // ✅ 하단 푸터
-// ✅ 하단 푸터
 Widget _buildFooter() {
   return Container(
     width: double.infinity,
     color: Colors.grey[100],
-    padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 72),
+    padding: const EdgeInsets.symmetric(vertical: 40),
     child: Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1260),
@@ -921,16 +1188,16 @@ Widget _buildFooter() {
                 style:
                     AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
               ),
-                            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
               Row(
                 children: [
                   TextButton(
-                      style: TextButton.styleFrom(
-    padding: EdgeInsets.zero,       // 내부 패딩 제거
-    minimumSize: Size.zero,         // 최소 터치 영역 제거
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 높이 축소
-  ),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero, // 내부 패딩 제거
+                      minimumSize: Size.zero, // 최소 터치 영역 제거
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 높이 축소
+                    ),
                     onPressed: () => Get.toNamed(AppRoutes.service),
                     child: Text(
                       '이용약관',

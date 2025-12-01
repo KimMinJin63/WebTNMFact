@@ -9,6 +9,7 @@ import 'package:tnm_fact/utils/app_title.dart';
 class HomeController extends GetxController {
   RxInt selectedIndex = 0.obs;
   final TextEditingController searchController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
   final FocusNode searchFocusNode = FocusNode();
   RxList<Map<String, dynamic>> postList = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> dailyPostList = <Map<String, dynamic>>[].obs;
@@ -184,6 +185,7 @@ class HomeController extends GetxController {
   }
 
   Future loadAllPosts() async {
+      isLoading.value = true;
     FirebaseFirestore.instance
         .collection('post')
         .where('status', isEqualTo: '발행')
@@ -214,8 +216,10 @@ class HomeController extends GetxController {
         };
       }).toList();
       originalPostList.value = postList.toList();
+      if (isLoading.value) isLoading.value = false;
 
       print('🔥 실시간 업데이트됨! 현재 총 게시글 수: ${postList.length}');
+       isLoading.value = false;
     });
   }
 
