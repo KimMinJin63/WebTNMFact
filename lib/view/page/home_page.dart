@@ -252,183 +252,182 @@ class HomePage extends GetView<HomeController> {
       ),
 
       // ✅ BODY 분기
-body: PopScope(
-  canPop: false,
-  onPopInvoked: (didPop) {
-    final controller = Get.find<HomeController>();
+      body: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          final controller = Get.find<HomeController>();
 
-    if (!didPop) {
-      // 1️⃣ 상세보기 → 홈 복귀
-      if (controller.currentPage.value == 'detail') {
-        controller.currentPage.value = 'home';
-        return;
-      }
+          if (!didPop) {
+            // 1️⃣ 상세보기 → 홈 복귀
+            if (controller.currentPage.value == 'detail') {
+              controller.currentPage.value = 'home';
+              return;
+            }
 
-      // 2️⃣ 검색 결과 상태 → 검색 해제 + 원본 복구
-      if (controller.isSearching.value) {
-        controller.isSearching.value = false;
-        controller.searchController.clear();
-        _resetListForTab(controller, controller.selectedIndex.value);
-        return;
-      }
+            // 2️⃣ 검색 결과 상태 → 검색 해제 + 원본 복구
+            if (controller.isSearching.value) {
+              controller.isSearching.value = false;
+              controller.searchController.clear();
+              _resetListForTab(controller, controller.selectedIndex.value);
+              return;
+            }
 
-      // 3️⃣ 다른 탭 → 전체기사 탭으로 복귀
-      if (controller.selectedIndex.value != 0) {
-        controller.selectTab(0);
-        controller.currentPage.value = 'home';
-        return;
-      }
+            // 3️⃣ 다른 탭 → 전체기사 탭으로 복귀
+            if (controller.selectedIndex.value != 0) {
+              controller.selectTab(0);
+              controller.currentPage.value = 'home';
+              return;
+            }
 
-      // 4️⃣ 홈 상태 → 앱 종료
-      Get.back();
-    }
-  },
-  child: Obx(() {
-    if (controller.currentPage.value == 'detail' &&
-        controller.selectedPost != null) {
-      return DetailView(post: controller.selectedPost!);
-    } else {
-      return _buildHomeContent(controller, adminController);
-    }
-  }),
-
-
+            // 4️⃣ 홈 상태 → 앱 종료
+            Get.back();
+          }
+        },
+        child: Obx(() {
+          if (controller.currentPage.value == 'detail' &&
+              controller.selectedPost != null) {
+            return DetailView(post: controller.selectedPost!);
+          } else {
+            return _buildHomeContent(controller, adminController);
+          }
+        }),
       ),
     );
   }
 }
 
-  // ✅ 기존 홈 콘텐츠 (Grid 포함)
-  Widget _buildHomeContent(
-      HomeController controller, AdminController adminController) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        controller: controller.scrollController,
-        child: Column(
-          children: [
-            Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1260),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 48),
-                      AutoSizeText(
-                        '진실을 전달하는 미디어',
-                        maxFontSize: 60,
-                        minFontSize: 20,
-                        style: AppTextStyle.koBold35(),
-                      ),
-                      const SizedBox(height: 48),
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final double width = constraints.maxWidth;
-                          final bool isMobileLayout = width <= 600;
-                          final int crossCount = width <= 680
-                              ? 2
-                              : width <= 1000
-                                  ? 3
-                                  : 4;
-                          const double aspectRatio = 1.4; // ✅ 카드 비율 고정
+// ✅ 기존 홈 콘텐츠 (Grid 포함)
+Widget _buildHomeContent(
+    HomeController controller, AdminController adminController) {
+  return SafeArea(
+    child: SingleChildScrollView(
+      controller: controller.scrollController,
+      child: Column(
+        children: [
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1260),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 48),
+                    AutoSizeText(
+                      '진실을 전달하는 미디어',
+                      maxFontSize: 60,
+                      minFontSize: 20,
+                      style: AppTextStyle.koBold35(),
+                    ),
+                    const SizedBox(height: 48),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final double width = constraints.maxWidth;
+                        final bool isMobileLayout = width <= 600;
+                        final int crossCount = width <= 680
+                            ? 2
+                            : width <= 1000
+                                ? 3
+                                : 4;
+                        const double aspectRatio = 1.4; // ✅ 카드 비율 고정
 
-                          Widget buildGrid({
-                            required List<Map<String, dynamic>> posts,
-                            int? maxRows,
-                          }) {
-                            final maxItems =
-                                maxRows == null ? null : crossCount * maxRows;
-                            return _buildPostGrid(
-                              posts: posts,
-                              controller: controller,
-                              crossAxisCount: crossCount,
-                              aspectRatio: aspectRatio,
-                              maxItems: maxItems,
+                        Widget buildGrid({
+                          required List<Map<String, dynamic>> posts,
+                          int? maxRows,
+                        }) {
+                          final maxItems =
+                              maxRows == null ? null : crossCount * maxRows;
+                          return _buildPostGrid(
+                            posts: posts,
+                            controller: controller,
+                            crossAxisCount: crossCount,
+                            aspectRatio: aspectRatio,
+                            maxItems: maxItems,
+                          );
+                        }
+
+                        Widget buildList({
+                          required List<Map<String, dynamic>> posts,
+                          int? maxItems,
+                        }) {
+                          return _buildPostList(
+                            posts: posts,
+                            controller: controller,
+                            maxItems: maxItems,
+                          );
+                        }
+
+                        return Obx(() {
+                          List<Map<String, dynamic>> visibleList;
+                          switch (controller.selectedIndex.value) {
+                            case 1:
+                              visibleList = controller.dailyPostList;
+                              break;
+                            case 2:
+                              visibleList = controller.focusPostList;
+                              break;
+                            case 3:
+                              visibleList = controller.insightPostList;
+                              break;
+                            case 4:
+                              visibleList = controller.peoplePostList;
+                              break;
+                            default:
+                              visibleList = controller.postList;
+                          }
+
+                          if (controller.isLoading.value) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+
+                          if (visibleList.isEmpty) {
+                            return Center(
+                              child: Text('게시글이 없습니다.',
+                                  style: AppTextStyle.koRegular18()),
                             );
                           }
 
-                          Widget buildList({
-                            required List<Map<String, dynamic>> posts,
-                            int? maxItems,
-                          }) {
-                            return _buildPostList(
-                              posts: posts,
-                              controller: controller,
-                              maxItems: maxItems,
-                            );
-                          }
+                          if (controller.selectedIndex.value == 0 &&
+                              !controller.isSearching.value) {
+                            final sections = [
+                              (
+                                title: '데일리 팩트',
+                                posts: controller.dailyPostList,
+                                accent: AppColor.primary,
+                                maxRows: 2,
+                                maxItems: isMobileLayout ? 5 : null,
+                                tabIndex: 1,
+                              ),
+                              (
+                                title: '포커스 팩트',
+                                posts: controller.focusPostList,
+                                accent: AppColor.focusFact,
+                                maxRows: 1,
+                                maxItems: isMobileLayout ? 3 : null,
+                                tabIndex: 2,
+                              ),
+                              (
+                                title: '인사이트 팩트',
+                                posts: controller.insightPostList,
+                                accent: AppColor.yellow,
+                                maxRows: 1,
+                                maxItems: isMobileLayout ? 3 : null,
+                                tabIndex: 3,
+                              ),
+                              (
+                                title: '피플&뷰',
+                                posts: controller.peoplePostList,
+                                accent: AppColor.peopleView,
+                                maxRows: 1,
+                                maxItems: isMobileLayout ? 3 : null,
+                                tabIndex: 4,
+                              ),
+                            ];
 
-                          return Obx(() {
-                            List<Map<String, dynamic>> visibleList;
-                            switch (controller.selectedIndex.value) {
-                              case 1:
-                                visibleList = controller.dailyPostList;
-                                break;
-                              case 2:
-                                visibleList = controller.focusPostList;
-                                break;
-                              case 3:
-                                visibleList = controller.insightPostList;
-                                break;
-                              case 4:
-                                visibleList = controller.peoplePostList;
-                                break;
-                              default:
-                                visibleList = controller.postList;
-                            }
-
-                            if (controller.isLoading.value) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
-
-                            if (visibleList.isEmpty) {
-                              return Center(
-                                child: Text('게시글이 없습니다.',
-                                    style: AppTextStyle.koRegular18()),
-                              );
-                            }
-
-                            if (controller.selectedIndex.value == 0 &&
-                                !controller.isSearching.value) {
-                              final sections = [
-                                (
-                                  title: '데일리 팩트',
-                                  posts: controller.dailyPostList,
-                                  accent: AppColor.primary,
-                                  maxRows: 2,
-                                  maxItems: isMobileLayout ? 5 : null,
-                                  tabIndex: 1,
-                                ),
-                                (
-                                  title: '포커스 팩트',
-                                  posts: controller.focusPostList,
-                                  accent: AppColor.focusFact,
-                                  maxRows: 1,
-                                  maxItems: isMobileLayout ? 3 : null,
-                                  tabIndex: 2,
-                                ),
-                                (
-                                  title: '인사이트 팩트',
-                                  posts: controller.insightPostList,
-                                  accent: AppColor.yellow,
-                                  maxRows: 1,
-                                  maxItems: isMobileLayout ? 3 : null,
-                                  tabIndex: 3,
-                                ),
-                                (
-                                  title: '피플&뷰',
-                                  posts: controller.peoplePostList,
-                                  accent: AppColor.peopleView,
-                                  maxRows: 1,
-                                  maxItems: isMobileLayout ? 3 : null,
-                                  tabIndex: 4,
-                                ),
-                              ];
-
-                              return Column(
-                                children: [
-                                  for (int i = 0; i < sections.length; i++) ...[
+                            return Column(
+                              children: [
+                                for (int i = 0; i < sections.length; i++)
+                                  if (sections[i].posts.isNotEmpty) ...[
                                     isMobileLayout
                                         ? _buildSectionList(
                                             title: sections[i].title,
@@ -450,7 +449,11 @@ body: PopScope(
                                             onMore: () => controller.selectTab(
                                                 sections[i].tabIndex),
                                           ),
-                                    if (i != sections.length - 1) ...[
+
+                                    // ✅ 다음 섹션 중에서 "비어있지 않은 섹션"이 또 있을 때만 구분선 표시
+                                    if (sections
+                                        .skip(i + 1)
+                                        .any((s) => s.posts.isNotEmpty)) ...[
                                       SizedBox(
                                           height: isMobileLayout ? 24 : 40),
                                       Divider(),
@@ -458,75 +461,75 @@ body: PopScope(
                                           height: isMobileLayout ? 24 : 40),
                                     ],
                                   ],
-                                ],
-                              );
-                            }
+                              ],
+                            );
+                          }
 
-                            return isMobileLayout
-                                ? buildList(posts: visibleList)
-                                : buildGrid(posts: visibleList);
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 60),
-                      // const SizedBox(height: 40),
-                    ],
-                  ),
+                          return isMobileLayout
+                              ? buildList(posts: visibleList)
+                              : buildGrid(posts: visibleList);
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 60),
+                    // const SizedBox(height: 40),
+                  ],
                 ),
               ),
             ),
-            _buildFooter(),
-          ],
-        ),
+          ),
+          _buildFooter(),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  void _resetListForTab(HomeController controller, int tabIndex) {
-    switch (tabIndex) {
-      case 0:
-        controller.postList.value = controller.originalPostList.toList();
-        break;
-      case 1:
-        controller.dailyPostList.value =
-            controller.originalDailyPostList.toList();
-        break;
-      case 2:
-        controller.focusPostList.value =
-            controller.originalFocusPostList.toList();
-        break;
-      case 3:
-        controller.insightPostList.value =
-            controller.originalInsightPostList.toList();
-        break;
-      case 4:
-        controller.peoplePostList.value =
-            controller.originalPeoplePostList.toList();
-        break;
-    }
+void _resetListForTab(HomeController controller, int tabIndex) {
+  switch (tabIndex) {
+    case 0:
+      controller.postList.value = controller.originalPostList.toList();
+      break;
+    case 1:
+      controller.dailyPostList.value =
+          controller.originalDailyPostList.toList();
+      break;
+    case 2:
+      controller.focusPostList.value =
+          controller.originalFocusPostList.toList();
+      break;
+    case 3:
+      controller.insightPostList.value =
+          controller.originalInsightPostList.toList();
+      break;
+    case 4:
+      controller.peoplePostList.value =
+          controller.originalPeoplePostList.toList();
+      break;
   }
+}
 
-  Future<void> _reloadTabData(HomeController controller, int tabIndex) async {
-    switch (tabIndex) {
-      case 0:
-        await controller.loadAllPosts();
-        break;
-      case 1:
-        await controller.loadDailyPosts();
-        break;
-      case 2:
-        await controller.loadFocusPosts();
-        break;
-      case 3:
-        await controller.loadInsightPosts();
-        break;
-      case 4:
-        await controller.loadPeoplePosts();
-        break;
-      default:
-        await controller.loadAllPosts();
-    }
+Future<void> _reloadTabData(HomeController controller, int tabIndex) async {
+  switch (tabIndex) {
+    case 0:
+      await controller.loadAllPosts();
+      break;
+    case 1:
+      await controller.loadDailyPosts();
+      break;
+    case 2:
+      await controller.loadFocusPosts();
+      break;
+    case 3:
+      await controller.loadInsightPosts();
+      break;
+    case 4:
+      await controller.loadPeoplePosts();
+      break;
+    default:
+      await controller.loadAllPosts();
   }
+}
 
 void _showSearchOverlay(BuildContext context, HomeController controller) {
   showGeneralDialog(
@@ -576,7 +579,8 @@ void _showSearchOverlay(BuildContext context, HomeController controller) {
                         ),
                         onSubmitted: (_) async {
                           Navigator.of(context).pop();
-                            await Future.delayed(const Duration(milliseconds: 100));
+                          await Future.delayed(
+                              const Duration(milliseconds: 100));
                           await _performSearch(controller);
                         },
                       ),
@@ -587,8 +591,8 @@ void _showSearchOverlay(BuildContext context, HomeController controller) {
                         Navigator.of(context).pop();
                         await _performSearch(controller);
                       },
-                      icon: Icon(Icons.search,
-                          color: AppColor.primary, size: 28),
+                      icon:
+                          Icon(Icons.search, color: AppColor.primary, size: 28),
                     ),
                   ],
                 ),
@@ -619,7 +623,7 @@ void _showSearchOverlay(BuildContext context, HomeController controller) {
   );
 }
 
- Future<void> _performSearch(HomeController controller) async {
+Future<void> _performSearch(HomeController controller) async {
   controller.clearFocus();
   final query = controller.searchController.text.trim();
 
@@ -639,8 +643,6 @@ void _showSearchOverlay(BuildContext context, HomeController controller) {
     _resetListForTab(controller, controller.selectedIndex.value);
   }
 }
-
-
 
 Widget _buildSectionGrid({
   required String title,
@@ -1047,7 +1049,7 @@ Widget _buildSectionList({
   );
 }
 
-// ✅ 내부 전환용 DetailView  
+// ✅ 내부 전환용 DetailView
 class DetailView extends StatelessWidget {
   final Map<String, dynamic> post;
   const DetailView({super.key, required this.post});
