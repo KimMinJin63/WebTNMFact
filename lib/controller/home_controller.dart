@@ -80,6 +80,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    isLoading.value = true; 
     loadAllPosts();
     loadDailyPosts();
     loadFocusPosts();
