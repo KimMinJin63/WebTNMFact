@@ -22,10 +22,10 @@ void main() async {
   setUrlStrategy(PathUrlStrategy());
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     await Future.wait([
-    rootBundle.load('assets/fonts/Pretendard-Regular.otf'),
-    rootBundle.load('assets/fonts/Pretendard-Medium.otf'),
-    rootBundle.load('assets/fonts/Pretendard-SemiBold.otf'),
-    rootBundle.load('assets/fonts/Pretendard-Bold.otf'),
+    rootBundle.load('assets/fonts/Pretendard-Regular.woff2'),
+    rootBundle.load('assets/fonts/Pretendard-Medium.woff2'),
+    rootBundle.load('assets/fonts/Pretendard-SemiBold.woff2'),
+    rootBundle.load('assets/fonts/Pretendard-Bold.woff2'),
   ]);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

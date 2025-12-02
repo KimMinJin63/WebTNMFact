@@ -9,34 +9,62 @@ class TermsOfServicePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 0.1초 딜레이로 폰트 캐시 안정화 후 렌더링
+    return FutureBuilder(
+      future: Future.delayed(const Duration(milliseconds: 100)),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        return _buildMainContent();
+      },
+    );
+  }
+
+  Widget _buildMainContent() {
     return Scaffold(
       backgroundColor: AppColor.white,
       body: SafeArea(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Padding(
-                    padding: const EdgeInsets.all(60.0),
-                    child: Column(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(60.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                  GestureDetector(
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.arrow_back, color: AppColor.primary),
-                        SizedBox(width: 4),
-                        Text('돌아가기',
-                            style: AppTextStyle.koSemiBold14()
-                                .copyWith(color: AppColor.primary)),
-                      ],
+              GestureDetector(
+                onTap: Get.back,
+                child: Row(
+                  children: [
+                    Icon(Icons.arrow_back, color: AppColor.primary),
+                    const SizedBox(width: 4),
+                    Text(
+                      '돌아가기',
+                      style: AppTextStyle.koSemiBold14()
+                          .copyWith(color: AppColor.primary),
                     ),
-                  ),
-              SizedBox(height: 16,),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text('''TNM 팩트 서비스 이용약관
-                
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                _serviceText,
+                style: AppTextStyle.koRegular14()
+                    .copyWith(height: 1.6, color: AppColor.black),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 🧾 서비스 이용약관 본문
+const String _serviceText = '''
+TNM 팩트 서비스 이용약관
+
 제1조 (목적)
 본 약관은 TNM 팩트(이하 "회사"라 함)가 제공하는 웹사이트 및 제반 서비스(이하 "서비스"라 함)의 이용과 관련하여 회사와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
 
@@ -76,12 +104,6 @@ class TermsOfServicePage extends StatelessWidget {
 
 서비스 이용과 관련하여 발생한 분쟁에 대한 소송은 민사소송법상의 관할 법원에 제기합니다.
 
-부칙 본 약관은 2025년 1월 1일부터 시행합니다.'''),
-              ),
-            ],
-          ),
-        ),
-      )),
-    );
-  }
-}
+부칙
+본 약관은 2025년 1월 1일부터 시행합니다.
+''';

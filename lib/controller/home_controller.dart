@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:intl/intl.dart';
+import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/utils/app_title.dart';
 
 class HomeController extends GetxController {
   RxInt selectedIndex = 0.obs;
   final TextEditingController searchController = TextEditingController();
   final ScrollController scrollController = ScrollController();
+    var isLoadingDetail = false.obs;
   final FocusNode searchFocusNode = FocusNode();
   RxList<Map<String, dynamic>> postList = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> dailyPostList = <Map<String, dynamic>>[].obs;
@@ -112,6 +114,40 @@ class HomeController extends GetxController {
 
     return dailyCounts;
   }
+
+  Future<void> openDetail(Map<String, dynamic> post) async {
+  if (isLoadingDetail.value) return; // 중복탭 방지
+  isLoadingDetail.value = true;
+
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+    final AdminController adminController = Get.find<AdminController>();
+    final postId = post['id'];
+
+    if (postId.isNotEmpty) {
+      await adminController.incrementViewCount(postId);
+    }
+
+    if (user == null) {
+      final cred = await FirebaseAuth.instance.signInAnonymously();
+      final userId = cred.user!.uid;
+      await adminController.incrementViewCount(postId);
+      logVisit(userId);
+    } else {
+      final userId = user.uid;
+      await adminController.incrementViewCount(postId);
+      logVisit(userId);
+    }
+
+    selectedPost = post;
+    currentPage.value = 'detail';
+  } finally {
+    // 0.4초 후 로딩 종료 (UX용 약간의 여유)
+    await Future.delayed(const Duration(milliseconds: 400));
+    isLoadingDetail.value = false;
+  }
+}
+
 
   Future findPost() async {
     final searchQuery = searchController.text.trim().toLowerCase();

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 
@@ -10,33 +9,62 @@ class PrivacyPolicyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 0.1초 딜레이 후 로딩 완료 → 폰트 로드 안정화 후 본문 표시
+    return FutureBuilder(
+      future: Future.delayed(const Duration(milliseconds: 100)),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        return _buildMainContent();
+      },
+    );
+  }
+
+  /// 본문 렌더링 함수
+  Widget _buildMainContent() {
     return Scaffold(
       backgroundColor: AppColor.white,
       body: SafeArea(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Padding(
-                    padding: const EdgeInsets.all(60.0),
-                    child: Column(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(60.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                  GestureDetector(
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.arrow_back, color: AppColor.primary),
-                        SizedBox(width: 4),
-                        Text('돌아가기',
-                            style: AppTextStyle.koSemiBold14()
-                                .copyWith(color: AppColor.primary)),
-                      ],
+              GestureDetector(
+                onTap: Get.back,
+                child: Row(
+                  children: [
+                    Icon(Icons.arrow_back, color: AppColor.primary),
+                    const SizedBox(width: 4),
+                    Text(
+                      '돌아가기',
+                      style: AppTextStyle.koSemiBold14()
+                          .copyWith(color: AppColor.primary),
                     ),
-                  ),
-              SizedBox(height: 16,),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text('''TNM 팩트 개인정보처리방침
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                _privacyText, // 아래 문자열 상수에서 불러오기
+                style: AppTextStyle.koRegular14()
+                    .copyWith(height: 1.6, color: AppColor.black),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 개인정보처리방침 본문
+const String _privacyText = '''
+TNM 팩트 개인정보처리방침
 
 TNM 팩트(이하 "회사")는 이용자의 개인정보를 중요시하며, 「개인정보보호법」 등 관련 법령을 준수하고 있습니다. 본 방침은 회사가 어떤 정보를 수집하고, 어떻게 이용하는지 알려드립니다.
 
@@ -53,14 +81,12 @@ TNM 팩트(이하 "회사")는 이용자의 개인정보를 중요시하며, 「
 회사는 수집한 정보를 다음의 목적으로만 활용합니다.
 
 웹사이트 접속 빈도 및 방문 시간 분석 (통계)
-
 Google AdSense를 통한 맞춤형 광고 제공
 
 제3조 (개인정보의 제3자 제공)
 회사는 이용자의 개인정보를 원칙적으로 외부에 제공하지 않습니다. 다만, 아래의 경우는 예외로 합니다.
 
 이용자들이 사전에 동의한 경우
-
 법령의 규정에 의거하거나, 수사 목적으로 법령에 정해진 절차와 방법에 따라 수사기관의 요구가 있는 경우
 
 제4조 (자동 수집 장치의 설치·운영 및 거부에 관한 사항)
@@ -76,18 +102,9 @@ Google AdSense를 통한 맞춤형 광고 제공
 회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 이용자의 고충 처리를 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.
 
 성명: 김병국 (편집인)
-
 직책: 개인정보 보호책임자 (CPO)
-
 이메일: tnmfact@gmail.com
 
 제6조 (개인정보처리방침의 변경)
-이 개인정보처리방침은 2025년 1월 1일부터 적용됩니다.'''),
-              ),
-            ],
-                    ),
-                  ),
-          )),
-    );
-  }
-}
+이 개인정보처리방침은 2025년 1월 1일부터 적용됩니다.
+''';

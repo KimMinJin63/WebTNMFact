@@ -252,45 +252,58 @@ class HomePage extends GetView<HomeController> {
       ),
 
       // ✅ BODY 분기
-      body: PopScope(
-        canPop: false,
-        onPopInvoked: (didPop) {
-          final controller = Get.find<HomeController>();
-
-          if (!didPop) {
-            // 1️⃣ 상세보기 → 홈 복귀
-            if (controller.currentPage.value == 'detail') {
-              controller.currentPage.value = 'home';
-              return;
-            }
-
-            // 2️⃣ 검색 결과 상태 → 검색 해제 + 원본 복구
-            if (controller.isSearching.value) {
-              controller.isSearching.value = false;
-              controller.searchController.clear();
-              _resetListForTab(controller, controller.selectedIndex.value);
-              return;
-            }
-
-            // 3️⃣ 다른 탭 → 전체기사 탭으로 복귀
-            if (controller.selectedIndex.value != 0) {
-              controller.selectTab(0);
-              controller.currentPage.value = 'home';
-              return;
-            }
-
-            // 4️⃣ 홈 상태 → 앱 종료
-            Get.back();
-          }
-        },
-        child: Obx(() {
-          if (controller.currentPage.value == 'detail' &&
-              controller.selectedPost != null) {
-            return DetailView(post: controller.selectedPost!);
-          } else {
-            return _buildHomeContent(controller, adminController);
-          }
-        }),
+      body: Column(
+        children: [
+                Obx(() => controller.isLoadingDetail.value
+          ? const LinearProgressIndicator(
+              minHeight: 3,
+              color: Colors.blueAccent,
+              backgroundColor: Colors.transparent,
+            )
+          : const SizedBox(height: 3)),
+          Expanded(
+            child: PopScope(
+              canPop: false,
+              onPopInvoked: (didPop) {
+                final controller = Get.find<HomeController>();
+            
+                if (!didPop) {
+                  // 1️⃣ 상세보기 → 홈 복귀
+                  if (controller.currentPage.value == 'detail') {
+                    controller.currentPage.value = 'home';
+                    return;
+                  }
+            
+                  // 2️⃣ 검색 결과 상태 → 검색 해제 + 원본 복구
+                  if (controller.isSearching.value) {
+                    controller.isSearching.value = false;
+                    controller.searchController.clear();
+                    _resetListForTab(controller, controller.selectedIndex.value);
+                    return;
+                  }
+            
+                  // 3️⃣ 다른 탭 → 전체기사 탭으로 복귀
+                  if (controller.selectedIndex.value != 0) {
+                    controller.selectTab(0);
+                    controller.currentPage.value = 'home';
+                    return;
+                  }
+            
+                  // 4️⃣ 홈 상태 → 앱 종료
+                  Get.back();
+                }
+              },
+              child: Obx(() {
+                if (controller.currentPage.value == 'detail' &&
+                    controller.selectedPost != null) {
+                  return DetailView(post: controller.selectedPost!);
+                } else {
+                  return _buildHomeContent(controller, adminController);
+                }
+              }),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -755,30 +768,31 @@ Widget _buildPostCard({
   final category = (post['category'] ?? '').toString();
 
   return GestureDetector(
-    onTap: () async {
-      print('onTap 눌림');
-      final user = FirebaseAuth.instance.currentUser;
-      final postId = post['id'];
-      final AdminController adminController = Get.find<AdminController>();
-      if (postId.isNotEmpty) {
-        await adminController.incrementViewCount(postId);
-      }
+    onTap: () => controller.openDetail(post),
+    // onTap: () async {
+    //   print('onTap 눌림');
+    //   final user = FirebaseAuth.instance.currentUser;
+    //   final postId = post['id'];
+    //   final AdminController adminController = Get.find<AdminController>();
+    //   if (postId.isNotEmpty) {
+    //     await adminController.incrementViewCount(postId);
+    //   }
 
-      if (user == null) {
-        print('로그인 안 된 상태, 익명 로그인 처리');
-        final cred = await FirebaseAuth.instance.signInAnonymously();
-        final userId = cred.user!.uid;
-        await adminController.incrementViewCount(postId);
-        controller.logVisit(userId);
-      } else {
-        final userId = user.uid;
-        await adminController.incrementViewCount(postId);
-        controller.logVisit(userId);
-      }
+    //   if (user == null) {
+    //     print('로그인 안 된 상태, 익명 로그인 처리');
+    //     final cred = await FirebaseAuth.instance.signInAnonymously();
+    //     final userId = cred.user!.uid;
+    //     await adminController.incrementViewCount(postId);
+    //     controller.logVisit(userId);
+    //   } else {
+    //     final userId = user.uid;
+    //     await adminController.incrementViewCount(postId);
+    //     controller.logVisit(userId);
+    //   }
 
-      controller.selectedPost = post;
-      controller.currentPage.value = 'detail';
-    },
+    //   controller.selectedPost = post;
+    //   controller.currentPage.value = 'detail';
+    // },
     child: Container(
       decoration: BoxDecoration(
         color: AppColor.white,
@@ -1056,6 +1070,21 @@ class DetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: Future.delayed(const Duration(milliseconds: 100)), // 🔹 0.1초 대기
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        return _buildDetailContent();
+      },
+    );
+  }
+
+  Widget _buildDetailContent() {
     final rawDate = post['date'];
     String titleDate = '';
 
@@ -1070,68 +1099,56 @@ class DetailView extends StatelessWidget {
       }
     }
 
-    print('post date: ${post['date']}');
-    print('titleDate: $titleDate');
-
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1260),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 60),
-                  GestureDetector(
-                    onTap: () {
-                      final controller = Get.find<HomeController>();
-                      controller.currentPage.value = 'home';
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.arrow_back, color: AppColor.primary),
-                        SizedBox(width: 4.w),
-                        Text('목록으로 돌아가기',
-                            style: AppTextStyle.koSemiBold14()
-                                .copyWith(color: AppColor.primary)),
-                      ],
-                    ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 60),
+                GestureDetector(
+                  onTap: () {
+                    final controller = Get.find<HomeController>();
+                    controller.currentPage.value = 'home';
+                  },
+                  child: Row(
+                    children: [
+                      Icon(Icons.arrow_back, color: AppColor.primary),
+                      const SizedBox(width: 4),
+                      Text('목록으로 돌아가기',
+                          style: AppTextStyle.koSemiBold14()
+                              .copyWith(color: AppColor.primary)),
+                    ],
                   ),
-                  SizedBox(height: 24.h),
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                    decoration: BoxDecoration(
-                      color: HomePage.getCategoryBackgroundColor(
-                          post['category'] ?? ''),
-                      borderRadius: BorderRadius.circular(80.r),
-                    ),
-                    child: Text(
-                      post['category'] ?? '',
-                      style: AppTextStyle.koSemiBold14().copyWith(
-                        color:
-                            HomePage.getCategoryColor(post['category'] ?? ''),
-                      ),
-                    ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  post['category'] ?? '',
+                  style: AppTextStyle.koSemiBold14().copyWith(
+                    color: HomePage.getCategoryColor(post['category'] ?? ''),
                   ),
-                  SizedBox(height: 12.h),
-                  Text(post['title'] ?? '[오늘의 교육 뉴스] $titleDate',
-                      style: TextStyle(
-                          fontFamily: 'PretendardBold',
-                          fontSize: 30,
-                          color: AppColor.black)),
-                  SizedBox(height: 8.h),
-                  Text('작성자: ${post['editor']} | $titleDate',
-                      style: AppTextStyle.koRegular14()),
-                  SizedBox(height: 24.h),
-                  Text(post['final_article'],
-                      style: AppTextStyle.koRegular18()
-                          .copyWith(color: AppColor.black)),
-                ],
-              ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  post['title'] ?? '[오늘의 교육 뉴스] $titleDate',
+                  style: AppTextStyle.koBold30(),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '작성자: ${post['editor']} | $titleDate',
+                  style: AppTextStyle.koRegular14(),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  post['final_article'],
+                  style: AppTextStyle.koRegular18()
+                      .copyWith(color: AppColor.black),
+                ),
+              ],
             ),
           ),
         ),
