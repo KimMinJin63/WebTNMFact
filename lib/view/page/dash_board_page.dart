@@ -25,7 +25,7 @@ class DashBoardPage extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
             child: SizedBox(
               width: double.infinity,
-              height: 75.h,
+              height: 80.h,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -33,7 +33,7 @@ class DashBoardPage extends StatelessWidget {
                       style: AppTextStyle.koBold28()
                           .copyWith(color: AppColor.black)),
                   Text('TNM Fact의 주요 현황을 확인하세요.',
-                      style: AppTextStyle.koSemiBold12()
+                      style: AppTextStyle.koSemiBold16()
                           .copyWith(color: AppColor.grey)),
                 ],
               ),

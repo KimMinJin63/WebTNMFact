@@ -126,32 +126,33 @@ class HomePage extends GetView<HomeController> {
                     },
                   );
                 }),
-                SizedBox(width: 16.w),
-                Obx(() {
-                  return AppTitleButton(
-                    title: '인사이트팩트',
-                    color: controller.selectedIndex.value == 3
-                        ? AppColor.primary
-                        : AppColor.black,
-                    onPressed: () {
-                      controller.selectTab(3);
-                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                    },
-                  );
-                }),
-                SizedBox(width: 16.w),
-                Obx(() {
-                  return AppTitleButton(
-                    title: '피플&뷰',
-                    color: controller.selectedIndex.value == 4
-                        ? AppColor.primary
-                        : AppColor.black,
-                    onPressed: () {
-                      controller.selectTab(4);
-                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                    },
-                  );
-                }),
+                // HIDE:  인사이트 팩트, 피플&뷰 숨김처리
+                // SizedBox(width: 16.w),
+                // Obx(() {
+                //   return AppTitleButton(
+                //     title: '인사이트팩트',
+                //     color: controller.selectedIndex.value == 3
+                //         ? AppColor.primary
+                //         : AppColor.black,
+                //     onPressed: () {
+                //       controller.selectTab(3);
+                //       controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                //     },
+                //   );
+                // }),
+                // SizedBox(width: 16.w),
+                // Obx(() {
+                //   return AppTitleButton(
+                //     title: '피플&뷰',
+                //     color: controller.selectedIndex.value == 4
+                //         ? AppColor.primary
+                //         : AppColor.black,
+                //     onPressed: () {
+                //       controller.selectTab(4);
+                //       controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                //     },
+                //   );
+                // }),
               ],
             ),
           ),
@@ -413,12 +414,13 @@ Widget _buildHomeContent(
                             case 2:
                               visibleList = controller.focusPostList;
                               break;
-                            case 3:
-                              visibleList = controller.insightPostList;
-                              break;
-                            case 4:
-                              visibleList = controller.peoplePostList;
-                              break;
+                            // HIDE:  인사이트 팩트, 피플&뷰 숨김처리
+                            // case 3:
+                            //   visibleList = controller.insightPostList;
+                            //   break;
+                            // case 4:
+                            //   visibleList = controller.peoplePostList;
+                            //   break;
                             default:
                               visibleList = controller.postList;
                           }
@@ -454,22 +456,23 @@ Widget _buildHomeContent(
                                 maxItems: isMobileLayout ? 3 : null,
                                 tabIndex: 2,
                               ),
-                              (
-                                title: '인사이트 팩트',
-                                posts: controller.insightPostList,
-                                accent: AppColor.yellow,
-                                maxRows: 1,
-                                maxItems: isMobileLayout ? 3 : null,
-                                tabIndex: 3,
-                              ),
-                              (
-                                title: '피플&뷰',
-                                posts: controller.peoplePostList,
-                                accent: AppColor.peopleView,
-                                maxRows: 1,
-                                maxItems: isMobileLayout ? 3 : null,
-                                tabIndex: 4,
-                              ),
+                              // HIDE:  인사이트 팩트, 피플&뷰 숨김처리
+                              // (
+                              //   title: '인사이트 팩트',
+                              //   posts: controller.insightPostList,
+                              //   accent: AppColor.yellow,
+                              //   maxRows: 1,
+                              //   maxItems: isMobileLayout ? 3 : null,
+                              //   tabIndex: 3,
+                              // ),
+                              // (
+                              //   title: '피플&뷰',
+                              //   posts: controller.peoplePostList,
+                              //   accent: AppColor.peopleView,
+                              //   maxRows: 1,
+                              //   maxItems: isMobileLayout ? 3 : null,
+                              //   tabIndex: 4,
+                              // ),
                             ];
 
                             return Column(
@@ -546,14 +549,15 @@ void _resetListForTab(HomeController controller, int tabIndex) {
       controller.focusPostList.value =
           controller.originalFocusPostList.toList();
       break;
-    case 3:
-      controller.insightPostList.value =
-          controller.originalInsightPostList.toList();
-      break;
-    case 4:
-      controller.peoplePostList.value =
-          controller.originalPeoplePostList.toList();
-      break;
+    // HIDE:  인사이트 팩트, 피플&뷰 숨김처리   
+    // case 3:
+    //   controller.insightPostList.value =
+    //       controller.originalInsightPostList.toList();
+    //   break;
+    // case 4:
+    //   controller.peoplePostList.value =
+    //       controller.originalPeoplePostList.toList();
+    //   break;
   }
 }
 

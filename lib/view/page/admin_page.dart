@@ -68,7 +68,7 @@ class AdminPage extends GetView<AdminController> {
                           style: AppTextStyle.koBold28()
                               .copyWith(color: AppColor.black)),
                       Text('게시물을 관리하고 새 글을 작성합니다.',
-                          style: AppTextStyle.koSemiBold12()
+                          style: AppTextStyle.koSemiBold16()
                               .copyWith(color: AppColor.grey)),
                     ],
                   ),
