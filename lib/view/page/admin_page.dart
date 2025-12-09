@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
+import 'package:tnm_fact/helpers/app_category_helper.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/widget/app_admin_top_bar.dart';
@@ -214,7 +215,9 @@ class AdminPage extends GetView<AdminController> {
                                   child: AppPost(
                                     title: title,
                                     author:
-                                        post['editor'] ?? '편집장 김병국',
+                                        CategoryHelper.getCategoryName(post['category']),
+                                    // author:
+                                    //     post['editor'] ?? '편집장 김병국',
                                     category: post['category'],
                                     createdAt:
                                         post['date'] ?? post['createdAt'],

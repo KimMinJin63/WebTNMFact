@@ -10,9 +10,16 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/controller/home_controller.dart';
+import 'package:tnm_fact/helpers/app_category_helper.dart';
 import 'package:tnm_fact/utils/app_color.dart';
+import 'package:tnm_fact/utils/app_date.dart';
 import 'package:tnm_fact/utils/app_routes.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
+import 'package:tnm_fact/view/page/detail_page.dart';
+import 'package:tnm_fact/view/widget/app_footer.dart';
+import 'package:tnm_fact/view/widget/app_post_list.dart';
+import 'package:tnm_fact/view/widget/app_post_list_tile.dart';
+import 'package:tnm_fact/view/widget/app_section_list.dart';
 import 'package:tnm_fact/view/widget/app_title_button.dart';
 
 // ✅ 내부 상세 페이지 위젯 import 제거됨
@@ -21,38 +28,6 @@ import 'package:tnm_fact/view/widget/app_title_button.dart';
 class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
   static const route = '/';
-
-  // 카테고리별 색상 반환 함수
-  static Color getCategoryColor(String category) {
-    switch (category) {
-      case '데일리 팩트':
-        return AppColor.primary;
-      case '인사이트 팩트':
-        return AppColor.yellow;
-      case '포커스 팩트':
-        return AppColor.focusFact;
-      case '피플&뷰':
-        return AppColor.peopleView;
-      default:
-        return AppColor.grey;
-    }
-  }
-
-  // 카테고리별 배경색 반환 함수
-  static Color getCategoryBackgroundColor(String category) {
-    switch (category) {
-      case '데일리 팩트':
-        return AppColor.primary.withOpacity(0.1);
-      case '인사이트 팩트':
-        return AppColor.yellow.withOpacity(0.2);
-      case '포커스 팩트':
-        return AppColor.focusFact.withOpacity(0.1);
-      case '피플&뷰':
-        return AppColor.peopleView.withOpacity(0.2);
-      default:
-        return AppColor.grey.withOpacity(0.1);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -253,94 +228,94 @@ class HomePage extends GetView<HomeController> {
       ),
 
       // ✅ BODY 분기
-body: Stack(
-  children: [
-    /// ① 기존 본문 전체를 Column으로 그대로 유지
-    Column(
-      children: [
-        // ✅ 상단 라인 로딩바
-        Obx(() => controller.isLoadingDetail.value
-            ? const LinearProgressIndicator(
-                minHeight: 3,
-                color: Colors.blueAccent,
-                backgroundColor: Colors.transparent,
-              )
-            : const SizedBox(height: 3)),
-        Expanded(
-          child: PopScope(
-            canPop: false,
-            onPopInvoked: (didPop) {
-              final controller = Get.find<HomeController>();
+      body: Stack(
+        children: [
+          /// ① 기존 본문 전체를 Column으로 그대로 유지
+          Column(
+            children: [
+              // ✅ 상단 라인 로딩바
+              Obx(() => controller.isLoadingDetail.value
+                  ? const LinearProgressIndicator(
+                      minHeight: 3,
+                      color: Colors.blueAccent,
+                      backgroundColor: Colors.transparent,
+                    )
+                  : const SizedBox(height: 3)),
+              Expanded(
+                child: PopScope(
+                  canPop: false,
+                  onPopInvoked: (didPop) {
+                    final controller = Get.find<HomeController>();
 
-              if (!didPop) {
-                // 1️⃣ 상세보기 → 홈 복귀
-                if (controller.currentPage.value == 'detail') {
-                  controller.currentPage.value = 'home';
-                  return;
-                }
+                    if (!didPop) {
+                      // 1️⃣ 상세보기 → 홈 복귀
+                      if (controller.currentPage.value == 'detail') {
+                        controller.currentPage.value = 'home';
+                        return;
+                      }
 
-                // 2️⃣ 검색 결과 상태 → 검색 해제 + 원본 복구
-                if (controller.isSearching.value) {
-                  controller.isSearching.value = false;
-                  controller.searchController.clear();
-                  _resetListForTab(
-                      controller, controller.selectedIndex.value);
-                  return;
-                }
+                      // 2️⃣ 검색 결과 상태 → 검색 해제 + 원본 복구
+                      if (controller.isSearching.value) {
+                        controller.isSearching.value = false;
+                        controller.searchController.clear();
+                        _resetListForTab(
+                            controller, controller.selectedIndex.value);
+                        return;
+                      }
 
-                // 3️⃣ 다른 탭 → 전체기사 탭으로 복귀
-                if (controller.selectedIndex.value != 0) {
-                  controller.selectTab(0);
-                  controller.currentPage.value = 'home';
-                  return;
-                }
+                      // 3️⃣ 다른 탭 → 전체기사 탭으로 복귀
+                      if (controller.selectedIndex.value != 0) {
+                        controller.selectTab(0);
+                        controller.currentPage.value = 'home';
+                        return;
+                      }
 
-                // 4️⃣ 홈 상태 → 앱 종료
-                Get.back();
-              }
-            },
-            child: Obx(() {
-              if (controller.currentPage.value == 'detail' &&
-                  controller.selectedPost != null) {
-                return DetailView(post: controller.selectedPost!);
-              } else {
-                return _buildHomeContent(controller, adminController);
-              }
-            }),
-          ),
-        ),
-      ],
-    ),
-
-    /// ② 데이터 로딩 중일 때 화면 덮는 오버레이
-    Obx(() {
-      if (controller.isLoading.value) {
-        return Positioned.fill(
-          child: Container(
-            color: Colors.white,
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(AppColor.primary),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "데이터를 불러오는 중입니다...",
-                    style: AppTextStyle.koRegular15()
-                        .copyWith(color: AppColor.grey),
-                  ),
-                ],
+                      // 4️⃣ 홈 상태 → 앱 종료
+                      Get.back();
+                    }
+                  },
+                  child: Obx(() {
+                    if (controller.currentPage.value == 'detail' &&
+                        controller.selectedPost != null) {
+                      return DetailView(post: controller.selectedPost!);
+                    } else {
+                      return _buildHomeContent(controller, adminController);
+                    }
+                  }),
+                ),
               ),
-            ),
+            ],
           ),
-        );
-      }
-      return const SizedBox.shrink();
-    }),
-  ],
-),
+
+          /// ② 데이터 로딩 중일 때 화면 덮는 오버레이
+          Obx(() {
+            if (controller.isLoading.value) {
+              return Positioned.fill(
+                child: Container(
+                  color: Colors.white,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(AppColor.primary),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          "데이터를 불러오는 중입니다...",
+                          style: AppTextStyle.koRegular15()
+                              .copyWith(color: AppColor.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+        ],
+      ),
     );
   }
 }
@@ -398,11 +373,27 @@ Widget _buildHomeContent(
                           required List<Map<String, dynamic>> posts,
                           int? maxItems,
                         }) {
-                          return _buildPostList(
-                            posts: posts,
-                            controller: controller,
-                            maxItems: maxItems,
-                          );
+                          return AppPostList(
+                              posts: posts,
+                              maxItems: maxItems,
+                              itemBuilder: (post) {
+                                final String title =
+                                    (post['title'] ?? '').toString();
+                                final String category =
+                                    (post['category'] ?? '').toString();
+                                final String postID =
+                                    (post['id'] ?? '').toString();
+                                final String date =
+                                    AppDate.format(post['date']); // ⭐ 날짜 처리 완료
+
+                                return AppPostListTile(
+                                    title: title,
+                                    onTap: () => controller.handlePostTap(post),
+                                    category: category,
+                                    date: date,
+                                    postID: postID,
+                                    post: post);
+                              });
                         }
 
                         return Obx(() {
@@ -480,7 +471,7 @@ Widget _buildHomeContent(
                                 for (int i = 0; i < sections.length; i++)
                                   if (sections[i].posts.isNotEmpty) ...[
                                     isMobileLayout
-                                        ? _buildSectionList(
+                                        ? AppSectionList(
                                             title: sections[i].title,
                                             posts: sections[i].posts,
                                             accentColor: sections[i].accent,
@@ -488,6 +479,29 @@ Widget _buildHomeContent(
                                             maxItems: sections[i].maxItems,
                                             onMore: () => controller.selectTab(
                                                 sections[i].tabIndex),
+                                            buildPostTile: (post) {
+                                              final String title =
+                                                  (post['title'] ?? '')
+                                                      .toString();
+                                              final String category =
+                                                  (post['category'] ?? '')
+                                                      .toString();
+                                              final String postID =
+                                                  (post['id'] ?? '').toString();
+                                              final String date =
+                                                  AppDate.format(post[
+                                                      'date']); // ⭐ 날짜 처리 완료
+
+                                              return AppPostListTile(
+                                                title: title,
+                                                category: category,
+                                                date: date,
+                                                postID: postID,
+                                                post: post,
+                                                onTap: () => controller
+                                                    .handlePostTap(post),
+                                              );
+                                            },
                                           )
                                         : _buildSectionGrid(
                                             title: sections[i].title,
@@ -529,7 +543,20 @@ Widget _buildHomeContent(
               ),
             ),
           ),
-          _buildFooter(),
+          AppFooter(
+            logo: 'TNM FACT',
+            companyInfo: '제호: TNM 팩트 (TNM Fact)',
+            name: '발행인: 김민진 | 편집인: 김병국',
+            publeInfo: '등록번호: (등록 후 기재 예정) | 등록일: (등록 후 기재 예정)',
+            address: '발행소: 서울시 금천구 벚꽃로 73',
+            contact: '연락처: tnmfact@gmail.com',
+            service: '이용약관',
+            privacy: '개인정보처리방침',
+            copyright: '© 2025 TNM Fact. All rights reserved.',
+            serviceTap: () => Get.toNamed(AppRoutes.service),
+            privacyTap: () => Get.toNamed(AppRoutes.privacy),
+          )
+          // _buildFooter(),
         ],
       ),
     ),
@@ -549,7 +576,7 @@ void _resetListForTab(HomeController controller, int tabIndex) {
       controller.focusPostList.value =
           controller.originalFocusPostList.toList();
       break;
-    // HIDE:  인사이트 팩트, 피플&뷰 숨김처리   
+    // HIDE:  인사이트 팩트, 피플&뷰 숨김처리
     // case 3:
     //   controller.insightPostList.value =
     //       controller.originalInsightPostList.toList();
@@ -856,13 +883,13 @@ Widget _buildPostCard({
             margin: const EdgeInsets.only(top: 8),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: HomePage.getCategoryBackgroundColor(category),
+              color: CategoryHelper.getCategoryBackgroundColor(category),
               borderRadius: BorderRadius.circular(80),
             ),
             child: Text(
               category,
               style: AppTextStyle.koSemiBold14().copyWith(
-                color: HomePage.getCategoryColor(category),
+                color: CategoryHelper.getCategoryColor(category),
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -894,404 +921,6 @@ Widget _buildPostCard({
             ),
           ),
         ],
-      ),
-    ),
-  );
-}
-
-// ✅ 모바일용 리스트뷰
-Widget _buildPostList({
-  required List<Map<String, dynamic>> posts,
-  required HomeController controller,
-  int? maxItems,
-}) {
-  if (posts.isEmpty) {
-    return Center(
-      child: Text('게시글이 없습니다.', style: AppTextStyle.koRegular18()),
-    );
-  }
-
-  final int itemCount =
-      maxItems == null ? posts.length : min(posts.length, maxItems);
-
-  return ListView.builder(
-    shrinkWrap: true,
-    physics: const NeverScrollableScrollPhysics(),
-    itemCount: itemCount,
-    itemBuilder: (context, index) {
-      final post = posts[index];
-      return _buildPostListTile(controller: controller, post: post);
-    },
-  );
-}
-
-// ✅ 모바일용 리스트 타일 (제목만 표시)
-Widget _buildPostListTile({
-  required HomeController controller,
-  required Map<String, dynamic> post,
-}) {
-  final timestamp = post['date'];
-  String formattedDate = '';
-
-  if (timestamp != null) {
-    if (timestamp is Timestamp) {
-      formattedDate = DateFormat('yyyy.MM.dd').format(timestamp.toDate());
-    } else if (timestamp is String) {
-      final parsed = DateTime.tryParse(timestamp);
-      if (parsed != null) {
-        formattedDate = DateFormat('yyyy.MM.dd').format(parsed);
-      } else {
-        formattedDate = timestamp;
-      }
-    }
-  }
-
-  final title = (post['title'] ?? '').toString();
-  final category = (post['category'] ?? '').toString();
-
-  return GestureDetector(
-    onTap: () async {
-      print('onTap 눌림');
-      final user = FirebaseAuth.instance.currentUser;
-      final postId = post['id'];
-      final AdminController adminController = Get.find<AdminController>();
-      if (postId.isNotEmpty) {
-        await adminController.incrementViewCount(postId);
-      }
-
-      if (user == null) {
-        print('로그인 안 된 상태, 익명 로그인 처리');
-        final cred = await FirebaseAuth.instance.signInAnonymously();
-        final userId = cred.user!.uid;
-        await adminController.incrementViewCount(postId);
-        controller.logVisit(userId);
-      } else {
-        final userId = user.uid;
-        await adminController.incrementViewCount(postId);
-        controller.logVisit(userId);
-      }
-
-      controller.selectedPost = post;
-      controller.currentPage.value = 'detail';
-    },
-    child: Container(
-      decoration: BoxDecoration(
-        color: AppColor.white,
-        border: Border(
-          bottom: BorderSide(
-            color: AppColor.border.withOpacity(0.3),
-            width: 1,
-          ),
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 카테고리 배지
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: HomePage.getCategoryBackgroundColor(category),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              category,
-              style: AppTextStyle.koSemiBold12().copyWith(
-                color: HomePage.getCategoryColor(category),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // 제목과 날짜
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title.isNotEmpty ? title : '[오늘의 교육 뉴스] $formattedDate',
-                  style: AppTextStyle.koSemiBold16(),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  formattedDate,
-                  style:
-                      AppTextStyle.koRegular12().copyWith(color: AppColor.grey),
-                ),
-              ],
-            ),
-          ),
-          // 화살표 아이콘
-          Icon(
-            Icons.chevron_right,
-            color: AppColor.grey,
-            size: 20,
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-// ✅ 모바일용 섹션 리스트
-Widget _buildSectionList({
-  required String title,
-  required List<Map<String, dynamic>> posts,
-  required HomeController controller,
-  required Color accentColor,
-  int? maxItems,
-  required VoidCallback onMore,
-}) {
-  final int displayMaxItems = maxItems ?? 10;
-  final bool showMore = posts.length > displayMaxItems;
-  final int itemCount = min(posts.length, displayMaxItems);
-
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: AppTextStyle.koBold18().copyWith(color: accentColor),
-          ),
-          if (showMore)
-            TextButton(
-              onPressed: () {
-                onMore();
-                // ✅ 부드러운 스크롤 대신 즉시 최상단으로 이동
-                controller.scrollController.jumpTo(0);
-              },
-              child: Text(
-                '>> 더보기',
-                style: AppTextStyle.koSemiBold14().copyWith(
-                  color: accentColor,
-                ),
-              ),
-            ),
-        ],
-      ),
-      const SizedBox(height: 8),
-      posts.isEmpty
-          ? Container(
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Text(
-                '게시글이 없습니다.',
-                style:
-                    AppTextStyle.koRegular18().copyWith(color: AppColor.grey),
-              ),
-            )
-          : ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: itemCount,
-              itemBuilder: (context, index) {
-                final post = posts[index];
-                return _buildPostListTile(
-                  controller: controller,
-                  post: post,
-                );
-              },
-            ),
-    ],
-  );
-}
-
-// ✅ 내부 전환용 DetailView
-class DetailView extends StatelessWidget {
-  final Map<String, dynamic> post;
-  const DetailView({super.key, required this.post});
-
-  @override
-  Widget build(BuildContext context) {
-    final rawDate = post['date'];
-    String titleDate = '';
-
-    if (rawDate is Timestamp) {
-      titleDate = DateFormat('yy.MM.dd').format(rawDate.toDate());
-    } else if (rawDate is String) {
-      try {
-        final parsedDate = DateTime.parse(rawDate);
-        titleDate = DateFormat('yy.MM.dd').format(parsedDate);
-      } catch (e) {
-        print('⚠️ 날짜 파싱 실패: $rawDate');
-      }
-    }
-
-    print('post date: ${post['date']}');
-    print('titleDate: $titleDate');
-
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1260),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 60),
-                  GestureDetector(
-                    onTap: () {
-                      final controller = Get.find<HomeController>();
-                      controller.currentPage.value = 'home';
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.arrow_back, color: AppColor.primary),
-                        SizedBox(width: 4.w),
-                        Text('목록으로 돌아가기',
-                            style: AppTextStyle.koSemiBold14()
-                                .copyWith(color: AppColor.primary)),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 24.h),
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                    decoration: BoxDecoration(
-                      color: HomePage.getCategoryBackgroundColor(
-                          post['category'] ?? ''),
-                      borderRadius: BorderRadius.circular(80.r),
-                    ),
-                    child: Text(
-                      post['category'] ?? '',
-                      style: AppTextStyle.koSemiBold14().copyWith(
-                        color:
-                            HomePage.getCategoryColor(post['category'] ?? ''),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Text(post['title'] ?? '[오늘의 교육 뉴스] $titleDate',
-                      style: TextStyle(
-                          fontFamily: 'Pretendard',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 30,
-                          color: AppColor.black)),
-                  SizedBox(height: 8.h),
-                  Text('작성자: ${post['editor']} | $titleDate',
-                      style: AppTextStyle.koRegular14()),
-                  SizedBox(height: 24.h),
-                  Text(post['final_article'],
-                      style: AppTextStyle.koRegular18()
-                          .copyWith(color: AppColor.black)),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ✅ 하단 푸터
-Widget _buildFooter() {
-  return Container(
-    width: double.infinity,
-    color: Colors.grey[100],
-    padding: const EdgeInsets.symmetric(vertical: 40),
-    child: Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1260),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // --- 로고 & 제호 ---
-              Text(
-                'TNM FACT',
-                style: AppTextStyle.koBold18(),
-              ),
-              const SizedBox(height: 8),
-
-              // --- 발행 정보 ---
-              Text(
-                '제호: TNM 팩트 (TNM Fact)',
-                style:
-                    AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
-              ),
-              Text(
-                '발행인: 김민진 | 편집인: 김병국',
-                style:
-                    AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '등록번호: (등록 후 기재 예정) | 등록일: (등록 후 기재 예정)',
-                style:
-                    AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '발행소: 서울시 금천구 벚꽃로 73',
-                style:
-                    AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '연락처: tnmfact@gmail.com',
-                style:
-                    AppTextStyle.koRegular14().copyWith(color: AppColor.grey),
-              ),
-              const SizedBox(height: 12),
-
-              Row(
-                children: [
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero, // 내부 패딩 제거
-                      minimumSize: Size.zero, // 최소 터치 영역 제거
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 높이 축소
-                    ),
-                    onPressed: () => Get.toNamed(AppRoutes.service),
-                    child: Text(
-                      '이용약관',
-                      style: AppTextStyle.koRegular14()
-                          .copyWith(color: AppColor.black),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 16,
-                  ),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero, // 내부 패딩 제거
-                      minimumSize: Size.zero, // 최소 터치 영역 제거
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 높이 축소
-                    ),
-                    onPressed: () => Get.toNamed(AppRoutes.privacy),
-                    child: Text(
-                      '개인정보처리방침',
-                      style: AppTextStyle.koRegular14()
-                          .copyWith(color: AppColor.black),
-                    ),
-                  ),
-                ],
-              ),
-
-              // --- 구분선 ---
-              const SizedBox(height: 12),
-              Divider(height: 32, color: AppColor.lightGrey),
-
-              // --- 저작권 문구 ---
-              Text(
-                '© 2025 TNM Fact. All rights reserved.',
-                style:
-                    AppTextStyle.koRegular12().copyWith(color: AppColor.grey),
-              ),
-            ],
-          ),
-        ),
       ),
     ),
   );

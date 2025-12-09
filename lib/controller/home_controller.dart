@@ -11,7 +11,7 @@ class HomeController extends GetxController {
   RxInt selectedIndex = 0.obs;
   final TextEditingController searchController = TextEditingController();
   final ScrollController scrollController = ScrollController();
-    var isLoadingDetail = false.obs;
+  var isLoadingDetail = false.obs;
   final FocusNode searchFocusNode = FocusNode();
   RxList<Map<String, dynamic>> postList = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> dailyPostList = <Map<String, dynamic>>[].obs;
@@ -80,7 +80,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    isLoading.value = true; 
+    isLoading.value = true;
     loadAllPosts();
     loadDailyPosts();
     loadFocusPosts();
@@ -116,39 +116,60 @@ class HomeController extends GetxController {
     return dailyCounts;
   }
 
-  Future<void> openDetail(Map<String, dynamic> post) async {
-  if (isLoadingDetail.value) return; // 중복탭 방지
-  isLoadingDetail.value = true;
-
-  try {
+  Future<void> handlePostTap(Map<String, dynamic> post) async {
+    final admin = Get.find<AdminController>();
     final user = FirebaseAuth.instance.currentUser;
-    final AdminController adminController = Get.find<AdminController>();
     final postId = post['id'];
 
-    if (postId.isNotEmpty) {
-      await adminController.incrementViewCount(postId);
+    if (postId != null) {
+      await admin.incrementViewCount(postId);
     }
 
     if (user == null) {
       final cred = await FirebaseAuth.instance.signInAnonymously();
       final userId = cred.user!.uid;
-      await adminController.incrementViewCount(postId);
+      await admin.incrementViewCount(postId);
       logVisit(userId);
     } else {
-      final userId = user.uid;
-      await adminController.incrementViewCount(postId);
-      logVisit(userId);
+      logVisit(user.uid);
     }
 
     selectedPost = post;
     currentPage.value = 'detail';
-  } finally {
-    // 0.4초 후 로딩 종료 (UX용 약간의 여유)
-    await Future.delayed(const Duration(milliseconds: 400));
-    isLoadingDetail.value = false;
   }
-}
 
+  Future<void> openDetail(Map<String, dynamic> post) async {
+    if (isLoadingDetail.value) return; // 중복탭 방지
+    isLoadingDetail.value = true;
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      final AdminController adminController = Get.find<AdminController>();
+      final postId = post['id'];
+
+      if (postId.isNotEmpty) {
+        await adminController.incrementViewCount(postId);
+      }
+
+      if (user == null) {
+        final cred = await FirebaseAuth.instance.signInAnonymously();
+        final userId = cred.user!.uid;
+        await adminController.incrementViewCount(postId);
+        logVisit(userId);
+      } else {
+        final userId = user.uid;
+        await adminController.incrementViewCount(postId);
+        logVisit(userId);
+      }
+
+      selectedPost = post;
+      currentPage.value = 'detail';
+    } finally {
+      // 0.4초 후 로딩 종료 (UX용 약간의 여유)
+      await Future.delayed(const Duration(milliseconds: 400));
+      isLoadingDetail.value = false;
+    }
+  }
 
   Future findPost() async {
     final searchQuery = searchController.text.trim().toLowerCase();
@@ -222,7 +243,7 @@ class HomeController extends GetxController {
   }
 
   Future loadAllPosts() async {
-      isLoading.value = true;
+    isLoading.value = true;
     FirebaseFirestore.instance
         .collection('post')
         .where('status', isEqualTo: '발행')
@@ -256,7 +277,7 @@ class HomeController extends GetxController {
       if (isLoading.value) isLoading.value = false;
 
       print('🔥 실시간 업데이트됨! 현재 총 게시글 수: ${postList.length}');
-       isLoading.value = false;
+      isLoading.value = false;
     });
   }
 
