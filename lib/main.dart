@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,6 +31,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // await FirebaseAuth.instance.setPersistence(Persistence.NONE);
   await initializeDateFormatting('ko_KR', null); // ✅ 로케일 설정 추가
   runApp(const MyApp());
 }

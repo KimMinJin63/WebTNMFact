@@ -59,8 +59,8 @@ class DashBoardPage extends StatelessWidget {
                               height: 48,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color:
-                                    AppColor.primary.withOpacity(0.2), // 옅은 보라 배경
+                                color: AppColor.primary
+                                    .withOpacity(0.2), // 옅은 보라 배경
                               ),
                               child: Icon(
                                 Icons.newspaper,
@@ -100,8 +100,8 @@ class DashBoardPage extends StatelessWidget {
                                 height: 48,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color:
-                                      AppColor.green.withOpacity(0.2), // 옅은 보라 배경
+                                  color: AppColor.green
+                                      .withOpacity(0.2), // 옅은 보라 배경
                                 ),
                                 child: Icon(
                                   Icons.remove_red_eye,
@@ -114,30 +114,47 @@ class DashBoardPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    '총 방문자 수',
-                                    style: AppTextStyle.koSemiBold16(),
-                                  ),
-                                  // SizedBox(height: 4.h),
-                                  FutureBuilder<int>(
-                                    future: controller
-                                        .fetchTotalVisits(), // ✅ Firestore에서 불러오기
-                                    builder: (context, snapshot) {
-                                      if (!snapshot.hasData) {
-                                        return const Text(
-                                          '-',
-                                          style: TextStyle(color: Colors.grey),
-                                        );
-                                      }
-                                      return Text(
-                                        '${snapshot.data}',
-                                        style: AppTextStyle.koBold28()
-                                            .copyWith(color: AppColor.green),
-                                      );
-                                    },
-                                  ),
+                                  Text('총 방문자 수',
+                                      style: AppTextStyle.koSemiBold16()),
+                                  Obx(() {
+                                    return Text(
+                                      '${controller.totalVisits.value}',
+                                      style: AppTextStyle.koBold28()
+                                          .copyWith(color: AppColor.green),
+                                    );
+                                  }),
                                 ],
-                              ),
+                              )
+                              // Column(
+                              //   crossAxisAlignment: CrossAxisAlignment.start,
+                              //   mainAxisAlignment: MainAxisAlignment.center,
+                              //   children: [
+                              //     Text(
+                              //       '총 방문자 수',
+                              //       style: AppTextStyle.koSemiBold16(),
+                              //     ),
+                              //     // SizedBox(height: 4.h),
+                              //     FutureBuilder<int>(
+                              //       future: controller
+                              //           .fetchTotalVisits(), // ✅ Firestore에서 불러오기
+                              //       builder: (context, snapshot) {
+                              //         if (!snapshot.hasData) {
+                              //           return const Text(
+                              //             '-',
+                              //             style: TextStyle(color: Colors.grey),
+                              //           );
+                              //         }
+                              //         return Obx(() {
+                              //           return Text(
+                              //             '${snapshot.data}',
+                              //             style: AppTextStyle.koBold28()
+                              //                 .copyWith(color: AppColor.green),
+                              //           );
+                              //         });
+                              //       },
+                              //     ),
+                              //   ],
+                              // ),
                             ],
                           ),
                         ),
@@ -265,7 +282,7 @@ class DashBoardPage extends StatelessWidget {
                                             : title;
                                       }
 
-                                       final post = top5[index];
+                                      final post = top5[index];
 
                                       return Row(
                                         children: [
@@ -303,8 +320,11 @@ class DashBoardPage extends StatelessWidget {
                                                     '어드민 페이지 잘 받아오나?? : ${post['category']}');
                                                 print(
                                                     '어드민 페이지 잘 받아오나?? : ${post['status']}');
-                                                 controller.originTabIndex!.value = controller.menuSelectedIndex.value; 
-                                                 print(
+                                                controller
+                                                        .originTabIndex!.value =
+                                                    controller.menuSelectedIndex
+                                                        .value;
+                                                print(
                                                     'originTabIndex 값은?? : ${controller.originTabIndex!.value}');
                                                 controller.menuSelectedIndex
                                                     .value = 1;

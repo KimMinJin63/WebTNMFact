@@ -130,8 +130,10 @@ class HomeController extends GetxController {
       final userId = cred.user!.uid;
       await admin.incrementViewCount(postId);
       logVisit(userId);
+      print('뷰 포인트 +1');
     } else {
       logVisit(user.uid);
+      print('뷰 포인트 +1+++++++++++');
     }
 
     selectedPost = post;

@@ -546,7 +546,7 @@ Widget _buildHomeContent(
           AppFooter(
             logo: 'TNM FACT',
             companyInfo: '제호: TNM 팩트 (TNM Fact)',
-            name: '발행인: 김민진 | 편집인: 김병국',
+            name: '발행인: 김민진 | 편집인: 김민진',
             publeInfo: '등록번호: (등록 후 기재 예정) | 등록일: (등록 후 기재 예정)',
             address: '발행소: 서울시 금천구 벚꽃로 73',
             contact: '연락처: tnmfact@gmail.com',
@@ -839,20 +839,23 @@ Widget _buildPostCard({
       final user = FirebaseAuth.instance.currentUser;
       final postId = post['id'];
       final AdminController adminController = Get.find<AdminController>();
-      if (postId.isNotEmpty) {
-        await adminController.incrementViewCount(postId);
-      }
+      // if (postId.isNotEmpty) {
+      //   await adminController.incrementViewCount(postId);
+      //   print('포스트 아이디가 있을때');
+      // }
 
       if (user == null) {
         print('로그인 안 된 상태, 익명 로그인 처리');
         final cred = await FirebaseAuth.instance.signInAnonymously();
         final userId = cred.user!.uid;
         await adminController.incrementViewCount(postId);
+        print('유저가 없을때');
         controller.logVisit(userId);
       } else {
         final userId = user.uid;
         await adminController.incrementViewCount(postId);
         controller.logVisit(userId);
+        print('유저가 있을때 있을때');
       }
 
       controller.selectedPost = post;

@@ -36,6 +36,7 @@ class AdminController extends GetxController {
   var isCreate = false.obs;
   final FocusNode searchFocusNode = FocusNode();
   RxInt? originTabIndex = RxInt(0);
+  var totalVisits = 0.obs;
 
   void openEditPage(Map<String, dynamic> post) {
     // final post = Get.arguments;
@@ -71,6 +72,7 @@ class AdminController extends GetxController {
     fetchAllPostCounts();
     fetchAllPosts();
     fetchNotPosts();
+    loadTotalVisits();
     fetchDonePosts();
     bindPosts();
     topPostsLast7DaysByView(5);
@@ -366,10 +368,11 @@ class AdminController extends GetxController {
     }
   }
 
-  Future<int> fetchTotalVisits() async {
+  loadTotalVisits() async {
     final snapshot =
         await FirebaseFirestore.instance.collection('visits').get();
-    return snapshot.docs.length; // ✅ 문서 개수 = 총 방문자 수
+    totalVisits.value = snapshot.docs.length;
+    print('$totalVisits 수 입니다.!!!!');
   }
 
   Future<void> incrementViewCount(String postId) async {
