@@ -337,7 +337,7 @@ Widget _buildHomeContent(
                   children: [
                     const SizedBox(height: 48),
                     AutoSizeText(
-                      '진실을 전달하는 미디어',
+                      '교육을 읽는 새로운 방법',
                       maxFontSize: 60,
                       minFontSize: 20,
                       style: AppTextStyle.koBold35(),
@@ -552,7 +552,7 @@ Widget _buildHomeContent(
             contact: '연락처: tnmfact@gmail.com',
             service: '이용약관',
             privacy: '개인정보처리방침',
-            copyright: '© 2025 TNM Fact. All rights reserved.',
+            copyright: '© 2026 TNM Fact. All rights reserved.',
             serviceTap: () => Get.toNamed(AppRoutes.service),
             privacyTap: () => Get.toNamed(AppRoutes.privacy),
           )

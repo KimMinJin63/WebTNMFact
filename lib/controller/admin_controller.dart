@@ -39,9 +39,6 @@ class AdminController extends GetxController {
   var totalVisits = 0.obs;
 
   void openEditPage(Map<String, dynamic> post) {
-    // final post = Get.arguments;
-
-    // final post = box.read('post');
     currentPost.value = post;
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['title']}');
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['content']}');
@@ -54,17 +51,6 @@ class AdminController extends GetxController {
       searchFocusNode.unfocus();
     }
   }
-
-//   @override
-// void onInit() {
-//   super.onInit();
-//   initAuth().then((_) {
-//     fetchAllPostCounts();
-//     fetchAllPosts();
-//     fetchNotPosts();
-//     fetchDonePosts();
-//   });
-// }
 
   @override
   void onInit() {
