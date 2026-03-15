@@ -60,7 +60,7 @@ class AppPostListTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title.isNotEmpty ? title : '[오늘의 교육 뉴스] $date',
+                    title.isNotEmpty ? title : '[오늘의 주요 이슈 TOP 3] $date',
                     style: AppTextStyle.koSemiBold16(),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

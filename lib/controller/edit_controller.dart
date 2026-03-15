@@ -15,7 +15,7 @@ class EditController extends GetxController {
   // RxString selectedFocus = ''.obs;
   // RxString selectedPeople = ''.obs;
   final box = GetStorage();
-  final kDailyPrefix = '[오늘의 교육 뉴스] ';
+  final kDailyPrefix = '[오늘의 주요 이슈 TOP 3] ';
 
   @override
   void onInit() {

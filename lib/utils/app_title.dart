@@ -1,4 +1,4 @@
-const kDailyPrefix = '[오늘의 교육 뉴스] ';
+const kDailyPrefix = '[오늘의 주요 이슈 TOP 3] ';
 
 /// 카테고리에 따라 제목 접두사 보장/제거 (표시/저장 공용)
 String normalizeTitleForCategory(String? rawTitle, String? category) {

@@ -43,15 +43,15 @@ class EditPage extends GetView<EditController> {
 
       // 🔹 데일리 팩트인 경우
       if (category == '데일리 팩트') {
-        if (title.isEmpty || title == '[오늘의 교육 뉴스]' || title == '[오늘의 교육 뉴스]') {
-          return '[오늘의 교육 뉴스] $formattedDate';
+        if (title.isEmpty || title == '[오늘의 주요 이슈 TOP 3]' || title == '[오늘의 주요 이슈 TOP 3]') {
+          return '[오늘의 주요 이슈 TOP 3] $formattedDate';
         }
 
-        if (title.startsWith('[오늘의 교육 뉴스]')) {
+        if (title.startsWith('[오늘의 주요 이슈 TOP 3]')) {
           return title;
         }
 
-        return '[오늘의 교육 뉴스] $title';
+        return '[오늘의 주요 이슈 TOP 3] $title';
       }
 
       // 🔹 인사이트 팩트 등 다른 카테고리

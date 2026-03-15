@@ -547,7 +547,7 @@ Widget _buildHomeContent(
             logo: 'TNM FACT',
             companyInfo: '제호: TNM 팩트 (TNM Fact)',
             name: '발행인: 김민진 | 편집인: 김민진',
-            publeInfo: '등록번호: (등록 후 기재 예정) | 등록일: (등록 후 기재 예정)',
+            publeInfo: '등록번호: 금천 라00261 | 등록일: 2026.02.23',
             address: '발행소: 서울시 금천구 벚꽃로 73',
             contact: '연락처: tnmfact@gmail.com',
             service: '이용약관',
@@ -900,7 +900,7 @@ Widget _buildPostCard({
           ),
           const SizedBox(height: 4),
           Text(
-            title.isNotEmpty ? title : '[오늘의 교육 뉴스] $formattedDate',
+            title.isNotEmpty ? title : '[오늘의 주요 이슈 TOP 3] $formattedDate',
             style: AppTextStyle.koSemiBold18(),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

@@ -269,13 +269,13 @@ class DashBoardPage extends StatelessWidget {
 
                                         if (category == '데일리 팩트') {
                                           if (title.isEmpty ||
-                                              title == '[오늘의 교육 뉴스]') {
-                                            return '[오늘의 교육 뉴스] $formattedDate';
+                                              title == '[오늘의 주요 이슈 TOP 3]') {
+                                            return '[오늘의 주요 이슈 TOP 3] $formattedDate';
                                           }
-                                          if (title.startsWith('[오늘의 교육 뉴스]')) {
+                                          if (title.startsWith('[오늘의 주요 이슈 TOP 3]')) {
                                             return title;
                                           }
-                                          return '[오늘의 교육 뉴스] $title';
+                                          return '[오늘의 주요 이슈 TOP 3] $title';
                                         }
                                         return title.isEmpty
                                             ? formattedDate
