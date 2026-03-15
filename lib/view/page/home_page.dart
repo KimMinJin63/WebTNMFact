@@ -313,7 +313,7 @@ Widget _buildHomeContent(
                   children: [
                     const SizedBox(height: 48),
                     AutoSizeText(
-                      '진실을 전달하는 미디어',
+                      '세상을 읽는 새로운 방법',
                       maxFontSize: 60,
                       minFontSize: 20,
                       style: AppTextStyle.koBold35(),
