@@ -35,7 +35,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   flutter_screenutil: ^5.9.3
-  get: ^4.7.2
+  get: ^4.7.3
   firebase_core: ^4.0.0
   firebase_auth: ^6.0.1
   cloud_firestore: ^6.0.0
@@ -88,15 +88,15 @@ flutter:
   #   - family: Schyler
   # example:
   fonts:
-    - family: Pretendand  # 👉 중요한 포인트: family 하나만!
+    - family: Pretendard  # 👉 중요한 포인트: family 하나만!
       fonts:
-        - asset: assets/fonts/Pretendard-Regular.otf
+        - asset: assets/fonts/Pretendard-Regular.woff2
           weight: 400
-        - asset: assets/fonts/Pretendard-Medium.otf
+        - asset: assets/fonts/Pretendard-Medium.woff2
           weight: 500
-        - asset: assets/fonts/Pretendard-SemiBold.otf
+        - asset: assets/fonts/Pretendard-SemiBold.woff2
           weight: 600
-        - asset: assets/fonts/Pretendard-Bold.otf
+        - asset: assets/fonts/Pretendard-Bold.woff2
           weight: 700
             #
   # For details regarding fonts from package dependencies,

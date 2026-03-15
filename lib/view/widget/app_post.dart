@@ -53,7 +53,8 @@ class AppPost extends StatelessWidget {
               child: Center(
                 child: Text(
                   author,
-                  style: TextStyle(fontSize: 14),
+                  style: AppTextStyle.koRegular14()
+                      .copyWith(color: AppColor.black),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -63,7 +64,8 @@ class AppPost extends StatelessWidget {
               child: Center(
                 child: Text(
                   category,
-                  style: TextStyle(fontSize: 14),
+                  style: AppTextStyle.koRegular14()
+                      .copyWith(color: AppColor.black),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -73,7 +75,8 @@ class AppPost extends StatelessWidget {
               child: Center(
                 child: Text(
                   createdAt,
-                  style: TextStyle(fontSize: 14),
+                  style: AppTextStyle.koRegular14()
+                      .copyWith(color: AppColor.black),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

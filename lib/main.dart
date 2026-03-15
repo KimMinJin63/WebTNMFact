@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,14 +23,15 @@ void main() async {
   setUrlStrategy(PathUrlStrategy());
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
     await Future.wait([
-    rootBundle.load('assets/fonts/Pretendard-Regular.otf'),
-    rootBundle.load('assets/fonts/Pretendard-Medium.otf'),
-    rootBundle.load('assets/fonts/Pretendard-SemiBold.otf'),
-    rootBundle.load('assets/fonts/Pretendard-Bold.otf'),
+    rootBundle.load('assets/fonts/Pretendard-Regular.woff2'),
+    rootBundle.load('assets/fonts/Pretendard-Medium.woff2'),
+    rootBundle.load('assets/fonts/Pretendard-SemiBold.woff2'),
+    rootBundle.load('assets/fonts/Pretendard-Bold.woff2'),
   ]);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // await FirebaseAuth.instance.setPersistence(Persistence.NONE);
   await initializeDateFormatting('ko_KR', null); // ✅ 로케일 설정 추가
   runApp(const MyApp());
 }

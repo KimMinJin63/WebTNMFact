@@ -39,24 +39,19 @@
     }
   },
 
-  "hosting": [
+"hosting": [
     {
       "target": "production",
       "public": "build/web",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-      "rewrites": [{ "source": "**", "destination": "/index.html" }],
-      "headers": [
+      "rewrites": [
         {
-          "source": "/admin",
-          "headers": [
-            { "key": "X-Robots-Tag", "value": "noindex" }
-          ]
+          "source": "/og-image.png",
+          "destination": "/og-image.png"
         },
         {
-          "source": "/admin/**",
-          "headers": [
-            { "key": "X-Robots-Tag", "value": "noindex" }
-          ]
+          "source": "**",
+          "destination": "/index.html"
         }
       ]
     },
@@ -64,19 +59,14 @@
       "target": "staging",
       "public": "build/web",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-      "rewrites": [{ "source": "**", "destination": "/index.html" }],
-      "headers": [
+      "rewrites": [
         {
-          "source": "/admin",
-          "headers": [
-            { "key": "X-Robots-Tag", "value": "noindex" }
-          ]
+          "source": "/og-image.png",
+          "destination": "/og-image.png"
         },
         {
-          "source": "/admin/**",
-          "headers": [
-            { "key": "X-Robots-Tag", "value": "noindex" }
-          ]
+          "source": "**",
+          "destination": "/index.html"
         }
       ]
     }

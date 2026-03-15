@@ -20,11 +20,12 @@ class AdminLayoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-  if (user == null) {
-    // 화면 그리기 전에 즉시 리다이렉트
-    Future.microtask(() => Get.offAllNamed('/admin'));
-    return const SizedBox.shrink(); // 아무것도 렌더링하지 않음
-  }
+    if (FirebaseAuth.instance.currentUser == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.offAllNamed('/admin');
+      });
+      return const SizedBox();
+    }
 
     final AdminController controller = Get.find<AdminController>();
     final screenWidth = ScreenUtil().screenWidth;
@@ -44,7 +45,7 @@ class AdminLayoutPage extends StatelessWidget {
             children: [
               if (showSidebar)
                 SizedBox(
-                   width: (width * 0.14).clamp(60.0, 200.0),
+                  width: (width * 0.14).clamp(60.0, 200.0),
                   child: Container(
                     // width: extended ? 239.w : 70.w,
                     color: AppColor.navy,
@@ -86,7 +87,7 @@ class AdminLayoutPage extends StatelessWidget {
                     ),
                   ),
                 ),
-          
+
               /// 우측 콘텐츠 영역
               Expanded(
                 child: Obx(() {
@@ -109,7 +110,7 @@ class AdminLayoutPage extends StatelessWidget {
                       return const Center(child: Text('게시글을 선택하세요.'));
                     }
                   }
-          
+
                   if (admin.isCreate.value && tab == 1) {
                     return WillPopScope(
                       onWillPop: () async {
@@ -120,7 +121,7 @@ class AdminLayoutPage extends StatelessWidget {
                     );
                   }
                   // final box = GetStorage();
-          
+
                   switch (controller.menuSelectedIndex.value) {
                     case 0:
                       return const DashBoardPage();
@@ -267,8 +268,8 @@ Widget _buildMenuItem(IconData icon, String label, int index,
       controller.fetchAllPosts();
     },
     child: Container(
-margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
-padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: isSelected ? AppColor.primary : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
@@ -298,7 +299,8 @@ padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
                 label,
                 style: isSelected
                     ? AppTextStyle.koSemiBold15().copyWith(color: Colors.white)
-                    : AppTextStyle.koRegular13().copyWith(color: Colors.white70),
+                    : AppTextStyle.koRegular13()
+                        .copyWith(color: Colors.white70),
               ),
             ),
           ]
