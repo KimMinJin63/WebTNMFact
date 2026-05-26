@@ -13,6 +13,9 @@ class AppRoutes {
   static const login = '/admin'; //로그인
   // static const admin = '/adminHome'; //어드민 페이지
   static const home = '/'; // 메인 페이지
+  static const post = '/post/:id'; // 게시글 상세
+
+  static String postDetail(String id) => '/post/$id';
   // static const create = '/create'; // 작성 페이지
   // static const edit = '/edit'; // 수정 페이지
   // static const detail = DetailPage.route; // 수정 페이지

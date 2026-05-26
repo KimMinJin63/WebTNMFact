@@ -5,7 +5,10 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
+import 'package:flutter/foundation.dart';
+import 'package:tnm_fact/utils/app_routes.dart';
 import 'package:tnm_fact/utils/app_title.dart';
+import 'package:tnm_fact/utils/web_history.dart';
 
 class HomeController extends GetxController {
   RxInt selectedIndex = 0.obs;
@@ -72,6 +75,7 @@ class HomeController extends GetxController {
   }
 
   void clearFocus() {
+    if (searchFocusNode.context == null) return;
     if (searchFocusNode.hasFocus) {
       searchFocusNode.unfocus();
     }
@@ -96,7 +100,8 @@ class HomeController extends GetxController {
   @override
   void onClose() {
     searchController.dispose();
-    searchFocusNode.dispose(); // ✅ FocusNode 정리
+    searchFocusNode.dispose();
+    scrollController.dispose();
     super.onClose();
   }
 
@@ -116,59 +121,95 @@ class HomeController extends GetxController {
     return dailyCounts;
   }
 
-  Future<void> handlePostTap(Map<String, dynamic> post) async {
-    final admin = Get.find<AdminController>();
-    final user = FirebaseAuth.instance.currentUser;
-    final postId = post['id'];
+  Map<String, dynamic>? findPostInCache(String id) {
+    final allLists = [
+      postList,
+      dailyPostList,
+      focusPostList,
+      insightPostList,
+      peoplePostList,
+      originalPostList,
+      originalDailyPostList,
+      originalFocusPostList,
+      originalInsightPostList,
+      originalPeoplePostList,
+    ];
 
-    if (postId != null) {
-      await admin.incrementViewCount(postId);
+    for (final list in allLists) {
+      for (final post in list) {
+        if (post['id']?.toString() == id) {
+          return post;
+        }
+      }
     }
-
-    if (user == null) {
-      final cred = await FirebaseAuth.instance.signInAnonymously();
-      final userId = cred.user!.uid;
-      await admin.incrementViewCount(postId);
-      logVisit(userId);
-      print('뷰 포인트 +1');
-    } else {
-      logVisit(user.uid);
-      print('뷰 포인트 +1+++++++++++');
-    }
-
-    selectedPost = post;
-    currentPage.value = 'detail';
+    return null;
   }
 
-  Future<void> openDetail(Map<String, dynamic> post) async {
-    if (isLoadingDetail.value) return; // 중복탭 방지
+  Future<Map<String, dynamic>?> fetchPostById(String id) async {
+    final doc =
+        await FirebaseFirestore.instance.collection('post').doc(id).get();
+    if (!doc.exists) return null;
+
+    final data = doc.data()!;
+    if (data['status'] != '발행') return null;
+
+    return _mapPostDocument(doc.id, data);
+  }
+
+  Map<String, dynamic> _mapPostDocument(
+      String docId, Map<String, dynamic> data) {
+    final ts = data['date'] as Timestamp;
+    final created = ts.toDate();
+    final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
+    final baseTitle = (data['title'] as String?) ??
+        DateFormat('yy.MM.dd', 'ko_KR').format(created);
+    final normalizedTitle =
+        normalizeTitleForCategory(baseTitle, data['category']);
+
+    return {
+      'id': docId,
+      'title': normalizedTitle,
+      'final_article': data['final_article'] ?? data['content'] ?? '',
+      'editor': data['editor'] ?? data['author'],
+      'date': display,
+      'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
+      'status': data['status'],
+      'category': data['category'],
+      'sortAt': created.millisecondsSinceEpoch,
+    };
+  }
+
+  Future<void> handlePostTap(Map<String, dynamic> post) async {
+    if (isLoadingDetail.value) return;
     isLoadingDetail.value = true;
 
     try {
+      final admin = Get.find<AdminController>();
       final user = FirebaseAuth.instance.currentUser;
-      final AdminController adminController = Get.find<AdminController>();
-      final postId = post['id'];
+      final postId = post['id']?.toString() ?? '';
+
+      if (postId.isEmpty) return;
 
       if (postId.isNotEmpty) {
-        await adminController.incrementViewCount(postId);
+        await admin.incrementViewCount(postId);
       }
 
       if (user == null) {
         final cred = await FirebaseAuth.instance.signInAnonymously();
         final userId = cred.user!.uid;
-        await adminController.incrementViewCount(postId);
+        await admin.incrementViewCount(postId);
         logVisit(userId);
       } else {
-        final userId = user.uid;
-        await adminController.incrementViewCount(postId);
-        logVisit(userId);
+        logVisit(user.uid);
       }
 
-      selectedPost = post;
-      currentPage.value = 'detail';
+      final postPath = AppRoutes.postDetail(postId);
+      final openedFromHome = kIsWeb && isBrowserOnHomePath();
+      await Get.toNamed(postPath);
+      if (kIsWeb && openedFromHome) {
+        repairBrowserHistoryAfterPostOpen(postPath);
+      }
     } finally {
-      // 0.4초 후 로딩 종료 (UX용 약간의 여유)
-      await Future.delayed(const Duration(milliseconds: 400));
       isLoadingDetail.value = false;
     }
   }

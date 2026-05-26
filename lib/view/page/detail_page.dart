@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/helpers/app_category_helper.dart';
 import 'package:tnm_fact/utils/app_color.dart';
+import 'package:tnm_fact/utils/app_navigation.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
-import 'package:tnm_fact/view/page/home_page.dart';
 
 class DetailView extends StatelessWidget {
   final Map<String, dynamic> post;
@@ -45,10 +44,7 @@ class DetailView extends StatelessWidget {
                 children: [
                   const SizedBox(height: 60),
                   GestureDetector(
-                    onTap: () {
-                      final controller = Get.find<HomeController>();
-                      controller.currentPage.value = 'home';
-                    },
+                    onTap: () => navigateBackToHome(context: context),
                     child: Row(
                       children: [
                         Icon(Icons.arrow_back, color: AppColor.primary),

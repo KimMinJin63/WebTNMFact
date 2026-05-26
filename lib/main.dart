@@ -11,6 +11,7 @@ import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/controller/login_controller.dart';
 import 'package:tnm_fact/firebase_options.dart';
 import 'package:tnm_fact/utils/app_pages.dart';
+import 'package:tnm_fact/utils/web_history.dart';
 import 'package:tnm_fact/view/page/admin_layout_page.dart';
 import 'package:tnm_fact/view/page/admin_page.dart';
 import 'package:tnm_fact/view/page/home_page.dart';
@@ -33,6 +34,7 @@ void main() async {
   );
   // await FirebaseAuth.instance.setPersistence(Persistence.NONE);
   await initializeDateFormatting('ko_KR', null); // ✅ 로케일 설정 추가
+  initWebHistoryBridge();
   runApp(const MyApp());
 }
 
@@ -52,7 +54,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           useInheritedMediaQuery: true,
           initialBinding: BindingsBuilder(() {
-            Get.lazyPut(() => HomeController(), fenix: true);
+            Get.put(HomeController(), permanent: true);
             Get.lazyPut(() => LoginController(), fenix: true);
             Get.put(AdminController(), permanent: true);
             Get.lazyPut(() => CreateController(), fenix: true);

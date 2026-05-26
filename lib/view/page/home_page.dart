@@ -15,8 +15,8 @@ import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_date.dart';
 import 'package:tnm_fact/utils/app_routes.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
-import 'package:tnm_fact/view/page/detail_page.dart';
 import 'package:tnm_fact/view/widget/app_footer.dart';
+import 'package:tnm_fact/view/widget/app_side_banner_layout.dart';
 import 'package:tnm_fact/view/widget/app_post_list.dart';
 import 'package:tnm_fact/view/widget/app_post_list_tile.dart';
 import 'package:tnm_fact/view/widget/app_section_list.dart';
@@ -78,43 +78,30 @@ class HomePage extends GetView<HomeController> {
                 SizedBox(width: 16.w),
                 Obx(() {
                   return AppTitleButton(
-                    title: '데일리팩트',
-                    color: controller.selectedIndex.value == 1
-                        ? AppColor.primary
-                        : AppColor.black,
-                    onPressed: () {
-                      controller.selectTab(1);
-                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                    },
-                  );
-                }),
-                SizedBox(width: 16.w),
-                Obx(() {
-                  return AppTitleButton(
                     title: '포커스 팩트',
                     color: controller.selectedIndex.value == 2
                         ? AppColor.primary
                         : AppColor.black,
                     onPressed: () {
                       controller.selectTab(2);
-                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                      controller.currentPage.value = 'home';
                     },
                   );
                 }),
-                // HIDE:  인사이트 팩트, 피플&뷰 숨김처리
-                // SizedBox(width: 16.w),
-                // Obx(() {
-                //   return AppTitleButton(
-                //     title: '인사이트팩트',
-                //     color: controller.selectedIndex.value == 3
-                //         ? AppColor.primary
-                //         : AppColor.black,
-                //     onPressed: () {
-                //       controller.selectTab(3);
-                //       controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                //     },
-                //   );
-                // }),
+                SizedBox(width: 16.w),
+                Obx(() {
+                  return AppTitleButton(
+                    title: '인사이트팩트',
+                    color: controller.selectedIndex.value == 3
+                        ? AppColor.primary
+                        : AppColor.black,
+                    onPressed: () {
+                      controller.selectTab(3);
+                      controller.currentPage.value = 'home';
+                    },
+                  );
+                }),
+                // HIDE:  피플&뷰 숨김처리
                 // SizedBox(width: 16.w),
                 // Obx(() {
                 //   return AppTitleButton(
@@ -242,46 +229,35 @@ class HomePage extends GetView<HomeController> {
                     )
                   : const SizedBox(height: 3)),
               Expanded(
-                child: PopScope(
-                  canPop: false,
-                  onPopInvoked: (didPop) {
-                    final controller = Get.find<HomeController>();
+                child: AppSideBannerLayout(
+                  child: PopScope(
+                    canPop: false,
+                    onPopInvoked: (didPop) {
+                      final controller = Get.find<HomeController>();
 
-                    if (!didPop) {
-                      // 1️⃣ 상세보기 → 홈 복귀
-                      if (controller.currentPage.value == 'detail') {
-                        controller.currentPage.value = 'home';
-                        return;
+                      if (!didPop) {
+                        // 1️⃣ 검색 결과 상태 → 검색 해제 + 원본 복구
+                        if (controller.isSearching.value) {
+                          controller.isSearching.value = false;
+                          controller.searchController.clear();
+                          _resetListForTab(
+                              controller, controller.selectedIndex.value);
+                          return;
+                        }
+
+                        // 2️⃣ 다른 탭 → 전체기사 탭으로 복귀
+                        if (controller.selectedIndex.value != 0) {
+                          controller.selectTab(0);
+                          controller.currentPage.value = 'home';
+                          return;
+                        }
+
+                        // 3️⃣ 홈 상태 → 앱 종료
+                        Get.back();
                       }
-
-                      // 2️⃣ 검색 결과 상태 → 검색 해제 + 원본 복구
-                      if (controller.isSearching.value) {
-                        controller.isSearching.value = false;
-                        controller.searchController.clear();
-                        _resetListForTab(
-                            controller, controller.selectedIndex.value);
-                        return;
-                      }
-
-                      // 3️⃣ 다른 탭 → 전체기사 탭으로 복귀
-                      if (controller.selectedIndex.value != 0) {
-                        controller.selectTab(0);
-                        controller.currentPage.value = 'home';
-                        return;
-                      }
-
-                      // 4️⃣ 홈 상태 → 앱 종료
-                      Get.back();
-                    }
-                  },
-                  child: Obx(() {
-                    if (controller.currentPage.value == 'detail' &&
-                        controller.selectedPost != null) {
-                      return DetailView(post: controller.selectedPost!);
-                    } else {
-                      return _buildHomeContent(controller, adminController);
-                    }
-                  }),
+                    },
+                    child: _buildHomeContent(controller, adminController),
+                  ),
                 ),
               ),
             ],
@@ -399,19 +375,12 @@ Widget _buildHomeContent(
                         return Obx(() {
                           List<Map<String, dynamic>> visibleList;
                           switch (controller.selectedIndex.value) {
-                            case 1:
-                              visibleList = controller.dailyPostList;
-                              break;
                             case 2:
                               visibleList = controller.focusPostList;
                               break;
-                            // HIDE:  인사이트 팩트, 피플&뷰 숨김처리
-                            // case 3:
-                            //   visibleList = controller.insightPostList;
-                            //   break;
-                            // case 4:
-                            //   visibleList = controller.peoplePostList;
-                            //   break;
+                            case 3:
+                              visibleList = controller.insightPostList;
+                              break;
                             default:
                               visibleList = controller.postList;
                           }
@@ -432,30 +401,22 @@ Widget _buildHomeContent(
                               !controller.isSearching.value) {
                             final sections = [
                               (
-                                title: '데일리 팩트',
-                                posts: controller.dailyPostList,
-                                accent: AppColor.primary,
-                                maxRows: 2,
-                                maxItems: isMobileLayout ? 5 : null,
-                                tabIndex: 1,
-                              ),
-                              (
                                 title: '포커스 팩트',
                                 posts: controller.focusPostList,
                                 accent: AppColor.focusFact,
-                                maxRows: 1,
-                                maxItems: isMobileLayout ? 3 : null,
+                                maxRows: 2,
+                                maxItems: isMobileLayout ? 5 : null,
                                 tabIndex: 2,
                               ),
-                              // HIDE:  인사이트 팩트, 피플&뷰 숨김처리
-                              // (
-                              //   title: '인사이트 팩트',
-                              //   posts: controller.insightPostList,
-                              //   accent: AppColor.yellow,
-                              //   maxRows: 1,
-                              //   maxItems: isMobileLayout ? 3 : null,
-                              //   tabIndex: 3,
-                              // ),
+                              (
+                                title: '인사이트 팩트',
+                                posts: controller.insightPostList,
+                                accent: AppColor.yellow,
+                                maxRows: 1,
+                                maxItems: isMobileLayout ? 3 : null,
+                                tabIndex: 3,
+                              ),
+                              // HIDE:  피플&뷰 숨김처리
                               // (
                               //   title: '피플&뷰',
                               //   posts: controller.peoplePostList,
@@ -576,11 +537,10 @@ void _resetListForTab(HomeController controller, int tabIndex) {
       controller.focusPostList.value =
           controller.originalFocusPostList.toList();
       break;
-    // HIDE:  인사이트 팩트, 피플&뷰 숨김처리
-    // case 3:
-    //   controller.insightPostList.value =
-    //       controller.originalInsightPostList.toList();
-    //   break;
+    case 3:
+      controller.insightPostList.value =
+          controller.originalInsightPostList.toList();
+      break;
     // case 4:
     //   controller.peoplePostList.value =
     //       controller.originalPeoplePostList.toList();
@@ -834,33 +794,7 @@ Widget _buildPostCard({
   final category = (post['category'] ?? '').toString();
 
   return GestureDetector(
-    onTap: () async {
-      print('onTap 눌림');
-      final user = FirebaseAuth.instance.currentUser;
-      final postId = post['id'];
-      final AdminController adminController = Get.find<AdminController>();
-      // if (postId.isNotEmpty) {
-      //   await adminController.incrementViewCount(postId);
-      //   print('포스트 아이디가 있을때');
-      // }
-
-      if (user == null) {
-        print('로그인 안 된 상태, 익명 로그인 처리');
-        final cred = await FirebaseAuth.instance.signInAnonymously();
-        final userId = cred.user!.uid;
-        await adminController.incrementViewCount(postId);
-        print('유저가 없을때');
-        controller.logVisit(userId);
-      } else {
-        final userId = user.uid;
-        await adminController.incrementViewCount(postId);
-        controller.logVisit(userId);
-        print('유저가 있을때 있을때');
-      }
-
-      controller.selectedPost = post;
-      controller.currentPage.value = 'detail';
-    },
+    onTap: () => controller.handlePostTap(post),
     child: Container(
       decoration: BoxDecoration(
         color: AppColor.white,
