@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tnm_fact/view/widget/side_banner_ad.dart';
 
 /// 메인 콘텐츠([contentMaxWidth]) 양옆 여백에 배너가 들어갈 만큼 넓을 때만 좌·우 배너 표시.
 class AppSideBannerLayout extends StatelessWidget {
@@ -9,11 +10,8 @@ class AppSideBannerLayout extends StatelessWidget {
 
   final Widget child;
 
-  static const String bannerAsset = 'assets/images/banner.png';
-
-  /// assets/images/banner.png 실제 픽셀 (세로형 스카이스크래퍼)
-  static const double bannerImageWidth = 688;
-  static const double bannerImageHeight = 1184;
+  static const double bannerImageWidth = SideBannerAd.designWidth;
+  static const double bannerImageHeight = SideBannerAd.designHeight;
 
   static const double bannerAspectRatio =
       bannerImageWidth / bannerImageHeight;
@@ -22,51 +20,53 @@ class AppSideBannerLayout extends StatelessWidget {
   static const double contentMaxWidth = 1260;
 
   /// 배너를 표시하기 위한 최소 폭
-  static const double minBannerWidth = 120;
+  static const double minBannerWidth = 200;
+
+  static const double targetBannerWidth = SideBannerAd.designWidth;
 
   /// 본문과 배너 사이 최소 여백
   static const double minSideGap = 12;
 
-  /// 화면에 그릴 때 원본 대비 축소 비율
-  static const double displayScale = 0.5;
+  static const double bannerOuterPadding = 12;
 
   static double _sideSpace(double viewportWidth) =>
       (viewportWidth - contentMaxWidth) / 2;
 
-  /// 화면 여백을 활용한 배너 폭 (원본보다 크게 늘리지 않음, [displayScale] 적용)
-  static double bannerWidthForViewport(double viewportWidth) {
+  static double sideContainerWidthForViewport(double viewportWidth) {
     final available = _sideSpace(viewportWidth) - minSideGap;
     if (available < minBannerWidth) return 0;
-    final fitted = available.clamp(minBannerWidth, bannerImageWidth);
-    return fitted * displayScale;
+    return available;
   }
 
-  static double bannerHeightForWidth(double bannerWidth) =>
-      bannerWidth / bannerAspectRatio;
-
   static bool shouldShowSideBanners(double viewportWidth) =>
-      bannerWidthForViewport(viewportWidth) > 0;
+      sideContainerWidthForViewport(viewportWidth) > 0;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final bannerWidth = bannerWidthForViewport(width);
+        final viewportWidth = constraints.maxWidth;
+        final sideWidth = sideContainerWidthForViewport(viewportWidth);
 
-        if (!shouldShowSideBanners(width)) {
+        if (!shouldShowSideBanners(viewportWidth)) {
           return child;
         }
 
-        final banner = _SideBanner(width: bannerWidth);
+        final banner = _SideBanner(sideWidth: sideWidth);
+        final rowHeight = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : MediaQuery.sizeOf(context).height;
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            banner,
-            Expanded(child: child),
-            banner,
-          ],
+        return SizedBox(
+          height: rowHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              banner,
+              Expanded(child: child),
+              banner,
+            ],
+          ),
         );
       },
     );
@@ -74,27 +74,31 @@ class AppSideBannerLayout extends StatelessWidget {
 }
 
 class _SideBanner extends StatelessWidget {
-  const _SideBanner({required this.width});
+  const _SideBanner({required this.sideWidth});
 
-  final double width;
+  final double sideWidth;
 
   @override
   Widget build(BuildContext context) {
-    final height = AppSideBannerLayout.bannerHeightForWidth(width);
+    final innerMaxWidth =
+        (sideWidth - AppSideBannerLayout.bannerOuterPadding * 2).clamp(0.0, sideWidth);
+    final bannerWidth = AppSideBannerLayout.targetBannerWidth
+        .clamp(AppSideBannerLayout.minBannerWidth, innerMaxWidth);
 
     return SizedBox(
-      width: width,
+      width: sideWidth,
       child: Padding(
-        padding: const EdgeInsets.only(top: 48, left: 4, right: 4),
-        child: SizedBox(
-          width: width,
-          height: height,
-          child: Image.asset(
-            AppSideBannerLayout.bannerAsset,
-            width: width,
-            height: height,
-            fit: BoxFit.contain,
-            filterQuality: FilterQuality.medium,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSideBannerLayout.bannerOuterPadding,
+        ),
+        child: Center(
+          child: SizedBox(
+            width: bannerWidth,
+            child: FittedBox(
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.center,
+              child: const SideBannerAd(),
+            ),
           ),
         ),
       ),

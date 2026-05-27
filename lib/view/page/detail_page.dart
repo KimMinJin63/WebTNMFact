@@ -7,6 +7,7 @@ import 'package:tnm_fact/helpers/app_category_helper.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_navigation.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
+import 'package:tnm_fact/view/widget/post_article_feedback.dart';
 
 class DetailView extends StatelessWidget {
   final Map<String, dynamic> post;
@@ -87,6 +88,9 @@ class DetailView extends StatelessWidget {
                   Text(post['final_article'],
                       style: AppTextStyle.koRegular18()
                           .copyWith(color: AppColor.black)),
+                  PostArticleFeedback(
+                    postId: (post['id'] ?? '').toString(),
+                  ),
                 ],
               ),
             ),

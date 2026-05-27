@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/controller/create_controller.dart';
 import 'package:tnm_fact/controller/edit_controller.dart';
@@ -34,6 +35,7 @@ void main() async {
   );
   // await FirebaseAuth.instance.setPersistence(Persistence.NONE);
   await initializeDateFormatting('ko_KR', null); // ✅ 로케일 설정 추가
+  await GetStorage.init();
   initWebHistoryBridge();
   runApp(const MyApp());
 }
