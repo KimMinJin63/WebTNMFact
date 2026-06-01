@@ -20,6 +20,14 @@ class CreateController extends GetxController {
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+  String _sanitizeDocId(String raw) {
+    // Firestore 문서 ID는 '/'를 포함할 수 없음. (콘솔에서 보기 좋게 공백은 유지)
+    // 길이도 너무 길어지지 않게 제한.
+    final trimmed = raw.trim();
+    final noSlash = trimmed.replaceAll('/', '／');
+    return noSlash.length <= 180 ? noSlash : noSlash.substring(0, 180).trim();
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -41,27 +49,29 @@ class CreateController extends GetxController {
     required int viewpoint,
   }) async {
     try {
-      // final now = DateTime.now();
       final normalizedTitle = normalizeTitleForCategory(title, category);
-      // final dateValue = status == '발행' ? FieldValue.serverTimestamp() : null;
+      final baseId = _sanitizeDocId(normalizedTitle.isEmpty ? title : normalizedTitle);
+      if (baseId.isEmpty) return;
 
-      final docRef = await firestore.collection('post').add({
-        // ✅ post로 통일
+      final postCol = firestore.collection('post');
+      var docId = baseId;
+
+      // 동일 제목이 이미 있으면 뒤에 타임스탬프를 붙여 충돌 회피
+      final existing = await postCol.doc(docId).get();
+      if (existing.exists) {
+        final suffix = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+        docId = _sanitizeDocId('${baseId}_$suffix');
+      }
+
+      await postCol.doc(docId).set({
         'title': normalizedTitle,
         'final_article': final_article,
         'category': category,
         'editor': editor,
-        // 'date': status == '발행' ? FieldValue.serverTimestamp() : '작성 중',
         'date': FieldValue.serverTimestamp(),
-        // 'date': dateValue,
-        // 'createdAtTs': FieldValue.serverTimestamp(),
         'status': status,
-        // 'focus': focus,
-        // 'people': people,
         'viewpoint': 0,
       });
-
-      final docId = docRef.id;
     } catch (e) {
       Get.snackbar('Error', 'Failed to create post: $e');
     }
