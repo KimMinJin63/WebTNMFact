@@ -31,10 +31,19 @@ void replaceBrowserUrlWithHome() {
 /// Get.toNamed 이후 호출 — 브라우저 히스토리를 […, /, /post/id] 형태로 맞춤
 void repairBrowserHistoryAfterPostOpen(String postPath) {
   if (!_postPathPattern.hasMatch(Uri.base.path)) return;
-  if (Uri.base.path != postPath) return;
+
+  final browserId = _postIdFromPath(Uri.base.path);
+  final targetId = _postIdFromPath(postPath);
+  if (browserId == null || targetId == null || browserId != targetId) return;
 
   html.window.history.replaceState(null, '', AppRoutes.home);
   html.window.history.pushState(null, '', postPath);
+}
+
+String? _postIdFromPath(String path) {
+  final match = _postPathPattern.firstMatch(path);
+  if (match == null) return null;
+  return AppRoutes.decodePostId(match.group(1));
 }
 
 bool _routeIsPostDetail() {
@@ -69,7 +78,10 @@ void _syncGetRouteWithBrowserUrl() {
 
   if (_routeIsPostDetail()) return;
 
-  final target = AppRoutes.postDetail(match.group(1)!);
+  final postId = AppRoutes.decodePostId(match.group(1));
+  if (postId.isEmpty) return;
+
+  final target = AppRoutes.postDetail(postId);
   if (Get.currentRoute == target) return;
 
   _handlingBrowserNav = true;

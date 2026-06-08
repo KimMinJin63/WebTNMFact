@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_navigation.dart';
+import 'package:tnm_fact/utils/app_routes.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/page/detail_page.dart';
 import 'package:tnm_fact/view/widget/app_side_banner_layout.dart';
@@ -26,8 +27,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   Future<void> _loadPost() async {
-    final id = Get.parameters['id'];
-    if (id == null || id.isEmpty) {
+    final id = AppRoutes.decodePostId(Get.parameters['id']);
+    if (id.isEmpty) {
       setState(() => _loading = false);
       return;
     }

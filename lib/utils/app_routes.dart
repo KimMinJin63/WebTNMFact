@@ -15,7 +15,19 @@ class AppRoutes {
   static const home = '/'; // 메인 페이지
   static const post = '/post/:id'; // 게시글 상세
 
-  static String postDetail(String id) => '/post/$id';
+  /// Firestore 문서 ID(제목 기반 한글 등)를 URL 경로에 안전하게 넣기 위한 인코딩
+  static String encodePostId(String id) => Uri.encodeComponent(id);
+
+  static String decodePostId(String? raw) {
+    if (raw == null || raw.isEmpty) return '';
+    try {
+      return Uri.decodeComponent(raw);
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  static String postDetail(String id) => '/post/${encodePostId(id)}';
   // static const create = '/create'; // 작성 페이지
   // static const edit = '/edit'; // 수정 페이지
   // static const detail = DetailPage.route; // 수정 페이지
