@@ -37,7 +37,8 @@ class DetailView extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1260),
+            // 뉴스 기사형 본문 폭 (좌우 여백 확보)
+            constraints: const BoxConstraints(maxWidth: 680),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
