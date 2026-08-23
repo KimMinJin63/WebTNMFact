@@ -43,9 +43,19 @@ class HomePage extends GetView<HomeController> {
         leading: Padding(
           padding: EdgeInsets.only(left: 16.w),
           child: GestureDetector(
-            onTap: () {
+            onTap: () async {
+              if (controller.isSearching.value) {
+                controller.isSearching.value = false;
+                controller.searchController.clear();
+                _resetListForTab(
+                    controller, controller.selectedIndex.value);
+              }
               controller.selectTab(0);
               controller.currentPage.value = 'home';
+              if (controller.scrollController.hasClients) {
+                controller.scrollController.jumpTo(0);
+              }
+              await _reloadTabData(controller, controller.selectedIndex.value);
             },
             child: SvgPicture.asset(
               'assets/images/logo.svg',
@@ -190,7 +200,7 @@ class HomePage extends GetView<HomeController> {
                             );
                           },
                         ),
-                        hintText: "관심있는 교육 키워드를 검색하세요",
+                        hintText: "관심있는 키워드를 검색하세요",
                         hintStyle: AppTextStyle.koRegular14().copyWith(
                           color: AppColor.grey,
                           fontSize: hintFontSize,

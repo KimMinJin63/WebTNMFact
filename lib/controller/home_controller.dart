@@ -81,6 +81,17 @@ class HomeController extends GetxController {
     }
   }
 
+  void _refreshVisibleList(
+    RxList<Map<String, dynamic>> list,
+    List<Map<String, dynamic>> data,
+  ) {
+    if (isSearching.value && searchController.text.trim().isNotEmpty) {
+      findPost();
+    } else {
+      list.value = data;
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -187,8 +198,18 @@ class HomeController extends GetxController {
       final admin = Get.find<AdminController>();
       final user = FirebaseAuth.instance.currentUser;
       final postId = post['id']?.toString() ?? '';
+      print('포스트 아이디 : $postId');
 
       if (postId.isEmpty) return;
+
+      final postPath = AppRoutes.postDetail(Uri.encodeComponent(postId));
+      // final postPath = AppRoutes.postDetail(postId);
+      print('포스트 경로 : $postPath');
+      final openedFromHome = kIsWeb && isBrowserOnHomePath();
+      await Get.toNamed(postPath);
+      if (kIsWeb && openedFromHome) {
+        repairBrowserHistoryAfterPostOpen(postPath);
+      }
 
       if (postId.isNotEmpty) {
         await admin.incrementViewCount(postId);
@@ -201,13 +222,6 @@ class HomeController extends GetxController {
         logVisit(userId);
       } else {
         logVisit(user.uid);
-      }
-
-      final postPath = AppRoutes.postDetail(postId);
-      final openedFromHome = kIsWeb && isBrowserOnHomePath();
-      await Get.toNamed(postPath);
-      if (kIsWeb && openedFromHome) {
-        repairBrowserHistoryAfterPostOpen(postPath);
       }
     } finally {
       isLoadingDetail.value = false;
@@ -293,7 +307,7 @@ class HomeController extends GetxController {
         .orderBy('date', descending: true)
         .snapshots() // ✅ get() 대신 snapshots()
         .listen((snapshot) {
-      postList.value = snapshot.docs.map((doc) {
+      final mapped = snapshot.docs.map((doc) {
         final data = doc.data();
         final ts = data['date'] as Timestamp;
         final created = ts.toDate();
@@ -316,7 +330,8 @@ class HomeController extends GetxController {
           'sortAt': created.millisecondsSinceEpoch, // ✅ 추가!
         };
       }).toList();
-      originalPostList.value = postList.toList();
+      originalPostList.value = mapped;
+      _refreshVisibleList(postList, mapped);
       if (isLoading.value) isLoading.value = false;
 
       print('🔥 실시간 업데이트됨! 현재 총 게시글 수: ${postList.length}');
@@ -332,7 +347,7 @@ class HomeController extends GetxController {
         .orderBy('date', descending: true)
         .snapshots()
         .listen((snapshot) {
-      dailyPostList.value = snapshot.docs.map((doc) {
+      final mapped = snapshot.docs.map((doc) {
         final data = doc.data();
         final ts = data['date'] as Timestamp; // ✅ Timestamp 가정
         final created = ts.toDate();
@@ -353,7 +368,8 @@ class HomeController extends GetxController {
         };
       }).toList();
 
-      originalDailyPostList.value = dailyPostList.toList();
+      originalDailyPostList.value = mapped;
+      _refreshVisibleList(dailyPostList, mapped);
 
       print('🔥 데일리 팩트 실시간 반영: ${dailyPostList.length}');
     });
@@ -367,7 +383,7 @@ class HomeController extends GetxController {
         .orderBy('date', descending: true)
         .snapshots()
         .listen((snapshot) {
-      insightPostList.value = snapshot.docs.map((doc) {
+      final mapped = snapshot.docs.map((doc) {
         final data = doc.data();
         final ts = data['date'] as Timestamp; // ✅ Timestamp 가정
         final created = ts.toDate();
@@ -387,7 +403,8 @@ class HomeController extends GetxController {
           'category': data['category'],
         };
       }).toList();
-      originalInsightPostList.value = insightPostList.toList();
+      originalInsightPostList.value = mapped;
+      _refreshVisibleList(insightPostList, mapped);
 
       print('🔥 인사이트 팩트 실시간 반영: ${insightPostList.length}');
     });
@@ -401,7 +418,7 @@ class HomeController extends GetxController {
         .orderBy('date', descending: true)
         .snapshots()
         .listen((snapshot) {
-      focusPostList.value = snapshot.docs.map((doc) {
+      final mapped = snapshot.docs.map((doc) {
         final data = doc.data();
         final ts = data['date'] as Timestamp;
         final created = ts.toDate();
@@ -422,7 +439,8 @@ class HomeController extends GetxController {
         };
       }).toList();
 
-      originalFocusPostList.value = focusPostList.toList();
+      originalFocusPostList.value = mapped;
+      _refreshVisibleList(focusPostList, mapped);
       print('🔥 포커스 팩트 실시간 반영: ${focusPostList.length}');
     });
   }
@@ -435,7 +453,7 @@ class HomeController extends GetxController {
         .orderBy('date', descending: true)
         .snapshots()
         .listen((snapshot) {
-      peoplePostList.value = snapshot.docs.map((doc) {
+      final mapped = snapshot.docs.map((doc) {
         final data = doc.data();
         final ts = data['date'] as Timestamp;
         final created = ts.toDate();
@@ -456,7 +474,8 @@ class HomeController extends GetxController {
         };
       }).toList();
 
-      originalPeoplePostList.value = peoplePostList.toList();
+      originalPeoplePostList.value = mapped;
+      _refreshVisibleList(peoplePostList, mapped);
       print('🔥 피플&뷰 실시간 반영: ${peoplePostList.length}');
     });
   }
