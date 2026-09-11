@@ -297,14 +297,14 @@ class AdminPage extends GetView<AdminController> {
       formattedDate = rawDate;
     }
 
-    if (category == '데일리 팩트') {
-      if (title.isEmpty || title == '[오늘의 주요 이슈 TOP 3]') {
-        return '[오늘의 주요 이슈 TOP 3] $formattedDate';
+    if (category == '이슈 팩트') {
+      if (title.isEmpty) {
+        return formattedDate;
       }
-      if (title.startsWith('[오늘의 주요 이슈 TOP 3]')) {
-        return title;
-      }
-      return '[오늘의 주요 이슈 TOP 3] $title';
+      // if (title.startsWith('[오늘의 주요 이슈 TOP 3]')) {
+      //   return title;
+      // }
+      return title;
     }
     return title.isEmpty ? formattedDate : title;
   }

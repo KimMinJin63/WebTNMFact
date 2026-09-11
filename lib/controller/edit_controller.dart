@@ -15,7 +15,7 @@ class EditController extends GetxController {
   // RxString selectedFocus = ''.obs;
   // RxString selectedPeople = ''.obs;
   final box = GetStorage();
-  final kDailyPrefix = '[오늘의 주요 이슈 TOP 3] ';
+  // final kDailyPrefix = '[오늘의 주요 이슈 TOP 3] ';
 
   @override
   void onInit() {
@@ -49,12 +49,12 @@ class EditController extends GetxController {
     required String docId,
   }) async {
     try {
-      final normalizedTitle = normalizeTitleForCategory(title, category);
-      print('🔥 수정할 문서 ID: $normalizedTitle');
+      // final normalizedTitle = normalizeTitleForCategory(title, category);
+      // print('🔥 수정할 문서 ID: $normalizedTitle');
 
      final Map<String, dynamic> updateData = {
 
-        'title': normalizedTitle,
+        'title': title,
         'final_article': final_article,
         'category': category,
         'editor': editor,

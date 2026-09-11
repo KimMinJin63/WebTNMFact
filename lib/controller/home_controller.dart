@@ -57,9 +57,6 @@ class HomeController extends GetxController {
       case 0:
         loadAllPosts();
         break;
-      case 1:
-        loadDailyPosts();
-        break;
       case 2:
         loadFocusPosts();
         break;
@@ -67,6 +64,9 @@ class HomeController extends GetxController {
         loadInsightPosts();
         break;
       case 4:
+        loadDailyPosts();
+        break;
+      case 5:
         loadPeoplePosts();
         break;
       default:
@@ -174,12 +174,12 @@ class HomeController extends GetxController {
     final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
     final baseTitle = (data['title'] as String?) ??
         DateFormat('yy.MM.dd', 'ko_KR').format(created);
-    final normalizedTitle =
-        normalizeTitleForCategory(baseTitle, data['category']);
+    // final normalizedTitle =
+    //     normalizeTitleForCategory(baseTitle, data['category']);
 
     return {
       'id': docId,
-      'title': normalizedTitle,
+      'title': baseTitle,
       'final_article': data['final_article'] ?? data['content'] ?? '',
       'editor': data['editor'] ?? data['author'],
       'date': display,
@@ -243,7 +243,7 @@ class HomeController extends GetxController {
                 false)
             .toList();
         break;
-      case 1:
+      case 4:
         print('데일리팩트 탭에서 검색 실행: $searchQuery');
         dailyPostList.value = originalDailyPostList
             .where((p) =>
@@ -267,7 +267,7 @@ class HomeController extends GetxController {
                 false)
             .toList();
         break;
-      case 4:
+      case 5:
         print('피플&뷰 탭에서 검색 실행: $searchQuery');
         peoplePostList.value = originalPeoplePostList
             .where((p) =>
@@ -315,12 +315,12 @@ class HomeController extends GetxController {
         final baseTitle = (data['title'] as String?) ??
             DateFormat('yy.MM.dd', 'ko_KR').format(created);
         // print('🔥🔥🔥🔥🔥🔥🔥🔥🔥기본 제목은 : $baseTitle');
-        final normalizedTitle =
-            normalizeTitleForCategory(baseTitle, data['category']);
+        // final normalizedTitle =
+        //     normalizeTitleForCategory(baseTitle, data['category']);
 
         return {
           'id': doc.id,
-          'title': normalizedTitle,
+          'title': baseTitle,
           'final_article': data['final_article'] ?? data['content'] ?? '',
           'editor': data['editor'] ?? data['author'],
           'date': display,
@@ -342,7 +342,7 @@ class HomeController extends GetxController {
   loadDailyPosts() {
     FirebaseFirestore.instance
         .collection('post')
-        .where('category', isEqualTo: '데일리 팩트')
+        .where('category', isEqualTo: '이슈 팩트')
         .where('status', isEqualTo: '발행')
         .orderBy('date', descending: true)
         .snapshots()
@@ -354,11 +354,11 @@ class HomeController extends GetxController {
         final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
         final baseTitle = (data['title'] as String?) ??
             DateFormat('yy.MM.dd', 'ko_KR').format(created);
-        final normalizedTitle =
-            normalizeTitleForCategory(baseTitle, data['category']);
+        // final normalizedTitle =
+        //     normalizeTitleForCategory(baseTitle, data['category']);
         return {
           'id': doc.id,
-          'title': normalizedTitle,
+          'title': baseTitle,
           'final_article': data['final_article'] ?? data['content'] ?? '',
           'editor': data['editor'] ?? data['author'],
           'date': display,
@@ -390,11 +390,11 @@ class HomeController extends GetxController {
         final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
         final baseTitle = (data['title'] as String?) ??
             DateFormat('yy.MM.dd', 'ko_KR').format(created);
-        final normalizedTitle =
-            normalizeTitleForCategory(baseTitle, data['category']);
+        // final normalizedTitle =
+        //     normalizeTitleForCategory(baseTitle, data['category']);
         return {
           'id': doc.id,
-          'title': normalizedTitle,
+          'title': baseTitle,
           'final_article': data['final_article'] ?? data['content'] ?? '',
           'editor': data['editor'] ?? data['author'],
           'date': display,
@@ -425,11 +425,11 @@ class HomeController extends GetxController {
         final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
         final baseTitle = (data['title'] as String?) ??
             DateFormat('yy.MM.dd', 'ko_KR').format(created);
-        final normalizedTitle =
-            normalizeTitleForCategory(baseTitle, data['category']);
+        // final normalizedTitle =
+        //     normalizeTitleForCategory(baseTitle, data['category']);
         return {
           'id': doc.id,
-          'title': normalizedTitle,
+          'title': baseTitle,
           'final_article': data['final_article'] ?? data['content'] ?? '',
           'editor': data['editor'] ?? data['author'],
           'date': display,
@@ -460,11 +460,11 @@ class HomeController extends GetxController {
         final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
         final baseTitle = (data['title'] as String?) ??
             DateFormat('yy.MM.dd', 'ko_KR').format(created);
-        final normalizedTitle =
-            normalizeTitleForCategory(baseTitle, data['category']);
+        // final normalizedTitle =
+        //     normalizeTitleForCategory(baseTitle, data['category']);
         return {
           'id': doc.id,
-          'title': normalizedTitle,
+          'title': baseTitle,
           'final_article': data['final_article'] ?? data['content'] ?? '',
           'editor': data['editor'] ?? data['author'],
           'date': display,

@@ -49,8 +49,8 @@ class CreateController extends GetxController {
     required int viewpoint,
   }) async {
     try {
-      final normalizedTitle = normalizeTitleForCategory(title, category);
-      final baseId = _sanitizeDocId(normalizedTitle.isEmpty ? title : normalizedTitle);
+      // final normalizedTitle = normalizeTitleForCategory(title, category);
+      final baseId = _sanitizeDocId(title.isEmpty ? title : title);
       if (baseId.isEmpty) return;
 
       final postCol = firestore.collection('post');
@@ -64,7 +64,7 @@ class CreateController extends GetxController {
       }
 
       await postCol.doc(docId).set({
-        'title': normalizedTitle,
+        'title': title,
         'final_article': final_article,
         'category': category,
         'editor': editor,

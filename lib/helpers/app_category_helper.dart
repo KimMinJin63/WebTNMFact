@@ -5,7 +5,7 @@ class CategoryHelper {
   /// 카테고리 텍스트 색상
   static Color getCategoryColor(String category) {
     switch (category) {
-      case '데일리 팩트':
+      case '이슈 팩트':
         return AppColor.primary;
       case '인사이트 팩트':
         return AppColor.yellow;
@@ -21,7 +21,7 @@ class CategoryHelper {
   /// 카테고리 배경색
   static Color getCategoryBackgroundColor(String category) {
     switch (category) {
-      case '데일리 팩트':
+      case '이슈 팩트':
         return AppColor.primary.withOpacity(0.1);
       case '인사이트 팩트':
         return AppColor.yellow.withOpacity(0.2);
@@ -37,8 +37,8 @@ class CategoryHelper {
   /// 카테고리별 작성자명(기자명)
   static String getCategoryName(String category) {
     switch (category) {
-      case '데일리 팩트':
-        return 'tnm팩트 편집부';
+      case '이슈 팩트':
+        return '김병국 기자';
       case '인사이트 팩트':
         return 'tnm팩트 편집부';
       case '포커스 팩트':

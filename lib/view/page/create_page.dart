@@ -198,11 +198,11 @@ class CreatePage extends GetView<CreateController> {
                         Divider(),
                         SizedBox(height: 16.h),
                         AppCheckboxTile(
-                          label: '데일리 팩트',
-                          value: controller.selectedCategory.value == '데일리 팩트',
+                          label: '이슈 팩트',
+                          value: controller.selectedCategory.value == '이슈 팩트',
                           onChanged: (v) {
                             controller.selectedCategory.value =
-                                v! ? '데일리 팩트' : '';
+                                v! ? '이슈 팩트' : '';
                           },
                         ),
                         AppCheckboxTile(

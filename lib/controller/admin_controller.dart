@@ -188,12 +188,12 @@ class AdminController extends GetxController {
         final baseTitle = (data['title'] as String?) ??
             DateFormat('yy.MM.dd', 'ko_KR').format(created);
         // print('🔥🔥🔥🔥🔥🔥🔥🔥🔥기본 제목은 : $baseTitle');
-        final normalizedTitle =
-            normalizeTitleForCategory(baseTitle, data['category']);
+        // final normalizedTitle =
+        //     normalizeTitleForCategory(baseTitle, data['category']);
 
         return {
           'id': doc.id,
-          'title': normalizedTitle,
+          'title': baseTitle,
           'final_article': data['final_article'] ?? data['content'] ?? '',
           'editor': data['editor'] ?? data['author'],
           'date': display,
@@ -226,11 +226,11 @@ class AdminController extends GetxController {
         final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
         final baseTitle = (data['title'] as String?) ??
             DateFormat('yy.MM.dd', 'ko_KR').format(created);
-        final normalizedTitle =
-            normalizeTitleForCategory(baseTitle, data['category']);
+        // final normalizedTitle =
+        //     normalizeTitleForCategory(baseTitle, data['category']);
         return {
           'id': doc.id,
-          'title': normalizedTitle,
+          'title': baseTitle,
           'final_article': data['final_article'] ?? data['content'] ?? '',
           'editor': data['editor'] ?? data['author'],
           'date': display,
@@ -264,11 +264,11 @@ class AdminController extends GetxController {
         final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
         final baseTitle = (data['title'] as String?) ??
             DateFormat('yy.MM.dd', 'ko_KR').format(created);
-        final normalizedTitle =
-            normalizeTitleForCategory(baseTitle, data['category']);
+        // final normalizedTitle =
+        //     normalizeTitleForCategory(baseTitle, data['category']);
         return {
           'id': doc.id,
-          'title': normalizedTitle,
+          'title': baseTitle,
           'final_article': data['final_article'] ?? data['content'] ?? '',
           'editor': data['editor'] ?? data['author'],
           'date': display,
@@ -415,13 +415,13 @@ class AdminController extends GetxController {
 
         final baseTitle = (data['title'] as String?) ??
             DateFormat('yy.MM.dd', 'ko_KR').format(created);
-        final normalizedTitle =
-            normalizeTitleForCategory(baseTitle, data['category']);
+        // final normalizedTitle =
+        //     normalizeTitleForCategory(baseTitle, data['category']);
         final display = DateFormat('yyyy-MM-dd HH:mm', 'ko_KR').format(created);
 
         return {
           'id': doc.id,
-          'title': normalizedTitle,
+          'title': baseTitle,
           'final_article': data['final_article'],
           'category': data['category'],
           'author': data['editor'] ?? data['author'],

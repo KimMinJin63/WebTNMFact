@@ -47,8 +47,7 @@ class HomePage extends GetView<HomeController> {
               if (controller.isSearching.value) {
                 controller.isSearching.value = false;
                 controller.searchController.clear();
-                _resetListForTab(
-                    controller, controller.selectedIndex.value);
+                _resetListForTab(controller, controller.selectedIndex.value);
               }
               controller.selectTab(0);
               controller.currentPage.value = 'home';
@@ -112,19 +111,19 @@ class HomePage extends GetView<HomeController> {
                   );
                 }),
                 // HIDE:  피플&뷰 숨김처리
-                // SizedBox(width: 16.w),
-                // Obx(() {
-                //   return AppTitleButton(
-                //     title: '피플&뷰',
-                //     color: controller.selectedIndex.value == 4
-                //         ? AppColor.primary
-                //         : AppColor.black,
-                //     onPressed: () {
-                //       controller.selectTab(4);
-                //       controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                //     },
-                //   );
-                // }),
+                SizedBox(width: 16.w),
+                Obx(() {
+                  return AppTitleButton(
+                    title: '이슈 팩트',
+                    color: controller.selectedIndex.value == 4
+                        ? AppColor.primary
+                        : AppColor.black,
+                    onPressed: () {
+                      controller.selectTab(4);
+                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
+                    },
+                  );
+                }),
               ],
             ),
           ),
@@ -391,9 +390,14 @@ Widget _buildHomeContent(
                             case 3:
                               visibleList = controller.insightPostList;
                               break;
+                            case 4:
+                              visibleList = controller.dailyPostList;
+                              break;
                             default:
                               visibleList = controller.postList;
                           }
+                          final bool isIssueFact =
+                              controller.selectedIndex.value == 4;
 
                           if (controller.isLoading.value) {
                             return const Center(
@@ -427,21 +431,21 @@ Widget _buildHomeContent(
                                 tabIndex: 3,
                               ),
                               // HIDE:  피플&뷰 숨김처리
-                              // (
-                              //   title: '피플&뷰',
-                              //   posts: controller.peoplePostList,
-                              //   accent: AppColor.peopleView,
-                              //   maxRows: 1,
-                              //   maxItems: isMobileLayout ? 3 : null,
-                              //   tabIndex: 4,
-                              // ),
+                              (
+                                title: '이슈 팩트',
+                                posts: controller.dailyPostList,
+                                accent: AppColor.primary,
+                                maxRows: 1,
+                                maxItems: isMobileLayout ? 3 : null,
+                                tabIndex: 4,
+                              ),
                             ];
 
                             return Column(
                               children: [
                                 for (int i = 0; i < sections.length; i++)
                                   if (sections[i].posts.isNotEmpty) ...[
-                                    isMobileLayout
+                                    (isMobileLayout || sections[i].tabIndex == 4)
                                         ? AppSectionList(
                                             title: sections[i].title,
                                             posts: sections[i].posts,
@@ -501,7 +505,7 @@ Widget _buildHomeContent(
                             );
                           }
 
-                          return isMobileLayout
+                          return (isMobileLayout || isIssueFact)
                               ? buildList(posts: visibleList)
                               : buildGrid(posts: visibleList);
                         });
@@ -551,10 +555,10 @@ void _resetListForTab(HomeController controller, int tabIndex) {
       controller.insightPostList.value =
           controller.originalInsightPostList.toList();
       break;
-    // case 4:
-    //   controller.peoplePostList.value =
-    //       controller.originalPeoplePostList.toList();
-    //   break;
+    case 4:
+      controller.peoplePostList.value =
+          controller.originalPeoplePostList.toList();
+      break;
   }
 }
 
@@ -844,7 +848,7 @@ Widget _buildPostCard({
           ),
           const SizedBox(height: 4),
           Text(
-            title.isNotEmpty ? title : '[오늘의 주요 이슈 TOP 3] $formattedDate',
+            title.isNotEmpty ? title : formattedDate,
             style: AppTextStyle.koSemiBold18(),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

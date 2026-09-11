@@ -42,16 +42,16 @@ class EditPage extends GetView<EditController> {
       }
 
       // 🔹 데일리 팩트인 경우
-      if (category == '데일리 팩트') {
-        if (title.isEmpty || title == '[오늘의 주요 이슈 TOP 3]' || title == '[오늘의 주요 이슈 TOP 3]') {
-          return '[오늘의 주요 이슈 TOP 3] $formattedDate';
+      if (category == '이슈 팩트') {
+        if (title.isEmpty) {
+          return formattedDate;
         }
 
-        if (title.startsWith('[오늘의 주요 이슈 TOP 3]')) {
-          return title;
-        }
+        // if (title.startsWith('[오늘의 주요 이슈 TOP 3]')) {
+        //   return title;
+        // }
 
-        return '[오늘의 주요 이슈 TOP 3] $title';
+        return title;
       }
 
       // 🔹 인사이트 팩트 등 다른 카테고리
@@ -274,12 +274,12 @@ class EditPage extends GetView<EditController> {
                           Divider(),
                           SizedBox(height: 16.h),
                           AppCheckboxTile(
-                            label: '데일리 팩트',
+                            label: '이슈 팩트',
                             value:
-                                controller.selectedCategory.value == '데일리 팩트',
+                                controller.selectedCategory.value == '이슈 팩트',
                             onChanged: (v) {
                               controller.selectedCategory.value =
-                                  v! ? '데일리 팩트' : '';
+                                  v! ? '이슈 팩트' : '';
                             },
                           ),
                           AppCheckboxTile(
