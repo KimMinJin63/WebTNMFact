@@ -8,6 +8,7 @@ import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_navigation.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/widget/post_article_feedback.dart';
+import 'package:web/web.dart' as web;
 
 class DetailView extends StatelessWidget {
   final Map<String, dynamic> post;
@@ -15,6 +16,9 @@ class DetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateSeo();
+    });
     final rawDate = post['date'];
     String titleDate = '';
 
@@ -69,8 +73,8 @@ class DetailView extends StatelessWidget {
                     child: Text(
                       post['category'] ?? '',
                       style: AppTextStyle.koSemiBold14().copyWith(
-                        color:
-                            CategoryHelper.getCategoryColor(post['category'] ?? ''),
+                        color: CategoryHelper.getCategoryColor(
+                            post['category'] ?? ''),
                       ),
                     ),
                   ),
@@ -82,8 +86,9 @@ class DetailView extends StatelessWidget {
                           fontSize: 30,
                           color: AppColor.black)),
                   SizedBox(height: 8.h),
-                  Text('작성자: ${CategoryHelper.getCategoryName(post['category'])} | $titleDate',
-                  // Text('작성자: ${post['editor']} | $titleDate',
+                  Text(
+                      '작성자: ${CategoryHelper.getCategoryName(post['category'])} | $titleDate',
+                      // Text('작성자: ${post['editor']} | $titleDate',
                       style: AppTextStyle.koRegular14()),
                   SizedBox(height: 24.h),
                   Text(post['final_article'],
@@ -99,5 +104,36 @@ class DetailView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _updateSeo() {
+    final title = post['title']?.toString() ?? '';
+    final article = (post['final_article'] ?? '').toString();
+
+    // 줄바꿈, 연속 공백 제거
+    final cleanText =
+        article.replaceAll('\n', ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+
+    // description은 160자 정도만 사용
+    final description = cleanText.length > 160
+        ? '${cleanText.substring(0, 160)}...'
+        : cleanText;
+
+    // 브라우저 탭 제목
+    web.document.title = '$title | TNM팩트';
+
+    // 기존 description 찾기
+    var metaDescription =
+        web.document.querySelector('meta[name="description"]');
+
+    // 없으면 새로 생성
+    if (metaDescription == null) {
+      metaDescription = web.document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      web.document.head?.append(metaDescription);
+    }
+
+    // description 적용
+    metaDescription.setAttribute('content', description);
   }
 }
