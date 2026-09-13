@@ -92,4 +92,5 @@ app.*.map.json
 /firebender.json.bak
 /opencode.json
 /opencode.json.bak
+functions/node_modules/
 # END Ruler Generated Files
