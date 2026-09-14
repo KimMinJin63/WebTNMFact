@@ -26,24 +26,26 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _loadPost();
   }
 
-  Future<void> _loadPost() async {
-    final id = AppRoutes.decodePostId(Get.parameters['id']);
-    if (id.isEmpty) {
-      setState(() => _loading = false);
-      return;
-    }
+Future<void> _loadPost() async {
+  final title = AppRoutes.decodePostId(Get.parameters['id']);
 
-    final controller = Get.find<HomeController>();
-    final cached = controller.findPostInCache(id);
-    final post = cached ?? await controller.fetchPostById(id);
-
-    if (!mounted) return;
-    setState(() {
-      _post = post;
-      _loading = false;
-    });
+  if (title.isEmpty) {
+    setState(() => _loading = false);
+    return;
   }
 
+  final controller = Get.find<HomeController>();
+
+  final cached = controller.findPostInCacheByTitle(title);
+  final post = cached ?? await controller.fetchPostByTitle(title);
+
+  if (!mounted) return;
+
+  setState(() {
+    _post = post;
+    _loading = false;
+  });
+}
   @override
   Widget build(BuildContext context) {
     return PopScope(

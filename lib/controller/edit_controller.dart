@@ -30,7 +30,7 @@ class EditController extends GetxController {
 
     if (post != null) {
       titleController.text = post['title'] ?? '';
-      contentController.text = post['content'] ?? '';
+      contentController.text = post['final_article'] ?? '';
       selectedCategory.value = post['category'] ?? '';
       selectedPublish.value = post['status'] ?? '';
       // selectedFocus.value = post['focus'] ?? '';

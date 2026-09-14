@@ -132,6 +132,48 @@ class HomeController extends GetxController {
     return dailyCounts;
   }
 
+  Map<String, dynamic>? findPostInCacheByTitle(String title) {
+  final allLists = [
+    postList,
+    dailyPostList,
+    focusPostList,
+    insightPostList,
+    peoplePostList,
+    originalPostList,
+    originalDailyPostList,
+    originalFocusPostList,
+    originalInsightPostList,
+    originalPeoplePostList,
+  ];
+
+  for (final list in allLists) {
+    for (final post in list) {
+      if (post['title']?.toString() == title) {
+        return post;
+      }
+    }
+  }
+
+  return null;
+}
+
+Future<Map<String, dynamic>?> fetchPostByTitle(String title) async {
+  final snapshot = await FirebaseFirestore.instance
+      .collection('post')
+      .where('title', isEqualTo: title)
+      .limit(1)
+      .get();
+
+  if (snapshot.docs.isEmpty) return null;
+
+  final doc = snapshot.docs.first;
+  final data = doc.data();
+
+  if (data['status'] != '발행') return null;
+
+  return _mapPostDocument(doc.id, data);
+}
+
   Map<String, dynamic>? findPostInCache(String id) {
     final allLists = [
       postList,
@@ -190,43 +232,57 @@ class HomeController extends GetxController {
     };
   }
 
-  Future<void> handlePostTap(Map<String, dynamic> post) async {
-    if (isLoadingDetail.value) return;
-    isLoadingDetail.value = true;
+Future<void> handlePostTap(Map<String, dynamic> post) async {
+  if (isLoadingDetail.value) return;
+  isLoadingDetail.value = true;
 
-    try {
-      final admin = Get.find<AdminController>();
-      final user = FirebaseAuth.instance.currentUser;
-      final postId = post['id']?.toString() ?? '';
-      print('포스트 아이디 : $postId');
+  try {
+    final admin = Get.find<AdminController>();
+    final user = FirebaseAuth.instance.currentUser;
 
-      if (postId.isEmpty) return;
+    final postId = post['id']?.toString() ?? '';
+    final postTitle = post['title']?.toString() ?? '';
 
-      final postPath = AppRoutes.postDetail(Uri.encodeComponent(postId));
-      // final postPath = AppRoutes.postDetail(postId);
-      print('포스트 경로 : $postPath');
-      final openedFromHome = kIsWeb && isBrowserOnHomePath();
-      await Get.toNamed(postPath);
-      if (kIsWeb && openedFromHome) {
-        repairBrowserHistoryAfterPostOpen(postPath);
-      }
+    print('포스트 아이디 : $postId');
+    print('포스트 제목 : $postTitle');
+
+    if (postTitle.isEmpty) return;
+
+    // URL은 제목 기준
+    final postPath =
+        AppRoutes.postDetail(Uri.encodeComponent(postTitle));
+
+    print('포스트 경로 : $postPath');
+
+    final openedFromHome = kIsWeb && isBrowserOnHomePath();
+
+    await Get.toNamed(postPath);
+
+    if (kIsWeb && openedFromHome) {
+      repairBrowserHistoryAfterPostOpen(postPath);
+    }
+
+    // 조회수 증가는 문서 ID 기준
+    if (postId.isNotEmpty) {
+      await admin.incrementViewCount(postId);
+    }
+
+    if (user == null) {
+      final cred = await FirebaseAuth.instance.signInAnonymously();
+      final userId = cred.user!.uid;
 
       if (postId.isNotEmpty) {
         await admin.incrementViewCount(postId);
       }
 
-      if (user == null) {
-        final cred = await FirebaseAuth.instance.signInAnonymously();
-        final userId = cred.user!.uid;
-        await admin.incrementViewCount(postId);
-        logVisit(userId);
-      } else {
-        logVisit(user.uid);
-      }
-    } finally {
-      isLoadingDetail.value = false;
+      logVisit(userId);
+    } else {
+      logVisit(user.uid);
     }
+  } finally {
+    isLoadingDetail.value = false;
   }
+}
 
   Future findPost() async {
     final searchQuery = searchController.text.trim().toLowerCase();
