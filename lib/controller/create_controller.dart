@@ -5,7 +5,6 @@ import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
-import 'package:tnm_fact/utils/app_title.dart';
 import 'package:tnm_fact/view/page/admin_page.dart';
 
 class CreateController extends GetxController {

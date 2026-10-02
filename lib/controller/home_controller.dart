@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tnm_fact/utils/app_routes.dart';
-import 'package:tnm_fact/utils/app_title.dart';
 import 'package:tnm_fact/utils/web_history.dart';
 
 class HomeController extends GetxController {

@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
-import 'package:tnm_fact/utils/app_title.dart';
 
 class EditController extends GetxController {
   final AdminController adminController = Get.find<AdminController>();

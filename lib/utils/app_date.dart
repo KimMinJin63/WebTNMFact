@@ -14,7 +14,12 @@ class AppDate {
       if (parsed != null) {
         return DateFormat('yyyy.MM.dd').format(parsed);
       }
-      return timestamp;
+      try {
+        return DateFormat('yyyy.MM.dd')
+            .format(DateFormat('yyyy-MM-dd HH:mm').parse(timestamp));
+      } catch (_) {
+        return timestamp;
+      }
     }
 
     return '';

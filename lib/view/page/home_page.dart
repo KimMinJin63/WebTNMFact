@@ -1,8 +1,6 @@
 import 'dart:math';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -16,6 +14,7 @@ import 'package:tnm_fact/utils/app_date.dart';
 import 'package:tnm_fact/utils/app_routes.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/widget/app_footer.dart';
+import 'package:tnm_fact/view/widget/app_issue_post_list_tile.dart';
 import 'package:tnm_fact/view/widget/app_side_banner_layout.dart';
 import 'package:tnm_fact/view/widget/app_post_list.dart';
 import 'package:tnm_fact/view/widget/app_post_list_tile.dart';
@@ -34,193 +33,135 @@ class HomePage extends GetView<HomeController> {
     final AdminController adminController = Get.find<AdminController>();
 
     return Scaffold(
-      backgroundColor: AppColor.background,
+      backgroundColor: AppColor.white,
+      // backgroundColor: AppColor.background,
       // backgroundColor: AppColor.primary.withOpacity(0.2),
       appBar: AppBar(
-        leadingWidth: ScreenUtil().screenWidth / 5,
+        automaticallyImplyLeading: false,
         backgroundColor: AppColor.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        toolbarHeight: 80,
         titleSpacing: 0,
-        leading: Padding(
-          padding: EdgeInsets.only(left: 16.w),
-          child: GestureDetector(
-            onTap: () async {
-              if (controller.isSearching.value) {
-                controller.isSearching.value = false;
-                controller.searchController.clear();
-                _resetListForTab(controller, controller.selectedIndex.value);
-              }
-              controller.selectTab(0);
-              controller.currentPage.value = 'home';
-              if (controller.scrollController.hasClients) {
-                controller.scrollController.jumpTo(0);
-              }
-              await _reloadTabData(controller, controller.selectedIndex.value);
-            },
-            child: SvgPicture.asset(
-              'assets/images/logo.svg',
-              height: 32.h,
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-        title: Center(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Obx(() {
-                  return AppTitleButton(
-                    color: controller.selectedIndex.value == 0
-                        ? AppColor.primary
-                        : AppColor.black,
-                    onPressed: () {
-                      controller.selectTab(0);
-                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                    },
-                    title: '전체기사',
-                  );
-                }),
-                SizedBox(width: 16.w),
-                Obx(() {
-                  return AppTitleButton(
-                    title: '포커스 팩트',
-                    color: controller.selectedIndex.value == 2
-                        ? AppColor.primary
-                        : AppColor.black,
-                    onPressed: () {
-                      controller.selectTab(2);
-                      controller.currentPage.value = 'home';
-                    },
-                  );
-                }),
-                SizedBox(width: 16.w),
-                Obx(() {
-                  return AppTitleButton(
-                    title: '인사이트팩트',
-                    color: controller.selectedIndex.value == 3
-                        ? AppColor.primary
-                        : AppColor.black,
-                    onPressed: () {
-                      controller.selectTab(3);
-                      controller.currentPage.value = 'home';
-                    },
-                  );
-                }),
-                // HIDE:  피플&뷰 숨김처리
-                SizedBox(width: 16.w),
-                Obx(() {
-                  return AppTitleButton(
-                    title: '이슈 팩트',
-                    color: controller.selectedIndex.value == 4
-                        ? AppColor.primary
-                        : AppColor.black,
-                    onPressed: () {
-                      controller.selectTab(4);
-                      controller.currentPage.value = 'home'; // ✅ 홈으로 전환
-                    },
-                  );
-                }),
-              ],
-            ),
+        leadingWidth: ScreenUtil().screenWidth > 1000 ? 272 : 56,
+        leading: const SizedBox.shrink(),
+        title: GestureDetector(
+          onTap: () => _onLogoTap(controller),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'TNM FACT',
+                style:
+                    AppTextStyle.koBold35().copyWith(color: AppColor.primary),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '세상을 읽는 새로운 방법',
+                style: AppTextStyle.koRegular13().copyWith(
+                  color: const Color(0xFF6B7280),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
           ),
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 16, top: 12, bottom: 12),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final double width = constraints.maxWidth;
-                double hintFontSize = width > 1000 ? 14 : 10;
-
-                if (ScreenUtil().screenWidth > 1000) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: AppColor.white,
-                      border: Border.all(color: AppColor.grey, width: 1.w),
-                      borderRadius: BorderRadius.circular(100.r),
-                    ),
-                    width: ScreenUtil().screenWidth / 4.5,
-                    alignment: Alignment.center,
-                    child: TextField(
-                      focusNode: controller.searchFocusNode,
-                      controller: controller.searchController,
-                      textAlignVertical: TextAlignVertical.center,
-                      style: AppTextStyle.koRegular15().copyWith(
-                        color: AppColor.grey,
-                        // fontSize: hintFontSize,
-                      ),
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          controller.isSearching.value = false;
-                          _resetListForTab(
-                            controller,
-                            controller.selectedIndex.value,
-                          );
-                        }
-                      },
-                      onSubmitted: (_) async {
-                        controller.clearFocus(); // ✅ 포커스 해제
-                        if (controller.searchController.text
-                            .trim()
-                            .isNotEmpty) {
-                          await controller.findPost(); // ✅ 엔터 입력 시 검색 실행
-                        } else {
-                          // ✅ 검색어가 비어있으면 탭에 맞는 전체 목록 불러오기
-                          await _reloadTabData(
-                              controller, controller.selectedIndex.value);
-                        }
-                      },
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        suffixIcon: LayoutBuilder(
-                          builder: (context, iconConstraints) {
-                            final double iconSize =
-                                iconConstraints.maxHeight * 0.6;
-                            return IconButton(
-                              padding: EdgeInsets.zero,
-                              onPressed: () async {
-                                print('검색 아이콘 클릭됨');
-                                if (controller
-                                    .searchController.text.isNotEmpty) {
-                                  await controller.findPost();
-                                } else {
-                                  await _reloadTabData(controller,
-                                      controller.selectedIndex.value);
-                                }
-                              },
-                              icon: Icon(Icons.search,
-                                  size: iconSize, color: AppColor.grey),
-                            );
-                          },
-                        ),
-                        hintText: "관심있는 키워드를 검색하세요",
-                        hintStyle: AppTextStyle.koRegular14().copyWith(
-                          color: AppColor.grey,
-                          fontSize: hintFontSize,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  );
-                } else {
-                  return IconButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      _showSearchOverlay(context, controller);
-                    },
-                    icon: Icon(Icons.search, size: 25, color: AppColor.grey),
-                  );
-                }
-              },
-            ),
-          ),
+          _buildSearchAction(context, controller),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(49),
+          child: Column(
+            children: [
+              Container(
+                color: AppColor.background,
+                height: 48,
+                child: Center(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Obx(() {
+                          return AppTitleButton(
+                            title: '전체기사',
+                            color: controller.selectedIndex.value == 0
+                                ? AppColor.primary
+                                : AppColor.black,
+                            onPressed: () {
+                              controller.selectTab(0);
+                              controller.currentPage.value = 'home';
+
+                              if (controller.scrollController.hasClients) {
+                                controller.scrollController.jumpTo(0);
+                              }
+                            },
+                          );
+                        }),
+                        SizedBox(width: 16.w),
+                        Obx(() {
+                          return AppTitleButton(
+                            title: '이슈 팩트',
+                            color: controller.selectedIndex.value == 4
+                                ? AppColor.primary
+                                : AppColor.black,
+// 이슈 팩트
+                            onPressed: () {
+                              controller.selectTab(4);
+                              controller.currentPage.value = 'home';
+
+                              if (controller.scrollController.hasClients) {
+                                controller.scrollController.jumpTo(0);
+                              }
+                            },
+                          );
+                        }),
+                        SizedBox(width: 16.w),
+                        Obx(() {
+                          return AppTitleButton(
+                            title: '포커스 팩트',
+                            color: controller.selectedIndex.value == 2
+                                ? AppColor.primary
+                                : AppColor.black,
+// 포커스 팩트
+                            onPressed: () {
+                              controller.selectTab(2);
+                              controller.currentPage.value = 'home';
+
+                              if (controller.scrollController.hasClients) {
+                                controller.scrollController.jumpTo(0);
+                              }
+                            },
+                          );
+                        }),
+                        SizedBox(width: 16.w),
+                        Obx(() {
+                          return AppTitleButton(
+                            title: '인사이트 팩트',
+                            color: controller.selectedIndex.value == 3
+                                ? AppColor.primary
+                                : AppColor.black,
+                            onPressed: () {
+                              controller.selectTab(3);
+                              controller.currentPage.value = 'home';
+
+                              if (controller.scrollController.hasClients) {
+                                controller.scrollController.jumpTo(0);
+                              }
+                            },
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const Divider(height: 1, color: AppColor.border),
+            ],
+          ),
+        ),
       ),
 
       // ✅ BODY 분기
@@ -238,35 +179,36 @@ class HomePage extends GetView<HomeController> {
                     )
                   : const SizedBox(height: 3)),
               Expanded(
-                child: AppSideBannerLayout(
-                  child: PopScope(
-                    canPop: false,
-                    onPopInvoked: (didPop) {
-                      final controller = Get.find<HomeController>();
-
-                      if (!didPop) {
-                        // 1️⃣ 검색 결과 상태 → 검색 해제 + 원본 복구
-                        if (controller.isSearching.value) {
-                          controller.isSearching.value = false;
-                          controller.searchController.clear();
-                          _resetListForTab(
-                              controller, controller.selectedIndex.value);
-                          return;
-                        }
-
-                        // 2️⃣ 다른 탭 → 전체기사 탭으로 복귀
-                        if (controller.selectedIndex.value != 0) {
-                          controller.selectTab(0);
-                          controller.currentPage.value = 'home';
-                          return;
-                        }
-
-                        // 3️⃣ 홈 상태 → 앱 종료
-                        Get.back();
+                child: PopScope(
+                  canPop: false,
+                  onPopInvoked: (didPop) {
+                    final controller = Get.find<HomeController>();
+                
+                    if (!didPop) {
+                      // 1️⃣ 검색 결과 상태 → 검색 해제 + 원본 복구
+                      if (controller.isSearching.value) {
+                        controller.isSearching.value = false;
+                        controller.searchController.clear();
+                        _resetListForTab(
+                            controller, controller.selectedIndex.value);
+                        return;
                       }
-                    },
-                    child: _buildHomeContent(controller, adminController),
-                  ),
+                
+                      // 2️⃣ 다른 탭 → 전체기사 탭으로 복귀
+                      if (controller.selectedIndex.value != 0) {
+                        controller.selectTab(0);
+                        controller.currentPage.value = 'home';
+                        if (controller.scrollController.hasClients) {
+                          controller.scrollController.jumpTo(0);
+                        }
+                        return;
+                      }
+                
+                      // 3️⃣ 홈 상태 → 앱 종료
+                      Get.back();
+                    }
+                  },
+                  child: _buildHomeContent(controller, adminController),
                 ),
               ),
             ],
@@ -320,23 +262,12 @@ Widget _buildHomeContent(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   children: [
-                    const SizedBox(height: 48),
-                    AutoSizeText(
-                      '세상을 읽는 새로운 방법',
-                      maxFontSize: 60,
-                      minFontSize: 20,
-                      style: AppTextStyle.koBold35(),
-                    ),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 32),
                     LayoutBuilder(
                       builder: (context, constraints) {
                         final double width = constraints.maxWidth;
                         final bool isMobileLayout = width <= 600;
-                        final int crossCount = width <= 680
-                            ? 2
-                            : width <= 1000
-                                ? 3
-                                : 4;
+                        final int crossCount = width <= 800 ? 2 : 3;
                         const double aspectRatio = 1.4; // ✅ 카드 비율 고정
 
                         Widget buildGrid({
@@ -359,26 +290,27 @@ Widget _buildHomeContent(
                           int? maxItems,
                         }) {
                           return AppPostList(
-                              posts: posts,
-                              maxItems: maxItems,
-                              itemBuilder: (post) {
-                                final String title =
-                                    (post['title'] ?? '').toString();
-                                final String category =
-                                    (post['category'] ?? '').toString();
-                                final String postID =
-                                    (post['id'] ?? '').toString();
-                                final String date =
-                                    AppDate.format(post['date']); // ⭐ 날짜 처리 완료
+                            posts: posts,
+                            maxItems: maxItems,
+                            itemBuilder: (post) {
+                              final String title =
+                                  (post['title'] ?? '').toString();
+                              final String category =
+                                  (post['category'] ?? '').toString();
+                              final String postID =
+                                  (post['id'] ?? '').toString();
+                              final String date = AppDate.format(post['date']);
 
-                                return AppPostListTile(
-                                    title: title,
-                                    onTap: () => controller.handlePostTap(post),
-                                    category: category,
-                                    date: date,
-                                    postID: postID,
-                                    post: post);
-                              });
+                              return AppPostListTile(
+                                title: title,
+                                onTap: () => controller.handlePostTap(post),
+                                category: category,
+                                date: date,
+                                postID: postID,
+                                post: post,
+                              );
+                            },
+                          );
                         }
 
                         return Obx(() {
@@ -398,7 +330,6 @@ Widget _buildHomeContent(
                           }
                           final bool isIssueFact =
                               controller.selectedIndex.value == 4;
-
                           if (controller.isLoading.value) {
                             return const Center(
                                 child: CircularProgressIndicator());
@@ -415,29 +346,28 @@ Widget _buildHomeContent(
                               !controller.isSearching.value) {
                             final sections = [
                               (
+                                title: '이슈 팩트',
+                                posts: controller.dailyPostList,
+                                accent: AppColor.primary,
+                                maxRows: 1,
+                                maxItems: 5,
+                                tabIndex: 4,
+                              ),
+                              (
                                 title: '포커스 팩트',
                                 posts: controller.focusPostList,
                                 accent: AppColor.focusFact,
-                                maxRows: 2,
-                                maxItems: isMobileLayout ? 5 : null,
                                 tabIndex: 2,
+                                maxRows: 1,
+                                maxItems: isMobileLayout ? 5 : null,
                               ),
                               (
                                 title: '인사이트 팩트',
                                 posts: controller.insightPostList,
                                 accent: AppColor.yellow,
-                                maxRows: 1,
-                                maxItems: isMobileLayout ? 3 : null,
                                 tabIndex: 3,
-                              ),
-                              // HIDE:  피플&뷰 숨김처리
-                              (
-                                title: '이슈 팩트',
-                                posts: controller.dailyPostList,
-                                accent: AppColor.primary,
                                 maxRows: 1,
                                 maxItems: isMobileLayout ? 3 : null,
-                                tabIndex: 4,
                               ),
                             ];
 
@@ -445,16 +375,31 @@ Widget _buildHomeContent(
                               children: [
                                 for (int i = 0; i < sections.length; i++)
                                   if (sections[i].posts.isNotEmpty) ...[
-                                    (isMobileLayout || sections[i].tabIndex == 4)
+                                    // 모바일은 전부 리스트
+                                    // PC에서는 이슈 팩트만 리스트
+                                    (isMobileLayout ||
+                                            sections[i].tabIndex == 4)
                                         ? AppSectionList(
                                             title: sections[i].title,
                                             posts: sections[i].posts,
                                             accentColor: sections[i].accent,
                                             controller: controller,
                                             maxItems: sections[i].maxItems,
+                                            showTitleDivider:
+                                                sections[i].tabIndex == 4,
                                             onMore: () => controller.selectTab(
                                                 sections[i].tabIndex),
                                             buildPostTile: (post) {
+                                              // 이슈 팩트
+                                              if (sections[i].tabIndex == 4) {
+                                                return _buildNewsListTile(
+                                                  controller: controller,
+                                                  post: post,
+                                                  highlightTitle: false,
+                                                );
+                                              }
+
+                                              // 포커스 팩트 / 인사이트 팩트
                                               final String title =
                                                   (post['title'] ?? '')
                                                       .toString();
@@ -464,8 +409,7 @@ Widget _buildHomeContent(
                                               final String postID =
                                                   (post['id'] ?? '').toString();
                                               final String date =
-                                                  AppDate.format(post[
-                                                      'date']); // ⭐ 날짜 처리 완료
+                                                  AppDate.format(post['date']);
 
                                               return AppPostListTile(
                                                 title: title,
@@ -478,25 +422,37 @@ Widget _buildHomeContent(
                                               );
                                             },
                                           )
+
+                                        // PC 포커스 팩트 / 인사이트 팩트는 기존 Grid
                                         : _buildSectionGrid(
                                             title: sections[i].title,
                                             posts: sections[i].posts,
                                             accentColor: sections[i].accent,
                                             controller: controller,
-                                            crossAxisCount: crossCount,
-                                            aspectRatio: aspectRatio,
+
+                                            // 인사이트 팩트는 가로 전체를 사용하는 1열
+                                            crossAxisCount:
+                                                sections[i].tabIndex == 3
+                                                    ? 1
+                                                    : crossCount,
+
+                                            // 인사이트 팩트는 와이드 카드
+                                            aspectRatio:
+                                                sections[i].tabIndex == 3
+                                                    ? 4.5
+                                                    : aspectRatio,
+
                                             maxRows: sections[i].maxRows,
                                             onMore: () => controller.selectTab(
                                                 sections[i].tabIndex),
                                           ),
-
-                                    // ✅ 다음 섹션 중에서 "비어있지 않은 섹션"이 또 있을 때만 구분선 표시
+                                    // 다음 비어있지 않은 섹션이 있을 때만 구분선
                                     if (sections
                                         .skip(i + 1)
                                         .any((s) => s.posts.isNotEmpty)) ...[
                                       SizedBox(
                                           height: isMobileLayout ? 24 : 40),
-                                      Divider(),
+                                      const Divider(),
                                       SizedBox(
                                           height: isMobileLayout ? 24 : 40),
                                     ],
@@ -505,9 +461,90 @@ Widget _buildHomeContent(
                             );
                           }
 
-                          return (isMobileLayout || isIssueFact)
-                              ? buildList(posts: visibleList)
-                              : buildGrid(posts: visibleList);
+                          if (controller.selectedIndex.value == 4) {
+                            return AppSectionList(
+                              title: '이슈 팩트',
+                              posts: visibleList,
+                              accentColor: AppColor.primary,
+                              controller: controller,
+                              showTitleDivider: true,
+                              onMore: () {},
+                              buildPostTile: (post) {
+                                return _buildNewsListTile(
+                                  controller: controller,
+                                  post: post,
+                                  highlightTitle: false,
+                                );
+                              },
+                            );
+                          }
+
+                          if (controller.selectedIndex.value == 2) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 48,
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      '포커스 팩트',
+                                      style: AppTextStyle.koBold20().copyWith(
+                                        color: AppColor.focusFact,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Divider(
+                                  height: 1,
+                                  thickness: 2,
+                                  color: AppColor.focusFact,
+                                ),
+                                const SizedBox(height: 16),
+                                isMobileLayout
+                                    ? buildList(posts: visibleList)
+                                    : buildGrid(posts: visibleList),
+                              ],
+                            );
+                          }
+
+                          if (controller.selectedIndex.value == 3) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 48,
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      '인사이트 팩트',
+                                      style: AppTextStyle.koBold20().copyWith(
+                                        color: AppColor.yellow,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Divider(
+                                  height: 1,
+                                  thickness: 2,
+                                  color: AppColor.yellow,
+                                ),
+                                const SizedBox(height: 16),
+                                isMobileLayout
+                                    ? buildList(posts: visibleList)
+                                    : _buildPostGrid(
+                                        posts: visibleList,
+                                        controller: controller,
+                                        crossAxisCount: 1,
+                                        aspectRatio: 4.5,
+                                      ),
+                              ],
+                            );
+                          }
+
+                          return buildGrid(posts: visibleList);
                         });
                       },
                     ),
@@ -538,6 +575,152 @@ Widget _buildHomeContent(
   );
 }
 
+Future<void> _onLogoTap(HomeController controller) async {
+  if (controller.isSearching.value) {
+    controller.isSearching.value = false;
+    controller.searchController.clear();
+    _resetListForTab(controller, controller.selectedIndex.value);
+  }
+  controller.selectTab(0);
+  controller.currentPage.value = 'home';
+  if (controller.scrollController.hasClients) {
+    controller.scrollController.jumpTo(0);
+  }
+  await _reloadTabData(controller, controller.selectedIndex.value);
+}
+
+Widget _buildSearchAction(
+  BuildContext context,
+  HomeController controller,
+) {
+  return Padding(
+    padding: const EdgeInsets.only(
+      right: 16,
+      top: 12,
+      bottom: 12,
+    ),
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final double width = constraints.maxWidth;
+        final double hintFontSize = width > 1000 ? 14 : 10;
+
+        if (ScreenUtil().screenWidth > 1000) {
+          return Container(
+            decoration: BoxDecoration(
+              color: AppColor.white,
+              border: Border.all(
+                color: AppColor.grey,
+                width: 1.w,
+              ),
+              borderRadius: BorderRadius.circular(100.r),
+            ),
+            width: ScreenUtil().screenWidth / 4.5,
+            height: 32,
+            alignment: Alignment.center,
+            child: TextField(
+              focusNode: controller.searchFocusNode,
+              controller: controller.searchController,
+              textAlignVertical: TextAlignVertical.center,
+              style: AppTextStyle.koRegular15().copyWith(
+                color: AppColor.grey,
+              ),
+              onChanged: (value) {
+                if (value.isEmpty) {
+                  controller.isSearching.value = false;
+                  _resetListForTab(
+                    controller,
+                    controller.selectedIndex.value,
+                  );
+                }
+              },
+              onSubmitted: (_) async {
+                controller.clearFocus();
+
+                if (controller.searchController.text.trim().isNotEmpty) {
+                  await controller.findPost();
+                } else {
+                  await _reloadTabData(
+                    controller,
+                    controller.selectedIndex.value,
+                  );
+                }
+              },
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                suffixIcon: LayoutBuilder(
+                  builder: (context, iconConstraints) {
+                    final double iconSize = iconConstraints.maxHeight * 0.6;
+
+                    return IconButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () async {
+                        if (controller.searchController.text.isNotEmpty) {
+                          await controller.findPost();
+                        } else {
+                          await _reloadTabData(
+                            controller,
+                            controller.selectedIndex.value,
+                          );
+                        }
+                      },
+                      icon: Icon(
+                        Icons.search,
+                        size: iconSize,
+                        color: AppColor.grey,
+                      ),
+                    );
+                  },
+                ),
+                hintText: '관심있는 키워드를 검색하세요',
+                hintStyle: AppTextStyle.koRegular14().copyWith(
+                  color: AppColor.grey,
+                  fontSize: hintFontSize,
+                ),
+                border: InputBorder.none,
+              ),
+            ),
+          );
+        }
+
+        return IconButton(
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            _showSearchOverlay(context, controller);
+          },
+          icon: const Icon(
+            Icons.search,
+            size: 25,
+            color: AppColor.grey,
+          ),
+        );
+      },
+    ),
+  );
+}
+
+Widget _buildNewsListTile({
+  required HomeController controller,
+  required Map<String, dynamic> post,
+  bool highlightTitle = false,
+}) {
+  final String title = (post['title'] ?? '').toString();
+  final String date = AppDate.format(post['date']);
+  final String excerpt =
+      AppIssuePostListTile.firstSentence(post['final_article']);
+
+  return AppIssuePostListTile(
+    title: title,
+    date: date,
+    excerpt: excerpt,
+    highlightTitle: highlightTitle,
+    onTap: () => controller.handlePostTap(post),
+  );
+}
+
 void _resetListForTab(HomeController controller, int tabIndex) {
   switch (tabIndex) {
     case 0:
@@ -556,8 +739,8 @@ void _resetListForTab(HomeController controller, int tabIndex) {
           controller.originalInsightPostList.toList();
       break;
     case 4:
-      controller.peoplePostList.value =
-          controller.originalPeoplePostList.toList();
+      controller.dailyPostList.value =
+          controller.originalDailyPostList.toList();
       break;
   }
 }
@@ -577,7 +760,7 @@ Future<void> _reloadTabData(HomeController controller, int tabIndex) async {
       await controller.loadInsightPosts();
       break;
     case 4:
-      await controller.loadPeoplePosts();
+      await controller.loadDailyPosts();
       break;
     default:
       await controller.loadAllPosts();
@@ -713,25 +896,34 @@ Widget _buildSectionGrid({
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title,
-              style: AppTextStyle.koBold20().copyWith(color: accentColor)),
-          if (showMore)
-            TextButton(
-              onPressed: () {
-                onMore();
-                // ✅ 부드러운 스크롤 대신 즉시 최상단으로 이동
-                controller.scrollController.jumpTo(0);
-              },
-              child: Text('>> 더보기',
-                  style:
-                      AppTextStyle.koSemiBold14().copyWith(color: accentColor)),
-            ),
-        ],
+      SizedBox(
+        height: 48,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title,
+                style: AppTextStyle.koBold20().copyWith(color: accentColor)),
+            if (showMore)
+              TextButton(
+                onPressed: () {
+                  onMore();
+                  // ✅ 부드러운 스크롤 대신 즉시 최상단으로 이동
+                  controller.scrollController.jumpTo(0);
+                },
+                child: Text('>> 더보기',
+                    style: AppTextStyle.koSemiBold14()
+                        .copyWith(color: accentColor)),
+              ),
+          ],
+        ),
       ),
-      const SizedBox(height: 16),
+      const SizedBox(height: 8),
+      Divider(
+        height: 1,
+        thickness: 2,
+        color: accentColor,
+      ),
+      const SizedBox(height: 32),
       posts.isEmpty
           ? Container(
               alignment: Alignment.centerLeft,
@@ -850,15 +1042,22 @@ Widget _buildPostCard({
           Text(
             title.isNotEmpty ? title : formattedDate,
             style: AppTextStyle.koSemiBold18(),
-            maxLines: 2,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2),
           Expanded(
             child: Text(
-              (post['final_article'] ?? '').toString(),
-              style: AppTextStyle.koRegular15().copyWith(color: AppColor.grey),
-              maxLines: 3,
+              (post['final_article'] ?? '')
+                  .toString()
+                  .replaceAll(RegExp(r'<br\s*/?>'), '\n')
+                  .replaceAll(RegExp(r'</p>'), '\n\n')
+                  .replaceAll(RegExp(r'<[^>]*>'), '')
+                  .trim(),
+              style: AppTextStyle.koRegular15().copyWith(
+                color: AppColor.grey,
+              ),
+              maxLines: 6,
               overflow: TextOverflow.ellipsis,
             ),
           ),

@@ -13,6 +13,8 @@ class AppSectionList extends StatelessWidget {
     required this.onMore,
     required this.buildPostTile,
     this.maxItems,
+    this.icon,
+    this.showTitleDivider = false,
   });
 
   final String title;
@@ -20,7 +22,9 @@ class AppSectionList extends StatelessWidget {
   final HomeController controller;
   final Color accentColor;
   final int? maxItems;
+  final IconData? icon;
   final VoidCallback onMore;
+  final bool showTitleDivider;
 
   /// 외부에서 리스트 타일 UI를 전달받음
   final Widget Function(Map<String, dynamic> post) buildPostTile;
@@ -35,30 +39,50 @@ class AppSectionList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         /// 상단 타이틀 + 더보기
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: AppTextStyle.koBold18().copyWith(color: accentColor),
-            ),
-            if (showMore)
-              TextButton(
-                onPressed: () {
-                  onMore();
-                  controller.scrollController.jumpTo(0);
-                },
-                child: Text(
-                  '>> 더보기',
-                  style: AppTextStyle.koSemiBold14().copyWith(
-                    color: accentColor,
+        SizedBox(
+          height: 48,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, color: accentColor, size: 20),
+                    const SizedBox(width: 6),
+                  ],
+                  Text(
+                    title,
+                    style: AppTextStyle.koBold20().copyWith(color: accentColor),
+                  ),
+                ],
+              ),
+              if (showMore)
+                TextButton(
+                  onPressed: () {
+                    onMore();
+                    controller.scrollController.jumpTo(0);
+                  },
+                  child: Text(
+                    '>> 더보기',
+                    style: AppTextStyle.koSemiBold14().copyWith(
+                      color: accentColor,
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
 
-        const SizedBox(height: 8),
+        if (showTitleDivider) ...[
+          const SizedBox(height: 8),
+          Divider(
+            height: 1,
+            thickness: 2,
+            color: accentColor,
+          ),
+          const SizedBox(height: 16),
+        ] else
+          const SizedBox(height: 8),
 
         /// 게시글 없을 때
         if (posts.isEmpty)
@@ -67,8 +91,7 @@ class AppSectionList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: Text(
               '게시글이 없습니다.',
-              style:
-                  AppTextStyle.koRegular18().copyWith(color: AppColor.grey),
+              style: AppTextStyle.koRegular18().copyWith(color: AppColor.grey),
             ),
           )
         else
