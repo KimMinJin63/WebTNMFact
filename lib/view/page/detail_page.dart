@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -135,5 +136,56 @@ class DetailView extends StatelessWidget {
 
     // description 적용
     metaDescription.setAttribute('content', description);
+
+    // ---------------------------
+    // NewsArticle JSON-LD
+    // ---------------------------
+
+    String datePublished = '';
+
+    final rawDate = post['date'];
+
+    if (rawDate is Timestamp) {
+      datePublished = rawDate.toDate().toIso8601String();
+    } else if (rawDate is String) {
+      try {
+        datePublished = DateTime.parse(rawDate).toIso8601String();
+      } catch (e) {
+        print('⚠️ JSON-LD 날짜 파싱 실패: $rawDate');
+      }
+    }
+
+    final jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'NewsArticle',
+      'headline': title,
+      'description': description,
+      'datePublished': datePublished,
+      'dateModified': datePublished,
+      'author': {
+        '@type': 'Person',
+        'name': post['editor']?.toString() ?? 'TNM팩트',
+      },
+      'publisher': {
+        '@type': 'Organization',
+        'name': 'TNM팩트',
+      },
+      'mainEntityOfPage': {
+        '@type': 'WebPage',
+        '@id': web.window.location.href,
+      },
+    };
+    // 기존 JSON-LD가 있으면 삭제
+    web.document.querySelector('script[data-tnm-news-article]')?.remove();
+
+    // 새로운 JSON-LD 생성
+    final script =
+        web.document.createElement('script') as web.HTMLScriptElement;
+
+    script.type = 'application/ld+json';
+    script.setAttribute('data-tnm-news-article', 'true');
+    script.text = jsonEncode(jsonLd);
+
+    web.document.head?.append(script);
   }
 }
