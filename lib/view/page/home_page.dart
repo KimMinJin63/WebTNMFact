@@ -557,16 +557,26 @@ Widget _buildHomeContent(
           ),
           AppFooter(
             logo: 'TNM FACT',
-            companyInfo: '제호: TNM 팩트 (TNM Fact)',
-            name: '발행인: 김민진 | 편집인: 김민진',
-            publeInfo: '등록번호: 금천 라00261 | 등록일: 2026.02.23',
-            address: '발행소: 서울시 금천구 벚꽃로 73',
-            contact: '연락처: tnmfact@gmail.com',
-            service: '이용약관',
-            privacy: '개인정보처리방침',
-            copyright: '© 2026 TNM Fact. All rights reserved.',
-            serviceTap: () => Get.toNamed(AppRoutes.service),
-            privacyTap: () => Get.toNamed(AppRoutes.privacy),
+            infoLines: const [
+              '(주)TNM FACT | 등록번호: 서울 아 56793 | 등록일자: 2026.10.13',
+              '발행인·편집인: 김민진 | 청소년보호책임자: 김민진 (tnmfact@gmail.com)',
+              '주소: 서울특별시 관악구 봉천로 408-1 | 대표전화: 010-8676-1864',
+            ],
+            links: [
+              FooterLink(
+                label: '이용약관',
+                onTap: () => Get.toNamed(AppRoutes.service),
+              ),
+              FooterLink(
+                label: '개인정보 처리방침',
+                onTap: () => Get.toNamed(AppRoutes.privacy),
+              ),
+              FooterLink(
+                label: '청소년보호정책',
+                onTap: () => Get.toNamed(AppRoutes.youth),
+              ),
+            ],
+            copyright: 'Copyright ⓒ TNM FACT. All rights reserved.',
           )
           // _buildFooter(),
         ],

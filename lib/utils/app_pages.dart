@@ -10,6 +10,7 @@ import 'package:tnm_fact/view/page/post_detail_page.dart';
 import 'package:tnm_fact/view/page/login_page.dart';
 import 'package:tnm_fact/view/page/privacy_policy_page.dart';
 import 'package:tnm_fact/view/page/terms_of_service_page.dart';
+import 'package:tnm_fact/view/page/youth_policy_page.dart';
 
 class AppPages {
   static final pages = [
@@ -32,5 +33,6 @@ class AppPages {
     // 독립 라우트만 추가
     GetPage(name: AppRoutes.service, page: () => TermsOfServicePage()),
     GetPage(name: AppRoutes.privacy, page: () => PrivacyPolicyPage()),
+    GetPage(name: AppRoutes.youth, page: () => const YouthPolicyPage()),
   ];
 }

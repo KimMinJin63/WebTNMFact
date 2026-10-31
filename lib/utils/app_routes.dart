@@ -34,5 +34,6 @@ class AppRoutes {
   // static const dash = '/dash'; // 수정 페이지
   static const layout = '/admin/home'; // 수정 페이지
   static const service = '/service'; // 수정 페이지
-  static const privacy = '/privacy'; // 수정 페이지
+  static const privacy = '/privacy'; // 개인정보 처리방침
+  static const youth = '/youth'; // 청소년보호정책
 }
