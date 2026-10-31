@@ -7,7 +7,6 @@ import 'package:tnm_fact/utils/app_navigation.dart';
 import 'package:tnm_fact/utils/app_routes.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/page/detail_page.dart';
-import 'package:tnm_fact/view/widget/app_side_banner_layout.dart';
 
 class PostDetailPage extends StatefulWidget {
   const PostDetailPage({super.key});
@@ -26,26 +25,27 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _loadPost();
   }
 
-Future<void> _loadPost() async {
-  final title = AppRoutes.decodePostId(Get.parameters['id']);
+  Future<void> _loadPost() async {
+    final title = AppRoutes.decodePostId(Get.parameters['id']);
 
-  if (title.isEmpty) {
-    setState(() => _loading = false);
-    return;
+    if (title.isEmpty) {
+      setState(() => _loading = false);
+      return;
+    }
+
+    final controller = Get.find<HomeController>();
+
+    final cached = controller.findPostInCacheByTitle(title);
+    final post = cached ?? await controller.fetchPostByTitle(title);
+
+    if (!mounted) return;
+
+    setState(() {
+      _post = post;
+      _loading = false;
+    });
   }
 
-  final controller = Get.find<HomeController>();
-
-  final cached = controller.findPostInCacheByTitle(title);
-  final post = cached ?? await controller.fetchPostByTitle(title);
-
-  if (!mounted) return;
-
-  setState(() {
-    _post = post;
-    _loading = false;
-  });
-}
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -59,9 +59,8 @@ Future<void> _loadPost() async {
               }
             },
       child: Scaffold(
-      backgroundColor: AppColor.background,
-      body: AppSideBannerLayout(
-        child: _loading
+        backgroundColor: AppColor.background,
+        body: _loading
             ? const Center(child: CircularProgressIndicator())
             : _post == null
                 ? Center(
@@ -74,8 +73,7 @@ Future<void> _loadPost() async {
                         ),
                         const SizedBox(height: 16),
                         TextButton(
-                          onPressed: () =>
-                              navigateBackToHome(context: context),
+                          onPressed: () => navigateBackToHome(context: context),
                           child: Text(
                             '목록으로 돌아가기',
                             style: AppTextStyle.koSemiBold14()
@@ -87,7 +85,6 @@ Future<void> _loadPost() async {
                   )
                 : DetailView(post: _post!),
       ),
-    ),
     );
   }
 }
