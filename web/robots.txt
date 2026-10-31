@@ -4,3 +4,6 @@ Disallow: /admin/
 Disallow: /admin/*
 Disallow: /user/
 Disallow: /user/*
+
+Sitemap: https://tnmfact.com/sitemap.xml
+Sitemap: https://tnmfact.com/news-sitemap.xml

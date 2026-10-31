@@ -60,6 +60,20 @@
           }
         },
         {
+          "source": "/news-sitemap.xml",
+          "function": {
+            "functionId": "newsSitemap",
+            "region": "asia-northeast3"
+          }
+        },
+        {
+          "source": "/rss.xml",
+          "function": {
+            "functionId": "rss",
+            "region": "asia-northeast3"
+          }
+        },
+        {
           "source": "/post/**",
           "function": {
             "functionId": "postPage",
@@ -89,6 +103,20 @@
           "source": "/sitemap.xml",
           "function": {
             "functionId": "sitemap",
+            "region": "asia-northeast3"
+          }
+        },
+        {
+          "source": "/news-sitemap.xml",
+          "function": {
+            "functionId": "newsSitemap",
+            "region": "asia-northeast3"
+          }
+        },
+        {
+          "source": "/rss.xml",
+          "function": {
+            "functionId": "rss",
             "region": "asia-northeast3"
           }
         },

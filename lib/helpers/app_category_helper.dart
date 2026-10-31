@@ -40,7 +40,7 @@ class CategoryHelper {
       case '이슈 팩트':
         return '김병국 기자';
       case '인사이트 팩트':
-        return 'tnm팩트 편집부';
+        return 'TNM팩트 편집부';
       case '포커스 팩트':
         return '에디터 힙더바리';
       case '피플&뷰':
