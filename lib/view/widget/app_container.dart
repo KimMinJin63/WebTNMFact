@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tnm_fact/utils/app_color.dart';
-import 'package:tnm_fact/utils/app_text_style.dart';
 
 class AppContainer extends StatelessWidget {
   const AppContainer(

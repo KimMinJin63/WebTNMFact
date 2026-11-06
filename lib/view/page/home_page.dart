@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
@@ -15,7 +14,6 @@ import 'package:tnm_fact/utils/app_routes.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/widget/app_footer.dart';
 import 'package:tnm_fact/view/widget/app_issue_post_list_tile.dart';
-import 'package:tnm_fact/view/widget/app_side_banner_layout.dart';
 import 'package:tnm_fact/view/widget/app_post_list.dart';
 import 'package:tnm_fact/view/widget/app_post_list_tile.dart';
 import 'package:tnm_fact/view/widget/app_section_list.dart';
@@ -52,7 +50,7 @@ class HomePage extends GetView<HomeController> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'TNM FACT',
+                'TNM팩트',
                 style:
                     AppTextStyle.koBold35().copyWith(color: AppColor.primary),
               ),
@@ -556,7 +554,7 @@ Widget _buildHomeContent(
             ),
           ),
           AppFooter(
-            logo: 'TNM FACT',
+            logo: 'TNM팩트',
             infoLines: const [
               'TNM팩트 | 등록번호: 서울 아 56793 | 등록일자: 2026.10.13',
               '발행인·편집인: 김민진 | 청소년보호책임자: 김민진 (tnmfact@gmail.com)',
@@ -806,7 +804,7 @@ void _showSearchOverlay(BuildContext context, HomeController controller) {
                         style: AppTextStyle.koRegular15()
                             .copyWith(color: AppColor.black),
                         decoration: InputDecoration(
-                          hintText: "관심있는 교육 키워드를 검색하세요",
+                          hintText: "관심있는 키워드를 검색하세요",
                           hintStyle: AppTextStyle.koRegular14()
                               .copyWith(color: AppColor.grey),
                           border: OutlineInputBorder(

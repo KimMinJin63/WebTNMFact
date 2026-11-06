@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/controller/edit_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
-import 'package:tnm_fact/view/page/admin_layout_page.dart';
-import 'package:tnm_fact/view/page/admin_page.dart';
 import 'package:tnm_fact/view/widget/%08app_checkbox.dart';
 
 class EditPage extends GetView<EditController> {

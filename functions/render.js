@@ -159,7 +159,7 @@ function renderPostHtml(post) {
 
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="TNM FACT">
+  <meta name="apple-mobile-web-app-title" content="TNM팩트">
   <link rel="apple-touch-icon" href="/icons/Icon-192.png">
   <link rel="icon" type="image/png" href="/favicon-v2.png">
   <link rel="manifest" href="/manifest.json">
@@ -184,7 +184,7 @@ function renderPostHtml(post) {
 
 <body>
   <article id="tnm-article">
-    <a class="site" href="${BASE_URL}/">TNM FACT</a>
+    <a class="site" href="${BASE_URL}/">TNM팩트</a>
     <header>
       ${category ? `<span class="section">${category}</span>` : ""}
       <h1>${safeTitle}</h1>

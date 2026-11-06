@@ -6,7 +6,6 @@ import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/controller/create_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
-import 'package:tnm_fact/view/page/admin_page.dart';
 import 'package:tnm_fact/view/widget/%08app_checkbox.dart';
 
 class CreatePage extends GetView<CreateController> {

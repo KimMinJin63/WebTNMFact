@@ -1,11 +1,11 @@
 {
-    "name": "tnm_fact",
-    "short_name": "tnm_fact",
+    "name": "TNM팩트",
+    "short_name": "TNM팩트",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "TNM팩트는 세상을 읽는 새로운 방법입니다.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

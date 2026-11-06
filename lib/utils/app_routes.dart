@@ -1,13 +1,3 @@
-import 'package:tnm_fact/view/page/admin_layout_page.dart';
-import 'package:tnm_fact/view/page/admin_page.dart';
-import 'package:tnm_fact/view/page/create_page.dart';
-import 'package:tnm_fact/view/page/dash_board_page.dart';
-import 'package:tnm_fact/view/page/detail_page.dart';
-import 'package:tnm_fact/view/page/edit_page.dart';
-import 'package:tnm_fact/view/page/home_page.dart';
-import 'package:tnm_fact/view/page/login_page.dart';
-import 'package:tnm_fact/view/page/privacy_policy_page.dart';
-import 'package:tnm_fact/view/page/terms_of_service_page.dart';
 
 class AppRoutes {
   static const login = '/admin'; //로그인

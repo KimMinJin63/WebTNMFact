@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,12 +12,7 @@ import 'package:tnm_fact/controller/login_controller.dart';
 import 'package:tnm_fact/firebase_options.dart';
 import 'package:tnm_fact/utils/app_pages.dart';
 import 'package:tnm_fact/utils/web_history.dart';
-import 'package:tnm_fact/view/page/admin_layout_page.dart';
-import 'package:tnm_fact/view/page/admin_page.dart';
-import 'package:tnm_fact/view/page/home_page.dart';
-import 'package:tnm_fact/view/page/login_page.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 void main() async {
@@ -52,7 +46,7 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return GetMaterialApp(
-          title: 'TNM FACT',
+          title: 'TNM팩트',
           debugShowCheckedModeBanner: false,
           useInheritedMediaQuery: true,
           initialBinding: BindingsBuilder(() {

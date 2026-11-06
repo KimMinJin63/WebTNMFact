@@ -1,4 +1,3 @@
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:flutter/material.dart';
 

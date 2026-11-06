@@ -1,12 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:tnm_fact/controller/admin_controller.dart';
-import 'package:tnm_fact/controller/home_controller.dart';
 import 'package:tnm_fact/helpers/app_category_helper.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
-import 'package:tnm_fact/view/page/home_page.dart';
 
 // ✅ 모바일용 리스트 타일 (제목만 표시)
 class AppPostListTile extends StatelessWidget {

@@ -1,5 +1,5 @@
 name: tnm_fact
-description: "A new Flutter project."
+description: "TNM팩트는 세상을 읽는 새로운 방법입니다."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

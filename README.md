@@ -1,6 +1,6 @@
 # tnm_fact
 
-A new Flutter project.
+TNM팩트는 세상을 읽는 새로운 방법입니다.
 
 ## Getting Started
 
