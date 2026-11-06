@@ -94,3 +94,6 @@ app.*.map.json
 /opencode.json.bak
 functions/node_modules/
 # END Ruler Generated Files
+
+# Firebase deploy cache
+.firebase/
