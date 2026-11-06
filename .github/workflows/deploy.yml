@@ -1,0 +1,49 @@
+# main에 push되면 웹 빌드 후 Firebase(production hosting + functions)에 배포합니다.
+name: Deploy to Firebase (production)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter 패키지 설치
+        run: flutter pub get
+
+      - name: 정적 분석 (에러만 실패 처리)
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: 웹 빌드
+        run: flutter build web --release
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+
+      - name: Functions 의존성 설치
+        run: npm ci
+        working-directory: functions
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Firebase 배포 (hosting:production + functions)
+        run: npx -y firebase-tools@15.35.0 deploy --only hosting:production,functions --project webtnmfact --non-interactive
