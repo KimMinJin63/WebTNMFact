@@ -558,7 +558,7 @@ Widget _buildHomeContent(
           AppFooter(
             logo: 'TNM FACT',
             infoLines: const [
-              '(주)TNM FACT | 등록번호: 서울 아 56793 | 등록일자: 2026.10.13',
+              'TNM팩트 | 등록번호: 서울 아 56793 | 등록일자: 2026.10.13',
               '발행인·편집인: 김민진 | 청소년보호책임자: 김민진 (tnmfact@gmail.com)',
               '주소: 서울특별시 관악구 봉천로 408-1 | 대표전화: 010-8676-1864',
             ],
@@ -576,7 +576,7 @@ Widget _buildHomeContent(
                 onTap: () => Get.toNamed(AppRoutes.youth),
               ),
             ],
-            copyright: 'Copyright ⓒ TNM FACT. All rights reserved.',
+            copyright: 'Copyright © TNM팩트. All rights reserved.',
           )
           // _buildFooter(),
         ],
