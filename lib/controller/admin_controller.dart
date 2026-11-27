@@ -9,6 +9,29 @@ import 'package:intl/intl.dart';
 class AdminController extends GetxController {
   TextEditingController searchController = TextEditingController();
   RxInt selectedIndex = 0.obs;
+  // 콘텐츠 관리 카테고리 필터 ('전체' 또는 카테고리명)
+  RxString categoryFilter = '전체'.obs;
+  // 이슈 팩트 세부 분류 필터 ('전체', '미분류' 또는 세부 분류명)
+  RxString subCategoryFilter = '전체'.obs;
+
+  /// 카테고리·세부 분류 필터를 적용한 목록
+  List<Map<String, dynamic>> applyCategoryFilter(
+      List<Map<String, dynamic>> list) {
+    final category = categoryFilter.value;
+    if (category == '전체') return list;
+    final sub = subCategoryFilter.value;
+    return list.where((p) {
+      if (p['category'] != category) return false;
+      if (category != '이슈 팩트' || sub == '전체') return true;
+      final postSub = (p['subCategory'] ?? '').toString();
+      return sub == '미분류' ? postSub.isEmpty : postSub == sub;
+    }).toList();
+  }
+
+  void selectCategoryFilter(String category) {
+    categoryFilter.value = category;
+    subCategoryFilter.value = '전체';
+  }
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   RxList<Map<String, dynamic>> postList = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> donePostList = <Map<String, dynamic>>[].obs;

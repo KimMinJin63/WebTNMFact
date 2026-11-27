@@ -168,6 +168,11 @@ class AdminPage extends GetView<AdminController> {
                           );
                         }),
 
+                        SizedBox(height: 12.h),
+
+                        // 🔹 카테고리 필터 (이슈 팩트 선택 시 세부 분류 필터 표시)
+                        Obx(() => _buildCategoryFilter(controller)),
+
                         SizedBox(height: 16.h),
 
                         // 🔹 헤더
@@ -190,6 +195,8 @@ class AdminPage extends GetView<AdminController> {
                                 visibleList = controller.postList;
                                 break;
                             }
+                            visibleList =
+                                controller.applyCategoryFilter(visibleList);
 
                             // ✅ 빈 목록 처리
                             if (visibleList.isEmpty) {
@@ -279,6 +286,105 @@ class AdminPage extends GetView<AdminController> {
         ),
       );
     });
+  }
+
+  /// 🔹 현재 상태 탭(모두/발행됨/대기중)의 목록
+  List<Map<String, dynamic>> _statusList(AdminController controller) {
+    switch (controller.selectedIndex.value) {
+      case 1:
+        return controller.donePostList;
+      case 2:
+        return controller.notPostList;
+      default:
+        return controller.postList;
+    }
+  }
+
+  /// 🔹 카테고리 필터 줄 + (이슈 팩트일 때) 세부 분류 필터 줄
+  Widget _buildCategoryFilter(AdminController controller) {
+    final list = _statusList(controller);
+    const categories = ['이슈 팩트', '포커스 팩트', '인사이트 팩트', '피플&뷰'];
+    final issuePosts =
+        list.where((p) => p['category'] == '이슈 팩트').toList();
+
+    Widget row(String label, List<(String, int)> items, String selected,
+        ValueChanged<String> onSelect) {
+      return Row(
+        children: [
+          SizedBox(
+            width: 70,
+            child: Text(label,
+                style: AppTextStyle.koSemiBold14()
+                    .copyWith(color: AppColor.grey)),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (int i = 0; i < items.length; i++) ...[
+                    if (i > 0)
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.w),
+                        child: Text('|',
+                            style: TextStyle(color: Colors.grey.shade400)),
+                      ),
+                    InkWell(
+                      onTap: () => onSelect(items[i].$1),
+                      child: Text(
+                        '${items[i].$1} (${items[i].$2})',
+                        style: AppTextStyle.koRegular14().copyWith(
+                          color: selected == items[i].$1
+                              ? AppColor.black
+                              : AppColor.primary,
+                          fontWeight: selected == items[i].$1
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      children: [
+        row(
+          '카테고리',
+          [
+            ('전체', list.length),
+            for (final c in categories)
+              (c, list.where((p) => p['category'] == c).length),
+          ],
+          controller.categoryFilter.value,
+          controller.selectCategoryFilter,
+        ),
+        if (controller.categoryFilter.value == '이슈 팩트') ...[
+          SizedBox(height: 8.h),
+          row(
+            '세부 분류',
+            [
+              ('전체', issuePosts.length),
+              for (final sub in CategoryHelper.issueSubCategories)
+                (sub, issuePosts.where((p) => p['subCategory'] == sub).length),
+              (
+                '미분류',
+                issuePosts
+                    .where((p) => (p['subCategory'] ?? '').toString().isEmpty)
+                    .length
+              ),
+            ],
+            controller.subCategoryFilter.value,
+            (v) => controller.subCategoryFilter.value = v,
+          ),
+        ],
+      ],
+    );
   }
 
   /// 🔹 타이틀 변환 로직 분리
