@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:tnm_fact/utils/admin_breakpoint.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 
@@ -14,7 +15,8 @@ class AppPost extends StatelessWidget {
       this.onTap,
       this.onContentTap,
       this.onDeleteTap,
-      this.color, this.textColor});
+      this.color,
+      this.textColor});
   final String title;
   final String author;
   final String category;
@@ -28,6 +30,84 @@ class AppPost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) =>
+          constraints.maxWidth < AdminBreakpoint.mobile
+              ? _buildCompact()
+              : _buildRow(),
+    );
+  }
+
+  /// 좁은 화면: 제목 한 줄 + (카테고리 · 작성자 · 날짜) + 발행여부 / 관리 버튼
+  Widget _buildCompact() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColor.border),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: onContentTap,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTextStyle.koSemiBold15()
+                        .copyWith(color: AppColor.black),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          status,
+                          style: AppTextStyle.koSemiBold12()
+                              .copyWith(color: textColor),
+                        ),
+                      ),
+                      Text(
+                        '$category · $author · $createdAt',
+                        style: AppTextStyle.koRegular12()
+                            .copyWith(color: const Color(0xFF6B7280)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.edit, size: 22, color: AppColor.primary),
+            onPressed: onTap,
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.delete, size: 22, color: AppColor.red),
+            onPressed: onDeleteTap,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 넓은 화면: 기존 표 형태 한 줄
+  Widget _buildRow() {
     return SizedBox(
       width: double.infinity,
       child: Padding(
@@ -86,13 +166,12 @@ class AppPost extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(20.r)
-                  ),
+                      color: color, borderRadius: BorderRadius.circular(20.r)),
                   alignment: Alignment.center,
                   child: Text(
                     status,
-                    style: AppTextStyle.koSemiBold14().copyWith(color: textColor),
+                    style:
+                        AppTextStyle.koSemiBold14().copyWith(color: textColor),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

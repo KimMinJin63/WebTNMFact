@@ -61,6 +61,8 @@ class AdminController extends GetxController {
 
   void openEditPage(Map<String, dynamic> post) {
     currentPost.value = post;
+    // 같은 글을 다시 열어도 수정 화면이 내용을 다시 채우도록 항상 알린다.
+    currentPost.refresh();
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['title']}');
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['content']}');
     print('admin 컨트롤러에서는 잘 받아오나?? : ${post['category']}');

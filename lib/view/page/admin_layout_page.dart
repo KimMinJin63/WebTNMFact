@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
+import 'package:tnm_fact/utils/admin_breakpoint.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/page/admin_page.dart';
@@ -17,8 +18,6 @@ class AdminLayoutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
     if (FirebaseAuth.instance.currentUser == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.offAllNamed('/admin');
@@ -27,119 +26,151 @@ class AdminLayoutPage extends StatelessWidget {
     }
 
     final AdminController controller = Get.find<AdminController>();
-    final screenWidth = ScreenUtil().screenWidth;
-    final bool isExtended = screenWidth > 600; // 기준 너비
-    final double railWidth = isExtended ? 240.w : 72.w;
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
 
-          bool showSidebar = width >= 400; // ✅ 400 미만이면 메뉴 자체 숨김
-          bool extended = width >= 650; // ✅ 600 이상이면 텍스트 확장
+    /// 우측(또는 모바일 본문) 콘텐츠 영역
+    final Widget content = Obx(() {
+      final admin = controller;
+      final tab = controller.menuSelectedIndex.value;
+      if (admin.isEditing.value && tab == 1) {
+        final post = admin.currentPost.value;
+        if (post != null) {
+          return WillPopScope(
+            onWillPop: () async {
+              admin.isEditing.value = false;
+              return false;
+            },
+            child: const EditPage(),
+          );
+        } else {
+          return const Center(child: Text('게시글을 선택하세요.'));
+        }
+      }
 
-          return Row(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (showSidebar)
-                SizedBox(
-                  width: (width * 0.14).clamp(60.0, 200.0),
-                  child: Container(
-                    // width: extended ? 239.w : 70.w,
-                    color: AppColor.navy,
-                    child: Column(
+      if (admin.isCreate.value && tab == 1) {
+        return WillPopScope(
+          onWillPop: () async {
+            admin.isCreate.value = false;
+            return false;
+          },
+          child: const CreatePage(),
+        );
+      }
+
+      switch (controller.menuSelectedIndex.value) {
+        case 0:
+          return const DashBoardPage();
+        case 1:
+          return const AdminPage();
+        case 2:
+          return const HomePage();
+        default:
+          return const DashBoardPage();
+      }
+    });
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+
+        // ✅ 좁은 화면: 상단바 + 햄버거 메뉴(Drawer)
+        if (width < AdminBreakpoint.sidebar) {
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: AppColor.navy,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              title: Text(
+                'TNM ADMIN',
+                style: AppTextStyle.koSemiBold18()
+                    .copyWith(color: Colors.white, letterSpacing: 0.5),
+              ),
+            ),
+            drawer: Drawer(
+              backgroundColor: AppColor.navy,
+              width: 240,
+              child: SafeArea(
+                child: Builder(
+                  builder: (drawerContext) => Obx(
+                    () => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (extended)
-                          Padding(
-                            padding:
-                                EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 12.h),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'TNM ADMIN',
-                                style: AppTextStyle.koSemiBold22().copyWith(
-                                  color: Colors.white,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
+                        const SizedBox(height: 12),
+                        for (final m in _menus)
+                          _buildMenuItem(
+                            m.icon,
+                            m.label,
+                            m.index,
+                            extended: true,
+                            onBeforeSelect: () =>
+                                Navigator.of(drawerContext).pop(),
                           ),
-                        Expanded(
-                          child: ClipRRect(
-                            child: Obx(
-                              () => Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildMenuItem(Icons.dashboard, "대시보드", 0,
-                                      extended: extended),
-                                  _buildMenuItem(Icons.description, "콘텐츠 관리", 1,
-                                      extended: extended),
-                                  _buildMenuItem(Icons.settings, "설정", 2,
-                                      extended: extended),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
                 ),
-
-              /// 우측 콘텐츠 영역
-              Expanded(
-                child: Obx(() {
-                  print('${controller.menuSelectedIndex.value}');
-                  // final AdminController adminController =
-                  //     Get.find<AdminController>();
-                  final admin = Get.find<AdminController>();
-                  final tab = controller.menuSelectedIndex.value;
-                  if (admin.isEditing.value && tab == 1) {
-                    final post = admin.currentPost.value;
-                    if (post != null) {
-                      return WillPopScope(
-                        onWillPop: () async {
-                          admin.isEditing.value = false;
-                          return false;
-                        },
-                        child: const EditPage(),
-                      );
-                    } else {
-                      return const Center(child: Text('게시글을 선택하세요.'));
-                    }
-                  }
-
-                  if (admin.isCreate.value && tab == 1) {
-                    return WillPopScope(
-                      onWillPop: () async {
-                        admin.isCreate.value = false;
-                        return false;
-                      },
-                      child: const CreatePage(),
-                    );
-                  }
-                  // final box = GetStorage();
-
-                  switch (controller.menuSelectedIndex.value) {
-                    case 0:
-                      return const DashBoardPage();
-                    case 1:
-                      return const AdminPage();
-                    case 2:
-                      return const HomePage();
-                    default:
-                      return const DashBoardPage();
-                  }
-                }),
               ),
-            ],
+            ),
+            body: content,
           );
-        },
-      ),
+        }
+
+        // ✅ 넓은 화면: 왼쪽 사이드바 (아주 넓으면 메뉴 이름까지 표시)
+        final bool extended = width >= AdminBreakpoint.sidebarExtended;
+        return Scaffold(
+          body: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                width: extended ? 200 : 72,
+                color: AppColor.navy,
+                child: Column(
+                  children: [
+                    if (extended)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'TNM ADMIN',
+                            style: AppTextStyle.koSemiBold22().copyWith(
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      const SizedBox(height: 20),
+                    Expanded(
+                      child: Obx(
+                        () => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (final m in _menus)
+                              _buildMenuItem(m.icon, m.label, m.index,
+                                  extended: extended),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(child: content),
+            ],
+          ),
+        );
+      },
     );
   }
 }
+
+const List<({IconData icon, String label, int index})> _menus = [
+  (icon: Icons.dashboard, label: '대시보드', index: 0),
+  (icon: Icons.description, label: '콘텐츠 관리', index: 1),
+  (icon: Icons.settings, label: '설정', index: 2),
+];
 
 Future<bool> showTNMMoveGuardDialog(BuildContext context) async {
   final w = MediaQuery.of(context).size.width;
@@ -236,14 +267,15 @@ Future<bool> showTNMMoveGuardDialog(BuildContext context) async {
 }
 
 Widget _buildMenuItem(IconData icon, String label, int index,
-    {bool extended = true}) {
+    {bool extended = true, VoidCallback? onBeforeSelect}) {
   final AdminController controller = Get.find<AdminController>();
-  final admin = Get.find<AdminController>();
   final isSelected = controller.menuSelectedIndex.value == index;
 
   return GestureDetector(
     onTap: () async {
-      final admin = Get.find<AdminController>();
+      // 모바일 Drawer에서 누른 경우 먼저 메뉴를 닫는다.
+      onBeforeSelect?.call();
+      final admin = controller;
       final currentTab = controller.menuSelectedIndex.value;
 
       if ((admin.isEditing.value || admin.isCreate.value) &&
@@ -267,8 +299,8 @@ Widget _buildMenuItem(IconData icon, String label, int index,
       controller.fetchAllPosts();
     },
     child: Container(
-      margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: isSelected ? AppColor.primary : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
@@ -281,18 +313,12 @@ Widget _buildMenuItem(IconData icon, String label, int index,
             message: label,
             child: Icon(
               icon,
-              size: extended
-                  ? (ScreenUtil().screenWidth < 900
-                      ? 32.w
-                      : 28) // ✅ 화면이 넓으면 크기 고정
-                  : (ScreenUtil().screenWidth < 500
-                      ? 28.w
-                      : 24), // ✅ 작은 화면은 살짝 확대
+              size: 24,
               color: isSelected ? Colors.white : Colors.white70,
             ),
           ),
           if (extended) ...[
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Flexible(
               child: Text(
                 label,

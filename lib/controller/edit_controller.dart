@@ -20,23 +20,20 @@ class EditController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // final post = box.read('post');
-    // final post = Get.arguments;
-    final post = adminController.currentPost.value;
-    print('컨트롤러에서는 잘 받아오나?? : ${post?['title']}');
-    print('컨트롤러에서는 잘 받아오나?? : ${post?['final_article']}');
-    print('컨트롤러에서는 잘 받아오나?? : ${post?['category']}');
-    print('컨트롤러에서는 잘 받아오나?? : ${post?['status']}');
+    // EditController는 한 번 만들어지면 계속 재사용되므로(onInit은 최초 1회),
+    // 수정할 글이 바뀔 때마다 입력칸을 다시 채운다.
+    loadPost(adminController.currentPost.value);
+    ever<Map<String, dynamic>?>(adminController.currentPost, loadPost);
+  }
 
-    if (post != null) {
-      titleController.text = post['title'] ?? '';
-      contentController.text = post['final_article'] ?? '';
-      selectedCategory.value = post['category'] ?? '';
-      selectedPublish.value = post['status'] ?? '';
-      selectedSubCategory.value = post['subCategory'] ?? '';
-      // selectedFocus.value = post['focus'] ?? '';
-      // selectedPeople.value = post['people'] ?? '';
-    }
+  /// 수정할 글의 내용으로 입력칸을 채운다.
+  void loadPost(Map<String, dynamic>? post) {
+    if (post == null) return;
+    titleController.text = (post['title'] ?? '').toString();
+    contentController.text = (post['final_article'] ?? '').toString();
+    selectedCategory.value = (post['category'] ?? '').toString();
+    selectedPublish.value = (post['status'] ?? '').toString();
+    selectedSubCategory.value = (post['subCategory'] ?? '').toString();
   }
 
   Future<void> editPost({

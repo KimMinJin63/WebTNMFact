@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:tnm_fact/utils/admin_breakpoint.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 
@@ -8,6 +9,16 @@ class AppPostTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 좁은 화면에서는 목록이 카드형이라 표 머리글을 숨긴다.
+    return LayoutBuilder(
+      builder: (context, constraints) =>
+          constraints.maxWidth < AdminBreakpoint.mobile
+              ? const SizedBox.shrink()
+              : _buildHeader(),
+    );
+  }
+
+  Widget _buildHeader() {
     return Center(
       child: Container(
         height: 60.h,

@@ -5,6 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:tnm_fact/controller/admin_controller.dart';
 import 'package:tnm_fact/helpers/app_category_helper.dart';
+import 'package:tnm_fact/utils/admin_breakpoint.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/widget/app_admin_top_bar.dart';
@@ -49,6 +50,8 @@ class AdminPage extends GetView<AdminController> {
       }
 
       // ✅ 본문 렌더링
+      final bool isNarrow =
+          MediaQuery.sizeOf(context).width < AdminBreakpoint.mobile;
       return Scaffold(
         backgroundColor: AppColor.white,
         body: Column(
@@ -57,25 +60,33 @@ class AdminPage extends GetView<AdminController> {
             // 상단 헤더 영역
             // -------------------------------
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
+              padding: isNarrow
+                  ? const EdgeInsets.fromLTRB(16, 16, 8, 12)
+                  : EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // 제목
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('콘텐츠 관리',
-                          style: AppTextStyle.koBold28()
-                              .copyWith(color: AppColor.black)),
-                      Text('게시물을 관리하고 새 글을 작성합니다.',
-                          style: AppTextStyle.koSemiBold16()
-                              .copyWith(color: AppColor.grey)),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('콘텐츠 관리',
+                            style: (isNarrow
+                                    ? AppTextStyle.koBold20()
+                                    : AppTextStyle.koBold28())
+                                .copyWith(color: AppColor.black)),
+                        Text('게시물을 관리하고 새 글을 작성합니다.',
+                            style: (isNarrow
+                                    ? AppTextStyle.koRegular14()
+                                    : AppTextStyle.koSemiBold16())
+                                .copyWith(color: AppColor.grey)),
+                      ],
+                    ),
                   ),
                   // 작성 버튼
                   Padding(
-                    padding: EdgeInsets.only(right: 20.w),
+                    padding: EdgeInsets.only(right: isNarrow ? 0 : 20.w),
                     child: TextButton(
                       onPressed: () {
                         controller.isCreate.value = true;
@@ -98,7 +109,7 @@ class AdminPage extends GetView<AdminController> {
             Expanded(
               child: Container(
                 color: AppColor.lightGrey,
-                padding: EdgeInsets.all(20.w),
+                padding: EdgeInsets.all(isNarrow ? 8 : 20.w),
                 child: Container(
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
@@ -106,7 +117,7 @@ class AdminPage extends GetView<AdminController> {
                     color: AppColor.white,
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(16.0.w),
+                    padding: EdgeInsets.all(isNarrow ? 12 : 16.0.w),
                     child: Column(
                       children: [
                         // 🔹 상단 탭 & 검색 바
@@ -141,7 +152,8 @@ class AdminPage extends GetView<AdminController> {
                               } else {
                                 if (controller.selectedIndex.value == 0) {
                                   await controller.fetchAllPosts();
-                                } else if (controller.selectedIndex.value == 1) {
+                                } else if (controller.selectedIndex.value ==
+                                    1) {
                                   await controller.fetchDonePosts();
                                 } else {
                                   await controller.fetchNotPosts();
@@ -218,11 +230,12 @@ class AdminPage extends GetView<AdminController> {
                                     _getDisplayTitle(post, controller);
 
                                 return Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: isNarrow ? 4 : 8.h),
                                   child: AppPost(
                                     title: title,
-                                    author:
-                                        CategoryHelper.getCategoryName(post['category']),
+                                    author: CategoryHelper.getCategoryName(
+                                        post['category']),
                                     // author:
                                     //     post['editor'] ?? '편집장 김병국',
                                     category: post['category'],
@@ -254,10 +267,10 @@ class AdminPage extends GetView<AdminController> {
                                             ),
                                             TextButton(
                                               onPressed: () {
-                                                controller.deletePost(post['id']);
-                                                controller.fetchAllPosts();
                                                 controller
-                                                    .fetchAllPostCounts();
+                                                    .deletePost(post['id']);
+                                                controller.fetchAllPosts();
+                                                controller.fetchAllPostCounts();
                                                 Get.back();
                                               },
                                               child: const Text('삭제'),
@@ -304,8 +317,7 @@ class AdminPage extends GetView<AdminController> {
   Widget _buildCategoryFilter(AdminController controller) {
     final list = _statusList(controller);
     const categories = ['이슈 팩트', '포커스 팩트', '인사이트 팩트', '피플&뷰'];
-    final issuePosts =
-        list.where((p) => p['category'] == '이슈 팩트').toList();
+    final issuePosts = list.where((p) => p['category'] == '이슈 팩트').toList();
 
     Widget row(String label, List<(String, int)> items, String selected,
         ValueChanged<String> onSelect) {
@@ -314,8 +326,8 @@ class AdminPage extends GetView<AdminController> {
           SizedBox(
             width: 70,
             child: Text(label,
-                style: AppTextStyle.koSemiBold14()
-                    .copyWith(color: AppColor.grey)),
+                style:
+                    AppTextStyle.koSemiBold14().copyWith(color: AppColor.grey)),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -388,7 +400,8 @@ class AdminPage extends GetView<AdminController> {
   }
 
   /// 🔹 타이틀 변환 로직 분리
-  String _getDisplayTitle(Map<String, dynamic> post, AdminController controller) {
+  String _getDisplayTitle(
+      Map<String, dynamic> post, AdminController controller) {
     final title = (post['title'] ?? '').toString().trim();
     final rawDate = (post['date'] ?? '').toString().trim();
     final category = (post['category'] ?? '').toString();
