@@ -12,104 +12,124 @@ class LoginPage extends GetView<LoginController> {
 
   @override
   Widget build(BuildContext context) {
-     AdminController adminController = Get.find<AdminController>();
+    AdminController adminController = Get.find<AdminController>();
     return Scaffold(
-  resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: true,
       backgroundColor: AppColor.shadowGrey,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Container(
-              padding: EdgeInsets.all(24),
-              width: 360,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
+        // 화면 높이를 최소 높이로 잡아 로그인 창을 가로·세로 모두 가운데 정렬
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 32,
+                minWidth: constraints.maxWidth - 32,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('사용자명', style: AppTextStyle.koRegular14()
-                          .copyWith(color: AppColor.black),),
-                  SizedBox(height: 8),
-                  TextField(
-                    controller: controller.usernameController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                    ),
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.all(24),
+                  width: 360,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  SizedBox(height: 16),
-                  Text('비밀번호', style: AppTextStyle.koRegular14()
-                          .copyWith(color: AppColor.black),),
-                  SizedBox(height: 8),
-                  Obx(() => TextField(
-                        controller: controller.passwordController,
-                        obscureText: !controller.isPasswordVisible.value,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '사용자명',
+                        style: AppTextStyle.koRegular14()
+                            .copyWith(color: AppColor.black),
+                      ),
+                      SizedBox(height: 8),
+                      TextField(
+                        controller: controller.usernameController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(4),
                           ),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 12, vertical: 12),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              controller.isPasswordVisible.value
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              size: 20,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        '비밀번호',
+                        style: AppTextStyle.koRegular14()
+                            .copyWith(color: AppColor.black),
+                      ),
+                      SizedBox(height: 8),
+                      Obx(() => TextField(
+                            controller: controller.passwordController,
+                            obscureText: !controller.isPasswordVisible.value,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 12),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  controller.isPasswordVisible.value
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  size: 20,
+                                ),
+                                onPressed: controller.togglePasswordVisibility,
+                              ),
                             ),
-                            onPressed: controller.togglePasswordVisibility,
-                          ),
-                        ),
-                      )),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Obx(() => Checkbox(
-                            value: controller.rememberMe.value,
-                            onChanged: (val) =>
-                                controller.rememberMe.value = val ?? false,
                           )),
-                      Text('기억하기', style: AppTextStyle.koRegular14()
-                          .copyWith(color: AppColor.black),),
-                      const Spacer(),
-                      ElevatedButton(
-                        onPressed: () async {
-                          String email = controller.usernameController.text.trim();
-                          String password =
-                              controller.passwordController.text.trim();
-                          print('로그인 성공: $email');
-                          print('로그인 성공: $password');
-                          adminController.menuSelectedIndex.value =0;
-                          adminController.isCreate.value = false;
-                          adminController.isEditing.value = false;
-          
-                          if (email.isNotEmpty && password.isNotEmpty) {
-                            await controller.login(email, password);
-                          } else {
-                            Get.snackbar('오류', '이메일과 비밀번호를 입력하세요');
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 12,
-                            horizontal: 24,
+                      SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Obx(() => Checkbox(
+                                value: controller.rememberMe.value,
+                                onChanged: (val) =>
+                                    controller.rememberMe.value = val ?? false,
+                              )),
+                          Text(
+                            '기억하기',
+                            style: AppTextStyle.koRegular14()
+                                .copyWith(color: AppColor.black),
                           ),
-                          backgroundColor: Colors.blue,
-                          textStyle: AppTextStyle.koRegular14()
-                          .copyWith(color: AppColor.black),
-                        ),
-                        child: const Text('로그인'),
+                          const Spacer(),
+                          ElevatedButton(
+                            onPressed: () async {
+                              String email =
+                                  controller.usernameController.text.trim();
+                              String password =
+                                  controller.passwordController.text.trim();
+                              print('로그인 성공: $email');
+                              print('로그인 성공: $password');
+                              adminController.menuSelectedIndex.value = 0;
+                              adminController.isCreate.value = false;
+                              adminController.isEditing.value = false;
+
+                              if (email.isNotEmpty && password.isNotEmpty) {
+                                await controller.login(email, password);
+                              } else {
+                                Get.snackbar('오류', '이메일과 비밀번호를 입력하세요');
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 24,
+                              ),
+                              backgroundColor: Colors.blue,
+                              textStyle: AppTextStyle.koRegular14()
+                                  .copyWith(color: AppColor.black),
+                            ),
+                            child: const Text('로그인'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

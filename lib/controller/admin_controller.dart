@@ -198,6 +198,7 @@ class AdminController extends GetxController {
           'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
           'status': data['status'],
           'category': data['category'],
+          'subCategory': data['subCategory'] ?? '',
           'sortAt': created.millisecondsSinceEpoch, // ✅ 추가!
         };
       }).toList();
@@ -235,6 +236,7 @@ class AdminController extends GetxController {
           'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
           'status': data['status'],
           'category': data['category'],
+          'subCategory': data['subCategory'] ?? '',
         };
       }).toList();
 
@@ -273,6 +275,7 @@ class AdminController extends GetxController {
           'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
           'status': data['status'],
           'category': data['category'],
+          'subCategory': data['subCategory'] ?? '',
         };
       }).toList();
 
@@ -422,6 +425,7 @@ class AdminController extends GetxController {
           'title': baseTitle,
           'final_article': data['final_article'],
           'category': data['category'],
+          'subCategory': data['subCategory'] ?? '',
           'author': data['editor'] ?? data['author'],
           'status': data['status'],
           'viewpoint': data['viewpoint'] ?? 0,

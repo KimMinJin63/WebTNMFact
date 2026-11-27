@@ -7,6 +7,7 @@ import 'package:tnm_fact/controller/create_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/widget/%08app_checkbox.dart';
+import 'package:tnm_fact/view/widget/app_issue_sub_category_selector.dart';
 
 class CreatePage extends GetView<CreateController> {
   const CreatePage({super.key});
@@ -52,6 +53,7 @@ class CreatePage extends GetView<CreateController> {
                         title: controller.titleController.text,
                         final_article: controller.contentController.text,
                         category: controller.selectedCategory.value,
+                        subCategory: controller.selectedSubCategory.value,
                         status: controller.selectedPublish.value,
                         // focus: controller.selectedFocus.value,
                         // people: controller.selectedPeople.value,
@@ -85,6 +87,7 @@ class CreatePage extends GetView<CreateController> {
                                 controller.contentController.clear();
                                 controller.selectedCategory.value = '';
                                 controller.selectedPublish.value = '';
+                                controller.selectedSubCategory.value = '';
                                 // controller.selectedFocus.value = '';
                                 // controller.selectedPeople.value = '';
                               },
@@ -226,6 +229,10 @@ class CreatePage extends GetView<CreateController> {
                             controller.selectedCategory.value = v! ? '피플&뷰' : '';
                           },
                         ),
+                        if (controller.selectedCategory.value == '이슈 팩트')
+                          AppIssueSubCategorySelector(
+                            selected: controller.selectedSubCategory,
+                          ),
                       ],
                     ),
                   ),

@@ -19,5 +19,5 @@ class AppColor {
   // 카테고리별 색상
   static const Color focusFact =
       Color(0xFF14B8A6); // 포커스 팩트 (청록계열로 톤 다운)
-  static const Color peopleView = Color(0xFFF59E0B); // 피플&뷰 (주황색)
+  static const Color peopleView = Color(0xFF8B5E3C); // 피플&뷰 (갈색)
 }

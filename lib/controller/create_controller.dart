@@ -9,6 +9,7 @@ import 'package:tnm_fact/controller/admin_controller.dart';
 class CreateController extends GetxController {
   RxString selectedCategory = ''.obs;
   RxString selectedPublish = ''.obs;
+  RxString selectedSubCategory = ''.obs; // 이슈 팩트 세부 분류
   // RxString selectedFocus = ''.obs;
   // RxString selectedPeople = ''.obs;
   TextEditingController titleController = TextEditingController();
@@ -40,6 +41,7 @@ class CreateController extends GetxController {
     required String title,
     required String final_article,
     required String category,
+    String subCategory = '',
     required String editor,
     required String status,
     // required String focus,
@@ -65,6 +67,8 @@ class CreateController extends GetxController {
         'title': title,
         'final_article': final_article,
         'category': category,
+        if (category == '이슈 팩트' && subCategory.isNotEmpty)
+          'subCategory': subCategory,
         'editor': editor,
         'date': FieldValue.serverTimestamp(),
         'status': status,

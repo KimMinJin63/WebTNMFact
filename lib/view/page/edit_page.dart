@@ -8,6 +8,7 @@ import 'package:tnm_fact/controller/edit_controller.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 import 'package:tnm_fact/utils/app_text_style.dart';
 import 'package:tnm_fact/view/widget/%08app_checkbox.dart';
+import 'package:tnm_fact/view/widget/app_issue_sub_category_selector.dart';
 
 class EditPage extends GetView<EditController> {
   const EditPage({super.key});
@@ -123,6 +124,7 @@ class EditPage extends GetView<EditController> {
                   title: controller.titleController.text,
                   final_article: controller.contentController.text,
                   category: controller.selectedCategory.value,
+                  subCategory: controller.selectedSubCategory.value,
                   status: controller.selectedPublish.value,
                   // focus: controller.selectedFocus.value,
                   // people: controller.selectedPeople.value,
@@ -161,6 +163,7 @@ class EditPage extends GetView<EditController> {
                           controller.contentController.clear();
                           controller.selectedCategory.value = '';
                           controller.selectedPublish.value = '';
+                          controller.selectedSubCategory.value = '';
                         },
                         child: const Text('확인'),
                       ),
@@ -306,6 +309,10 @@ class EditPage extends GetView<EditController> {
                                   v! ? '피플&뷰' : '';
                             },
                           ),
+                          if (controller.selectedCategory.value == '이슈 팩트')
+                            AppIssueSubCategorySelector(
+                              selected: controller.selectedSubCategory,
+                            ),
                         ],
                       ),
                     ),

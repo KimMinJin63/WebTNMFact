@@ -11,6 +11,8 @@ import 'package:tnm_fact/utils/web_history.dart';
 
 class HomeController extends GetxController {
   RxInt selectedIndex = 0.obs;
+  // 이슈 팩트 세부 메뉴 ('전체' 또는 CategoryHelper.issueSubCategories 중 하나)
+  RxString selectedIssueSub = '전체'.obs;
   final TextEditingController searchController = TextEditingController();
   final ScrollController scrollController = ScrollController();
   var isLoadingDetail = false.obs;
@@ -39,6 +41,7 @@ class HomeController extends GetxController {
 
   void selectTab(int index) {
     selectedIndex.value = index;
+    if (index != 4) selectedIssueSub.value = '전체';
     clearFocus();
     // searchController.clear();
     // postList.assignAll(originalPostList);
@@ -227,6 +230,7 @@ Future<Map<String, dynamic>?> fetchPostByTitle(String title) async {
       'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
       'status': data['status'],
       'category': data['category'],
+      'subCategory': data['subCategory'] ?? '',
       'sortAt': created.millisecondsSinceEpoch,
     };
   }
@@ -382,6 +386,7 @@ Future<void> handlePostTap(Map<String, dynamic> post) async {
           'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
           'status': data['status'],
           'category': data['category'],
+          'subCategory': data['subCategory'] ?? '',
           'sortAt': created.millisecondsSinceEpoch, // ✅ 추가!
         };
       }).toList();
@@ -420,6 +425,7 @@ Future<void> handlePostTap(Map<String, dynamic> post) async {
           'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
           'status': data['status'],
           'category': data['category'],
+          'subCategory': data['subCategory'] ?? '',
         };
       }).toList();
 
@@ -456,6 +462,7 @@ Future<void> handlePostTap(Map<String, dynamic> post) async {
           'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
           'status': data['status'],
           'category': data['category'],
+          'subCategory': data['subCategory'] ?? '',
         };
       }).toList();
       originalInsightPostList.value = mapped;
@@ -491,6 +498,7 @@ Future<void> handlePostTap(Map<String, dynamic> post) async {
           'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
           'status': data['status'],
           'category': data['category'],
+          'subCategory': data['subCategory'] ?? '',
         };
       }).toList();
 
@@ -526,6 +534,7 @@ Future<void> handlePostTap(Map<String, dynamic> post) async {
           'viewpoint': data['viewpoint'] ?? data['viewPoint'] ?? 0,
           'status': data['status'],
           'category': data['category'],
+          'subCategory': data['subCategory'] ?? '',
         };
       }).toList();
 

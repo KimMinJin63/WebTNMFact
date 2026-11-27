@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:tnm_fact/utils/app_color.dart';
 
 class CategoryHelper {
+  /// 이슈 팩트 세부 분류 (Firestore 'subCategory' 필드 값)
+  static const List<String> issueSubCategories = [
+    '정치',
+    '국제',
+    '경제',
+    '사회',
+    '스포츠',
+  ];
+
   /// 카테고리 텍스트 색상
   static Color getCategoryColor(String category) {
     switch (category) {

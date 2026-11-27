@@ -11,6 +11,7 @@ class EditController extends GetxController {
   final TextEditingController contentController = TextEditingController();
   RxString selectedCategory = ''.obs;
   RxString selectedPublish = ''.obs;
+  RxString selectedSubCategory = ''.obs; // 이슈 팩트 세부 분류
   // RxString selectedFocus = ''.obs;
   // RxString selectedPeople = ''.obs;
   final box = GetStorage();
@@ -32,6 +33,7 @@ class EditController extends GetxController {
       contentController.text = post['final_article'] ?? '';
       selectedCategory.value = post['category'] ?? '';
       selectedPublish.value = post['status'] ?? '';
+      selectedSubCategory.value = post['subCategory'] ?? '';
       // selectedFocus.value = post['focus'] ?? '';
       // selectedPeople.value = post['people'] ?? '';
     }
@@ -41,6 +43,7 @@ class EditController extends GetxController {
     required String? title,
     required String final_article,
     required String category,
+    String subCategory = '',
     required String editor,
     required String status,
     // required String focus,
@@ -56,6 +59,10 @@ class EditController extends GetxController {
         'title': title,
         'final_article': final_article,
         'category': category,
+        // 이슈 팩트가 아니거나 미선택이면 필드 삭제
+        'subCategory': (category == '이슈 팩트' && subCategory.isNotEmpty)
+            ? subCategory
+            : FieldValue.delete(),
         'editor': editor,
         'status': status,
         // 'focus': focus,

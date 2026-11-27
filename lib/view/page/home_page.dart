@@ -151,6 +151,23 @@ class HomePage extends GetView<HomeController> {
                             },
                           );
                         }),
+                        SizedBox(width: 16.w),
+                        Obx(() {
+                          return AppTitleButton(
+                            title: '피플&뷰',
+                            color: controller.selectedIndex.value == 5
+                                ? AppColor.primary
+                                : AppColor.black,
+                            onPressed: () {
+                              controller.selectTab(5);
+                              controller.currentPage.value = 'home';
+
+                              if (controller.scrollController.hasClients) {
+                                controller.scrollController.jumpTo(0);
+                              }
+                            },
+                          );
+                        }),
                       ],
                     ),
                   ),
@@ -176,6 +193,10 @@ class HomePage extends GetView<HomeController> {
                       backgroundColor: Colors.transparent,
                     )
                   : const SizedBox(height: 3)),
+              // ✅ 이슈 팩트 세부 메뉴 (이슈 팩트 탭에서만 표시)
+              Obx(() => controller.selectedIndex.value == 4
+                  ? _buildIssueSubMenu(controller)
+                  : const SizedBox.shrink()),
               Expanded(
                 child: PopScope(
                   canPop: false,
@@ -321,7 +342,16 @@ Widget _buildHomeContent(
                               visibleList = controller.insightPostList;
                               break;
                             case 4:
-                              visibleList = controller.dailyPostList;
+                              final String sub =
+                                  controller.selectedIssueSub.value;
+                              visibleList = sub == '전체'
+                                  ? controller.dailyPostList
+                                  : controller.dailyPostList
+                                      .where((p) => p['subCategory'] == sub)
+                                      .toList();
+                              break;
+                            case 5:
+                              visibleList = controller.peoplePostList;
                               break;
                             default:
                               visibleList = controller.postList;
@@ -364,6 +394,14 @@ Widget _buildHomeContent(
                                 posts: controller.insightPostList,
                                 accent: AppColor.yellow,
                                 tabIndex: 3,
+                                maxRows: 1,
+                                maxItems: isMobileLayout ? 3 : null,
+                              ),
+                              (
+                                title: '피플&뷰',
+                                posts: controller.peoplePostList,
+                                accent: AppColor.peopleView,
+                                tabIndex: 5,
                                 maxRows: 1,
                                 maxItems: isMobileLayout ? 3 : null,
                               ),
@@ -428,15 +466,17 @@ Widget _buildHomeContent(
                                             accentColor: sections[i].accent,
                                             controller: controller,
 
-                                            // 인사이트 팩트는 가로 전체를 사용하는 1열
+                                            // 인사이트 팩트·피플&뷰는 가로 전체를 사용하는 1열
                                             crossAxisCount:
-                                                sections[i].tabIndex == 3
+                                                _isWideSection(
+                                                        sections[i].tabIndex)
                                                     ? 1
                                                     : crossCount,
 
-                                            // 인사이트 팩트는 와이드 카드
+                                            // 인사이트 팩트·피플&뷰는 와이드 카드
                                             aspectRatio:
-                                                sections[i].tabIndex == 3
+                                                _isWideSection(
+                                                        sections[i].tabIndex)
                                                     ? 4.5
                                                     : aspectRatio,
 
@@ -507,7 +547,12 @@ Widget _buildHomeContent(
                             );
                           }
 
-                          if (controller.selectedIndex.value == 3) {
+                          if (_isWideSection(controller.selectedIndex.value)) {
+                            final bool isPeople =
+                                controller.selectedIndex.value == 5;
+                            final Color accent = isPeople
+                                ? AppColor.peopleView
+                                : AppColor.yellow;
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -516,9 +561,9 @@ Widget _buildHomeContent(
                                   child: Align(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
-                                      '인사이트 팩트',
+                                      isPeople ? '피플&뷰' : '인사이트 팩트',
                                       style: AppTextStyle.koBold20().copyWith(
-                                        color: AppColor.yellow,
+                                        color: accent,
                                       ),
                                     ),
                                   ),
@@ -527,7 +572,7 @@ Widget _buildHomeContent(
                                 Divider(
                                   height: 1,
                                   thickness: 2,
-                                  color: AppColor.yellow,
+                                  color: accent,
                                 ),
                                 const SizedBox(height: 16),
                                 isMobileLayout
@@ -750,8 +795,56 @@ void _resetListForTab(HomeController controller, int tabIndex) {
       controller.dailyPostList.value =
           controller.originalDailyPostList.toList();
       break;
+    case 5:
+      controller.peoplePostList.value =
+          controller.originalPeoplePostList.toList();
+      break;
   }
 }
+
+// 이슈 팩트 세부 메뉴: 전체 / 정치 / 국제 / 경제 / 사회 / 스포츠
+Widget _buildIssueSubMenu(HomeController controller) {
+  const List<String> menus = ['전체', ...CategoryHelper.issueSubCategories];
+
+  return Container(
+    height: 44,
+    decoration: const BoxDecoration(
+      color: AppColor.white,
+      border: Border(bottom: BorderSide(color: AppColor.border)),
+    ),
+    child: Center(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final menu in menus)
+              TextButton(
+                onPressed: () {
+                  controller.selectedIssueSub.value = menu;
+                  if (controller.scrollController.hasClients) {
+                    controller.scrollController.jumpTo(0);
+                  }
+                },
+                child: Text(
+                  menu,
+                  style: controller.selectedIssueSub.value == menu
+                      ? AppTextStyle.koSemiBold14()
+                          .copyWith(color: AppColor.primary)
+                      : AppTextStyle.koRegular14()
+                          .copyWith(color: const Color(0xFF6B7280)),
+                ),
+              ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+// 인사이트 팩트(3)·피플&뷰(5)는 1열 와이드 카드로 보여준다.
+bool _isWideSection(int tabIndex) => tabIndex == 3 || tabIndex == 5;
 
 Future<void> _reloadTabData(HomeController controller, int tabIndex) async {
   switch (tabIndex) {
@@ -769,6 +862,9 @@ Future<void> _reloadTabData(HomeController controller, int tabIndex) async {
       break;
     case 4:
       await controller.loadDailyPosts();
+      break;
+    case 5:
+      await controller.loadPeoplePosts();
       break;
     default:
       await controller.loadAllPosts();
